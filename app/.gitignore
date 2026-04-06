@@ -1,0 +1,14 @@
+# App-level .gitignore for AcademicManager
+
+# Built objects
+/build
+
+# Sensitive configuration & local properties
+google-services.json
+secrets.xml
+api_keys.xml
+*.jks
+*.keystore
+
+# Logs
+*.log

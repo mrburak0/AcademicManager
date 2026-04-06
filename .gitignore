@@ -1,0 +1,31 @@
+# Root .gitignore for AcademicManager
+
+# Built objects
+.gradle/
+build/
+bin/
+
+# IDE specific
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sensitive configuration & local properties
+local.properties
+.env
+.env.*
+
+# Keystores & Credentials
+*.jks
+*.keystore
+*.p12
+*.key
+google-services.json
+
+# Logs
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
