@@ -22,6 +22,14 @@ class ViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return DataImportViewModel(repository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        if (modelClass.isAssignableFrom(AdminViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AdminViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(AnnouncementsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AnnouncementsViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Bilinmeyen ViewModel sınıfı: ${modelClass.name}")
     }
 }

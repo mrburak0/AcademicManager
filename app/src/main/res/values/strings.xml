@@ -1,3 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AcademicManager</string>
+
+    <!-- ── Auth / Login ───────────────────────────────────────── -->
+    <string name="sign_in">Sign In</string>
+    <string name="sign_in_subtitle">Enter your credentials to continue</string>
+    <string name="username">Username</string>
+    <string name="username_hint">Enter your username</string>
+    <string name="password">Password</string>
+    <string name="password_hint">Enter your password</string>
+    <string name="signing_in">Signing in…</string>
+    <string name="demo_accounts">Demo Accounts</string>
+    <string name="no_account_register">No account?&#160;</string>
+    <string name="register_link">Register</string>
+    <string name="invalid_credentials">Invalid username or password.</string>
+    <string name="account_pending">Your account has not been approved by an admin yet.</string>
+    <string name="no_internet">No internet connection. Please check your network.</string>
+
+    <!-- ── Change Password (first login) ──────────────────────── -->
+    <string name="first_time_title">First-Time Security Update</string>
+    <string name="first_time_subtitle">You must change your default password to continue.</string>
+    <string name="old_password">Old Password</string>
+    <string name="old_password_hint">Enter your current password</string>
+    <string name="new_password">New Password</string>
+    <string name="new_password_hint">At least 6 characters</string>
+    <string name="confirm_password">Confirm New Password</string>
+    <string name="confirm_password_hint">Re-enter your password</string>
+    <string name="update_password">Update Password</string>
+
+    <!-- ── Register ───────────────────────────────────────────── -->
+    <string name="register_title">Create Account</string>
+    <string name="register_title_admin">Create Admin Account</string>
+    <string name="register_subtitle">Your account will be active after admin approval.</string>
+    <string name="register_subtitle_admin">Admin code required — for authorized users.</string>
+    <string name="full_name">Full Name</string>
+    <string name="full_name_hint">E.g. John Smith</string>
+    <string name="username_hint_detail">E.g. john_smith (no spaces)</string>
+    <string name="department">Department</string>
+    <string name="select_department">Select Department</string>
+    <string name="account_type">Account Type</string>
+    <string name="role_lecturer">Lecturer</string>
+    <string name="role_student">Student</string>
+    <string name="role_admin">Admin</string>
+    <string name="role_admin_subtitle">Requires authorization code</string>
+    <string name="admin_authorization">Admin Authorization</string>
+    <string name="admin_code">Admin Code</string>
+    <string name="admin_code_hint">Secret code</string>
+    <string name="admin_code_required">Admin code is required for admin registration</string>
+    <string name="register_btn">Register</string>
+    <string name="register_btn_admin">Register as Admin</string>
+    <string name="reg_pending_title">Registration Received!</string>
+    <string name="reg_pending_msg">Your account has been created. You can login after admin approval.</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="account_exists">This username is already taken.</string>
+    <string name="registration_failed">Registration failed: %s</string>
+
+    <!-- ── Navigation ─────────────────────────────────────────── -->
+    <string name="nav_home">Home</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_classrooms">Classrooms</string>
+    <string name="nav_schedule">Schedule</string>
+    <string name="nav_import">Import</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_announcements">Announcements</string>
+    <string name="nav_availability">Availability</string>
+
+    <!-- ── Common actions ─────────────────────────────────────── -->
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string name="approve">Approve</string>
+    <string name="reject">Reject</string>
+    <string name="confirm_change">Confirm Change</string>
+    <string name="fill_all_fields">Please fill all fields</string>
+    <string name="passwords_no_match">Passwords do not match!</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="note_optional">Note (optional)</string>
+
+    <!-- ── Admin Dashboard ────────────────────────────────────── -->
+    <string name="admin_dashboard">Admin Dashboard</string>
+    <string name="admin_dashboard_subtitle">Real-time overview</string>
+    <string name="panel_unassigned_lecturers">Unassigned Lecturers</string>
+    <string name="panel_unassigned_courses">Unassigned Courses</string>
+    <string name="panel_total_classrooms">Total\nClassrooms</string>
+    <string name="panel_availability">Availability Notifications</string>
+    <string name="panel_pending_reg">Pending Registrations</string>
+    <string name="panel_student_mgmt">Student Management</string>
+    <string name="panel_schedule">Schedule Entries</string>
+    <string name="db_empty_title">Empty Database Detected</string>
+    <string name="db_empty_desc">Load demo data to get started: 3 sample lecturers, 6 courses, 5 classrooms and a student.</string>
+    <string name="load_demo_data">Load Demo Data</string>
+    <string name="reload_demo_data">Reload Demo Data</string>
+    <string name="demo_loaded">Demo data loaded! 3 lecturers, 6 courses, 4 classrooms and 1 student added.</string>
+    <string name="demo_failed">Failed to load demo data. Check your connection.</string>
+    <string name="all_lecturers_assigned">All lecturers have been assigned.</string>
+    <string name="all_courses_scheduled">All courses have been scheduled.</string>
+    <string name="no_schedule_yet">No schedule entries yet.</string>
+    <string name="no_students_yet">No students added yet.</string>
+
+    <!-- Lecturer info row -->
+    <string name="delete_lecturer_title">Delete Lecturer</string>
+    <string name="delete_lecturer_msg">Are you sure you want to delete %s?</string>
+    <string name="lect_detail_title">Title</string>
+    <string name="lect_detail_username">Username</string>
+    <string name="lect_detail_dept">Department</string>
+    <string name="lect_detail_working">Working Type</string>
+    <string name="lect_detail_role">Role</string>
+
+    <!-- Course row -->
+    <string name="delete_course_title">Delete Course</string>
+    <string name="delete_course_msg">Are you sure you want to delete the course %s?</string>
+
+    <!-- Student management -->
+    <string name="delete_student_title">Delete Student</string>
+    <string name="delete_student_msg">Are you sure you want to delete student %s?</string>
+    <string name="add_student_title">Add Student</string>
+    <string name="student_name_label">Full Name</string>
+    <string name="student_username_label">Username</string>
+    <string name="student_password_label">Password</string>
+    <string name="student_dept_label">Department</string>
+    <string name="student_id_label">Student Number</string>
+    <string name="student_id_hint">E.g. 20230001</string>
+    <string name="class_year_label">Class Year</string>
+    <string name="year_1">1st Year</string>
+    <string name="year_2">2nd Year</string>
+    <string name="year_3">3rd Year</string>
+    <string name="year_4">4th Year</string>
+    <string name="masters_1">Masters 1st Year</string>
+    <string name="masters_2">Masters 2nd Year</string>
+    <string name="phd_1">PhD 1st Year</string>
+    <string name="phd_2">PhD 2nd Year</string>
+    <string name="phd_3">PhD 3rd Year</string>
+    <string name="phd_4">PhD 4th Year</string>
+
+    <!-- Availability notifications -->
+    <string name="schedule_btn">Schedule</string>
+    <string name="reject_notification_title">Reject Notification</string>
+    <string name="reject_notification_msg">%s\'s availability notification will be rejected. They will not be considered available for this slot.</string>
+    <string name="rejection_reason_label">Rejection Reason</string>
+    <string name="rejection_reason_hint">Enter reason for rejection (optional)</string>
+
+    <!-- Pending registrations -->
+    <string name="reject_reg_title">Reject Registration</string>
+    <string name="reject_reg_msg">%s (@%s) will be deleted.</string>
+    <string name="reject_and_delete">Reject &amp; Delete</string>
+
+    <!-- ── Classrooms ──────────────────────────────────────────── -->
+    <string name="classrooms_title">Classrooms</string>
+    <string name="classrooms_subtitle_one">%d room registered</string>
+    <string name="classrooms_subtitle">%d rooms registered</string>
+    <string name="no_classrooms">No classrooms yet</string>
+    <string name="tap_plus_add">Tap + to add your first classroom</string>
+    <string name="add_classroom_title">Add Classroom</string>
+    <string name="classroom_name_label">Room Name</string>
+    <string name="classroom_name_hint">E.g. A-101, Lab-2, BL-203</string>
+    <string name="capacity_label">Student Capacity</string>
+    <string name="capacity_hint">E.g. 30, 60, 120</string>
+    <string name="classroom_type_label">Classroom Type</string>
+    <string name="type_lecture">Lecture Hall</string>
+    <string name="type_lab">Laboratory</string>
+    <string name="type_computer">Computer Lab</string>
+    <string name="capacity_display">Capacity: %d students</string>
+    <string name="bookings_label">bookings</string>
+    <string name="room_name_empty">Room name cannot be empty</string>
+
+    <!-- ── Assignment ─────────────────────────────────────────── -->
+    <string name="course_assignment_title">Course Assignment</string>
+    <string name="course_assignment_subtitle">Fill all fields. Clashes are automatically blocked.</string>
+    <string name="select_course">Select a course</string>
+    <string name="select_lecturer">Select a lecturer</string>
+    <string name="select_classroom">Select a classroom</string>
+    <string name="select_day">Select a day</string>
+    <string name="select_time">Select a time slot</string>
+    <string name="select_session">Select session type</string>
+    <string name="label_course">Course</string>
+    <string name="label_lecturer">Lecturer</string>
+    <string name="label_classroom">Classroom</string>
+    <string name="label_day">Day</string>
+    <string name="label_time_slot">Time Slot</string>
+    <string name="label_session_type">Session Type</string>
+    <string name="session_theory">Theory</string>
+    <string name="session_lab">Lab</string>
+    <string name="assign_btn">Assign Course</string>
+    <string name="current_schedule">Current Schedule (%d)</string>
+    <string name="assignment_saved">Assignment saved successfully!</string>
+    <string name="remove_assignment_title">Remove Assignment</string>
+    <string name="remove_assignment_msg">Remove %s from %s at %s?</string>
+    <string name="remove">Remove</string>
+
+    <!-- ── Weekdays ───────────────────────────────────────────── -->
+    <string name="day_monday">Monday</string>
+    <string name="day_tuesday">Tuesday</string>
+    <string name="day_wednesday">Wednesday</string>
+    <string name="day_thursday">Thursday</string>
+    <string name="day_friday">Friday</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+
+    <!-- ── Lecturer Home ──────────────────────────────────────── -->
+    <string name="welcome_prefix">Welcome, </string>
+    <string name="stat_total_courses">Total Courses</string>
+    <string name="stat_days_active">Days Active</string>
+    <string name="stat_working_type">Working Type</string>
+    <string name="this_week">This Week</string>
+    <string name="no_courses_assigned">No courses assigned yet</string>
+    <string name="contact_admin">Please contact your administrator.</string>
+    <string name="courses_count">%d courses</string>
+    <string name="course_count_one">%d course</string>
+
+    <!-- ── Lecturer Calendar ──────────────────────────────────── -->
+    <string name="my_schedule">My Schedule</string>
+    <string name="sessions_per_week">%d sessions/week</string>
+    <string name="pdf_btn">PDF</string>
+    <string name="notify_availability">Notify Availability</string>
+    <string name="availability_dialog_title">Notify Availability</string>
+    <string name="availability_desc">Select your available day, time and classroom. Admin will consider this when creating the schedule.</string>
+    <string name="available_day_label">Available Day: %s</string>
+    <string name="available_time_label">Available Time</string>
+    <string name="available_time_hint">Select your available time</string>
+    <string name="preferred_course_label">Preferred Course</string>
+    <string name="preferred_course_hint">Select a course (optional)</string>
+    <string name="preferred_class_label">Preferred Classroom</string>
+    <string name="preferred_class_hint">Select a classroom (optional)</string>
+    <string name="note_label">Note</string>
+    <string name="note_hint">You can add additional info or preferences…</string>
+    <string name="notify_btn">Notify Availability</string>
+    <string name="available_awaiting">Available — Awaiting Approval</string>
+    <string name="no_sessions">No sessions</string>
+    <string name="sessions_count_one">%d session</string>
+    <string name="sessions_count">%d sessions</string>
+
+    <!-- ── Student Home ───────────────────────────────────────── -->
+    <string name="welcome_student">Welcome,</string>
+    <string name="stat_weekly_courses">Weekly Courses</string>
+    <string name="stat_active_days">Active Days</string>
+    <string name="stat_lab_sessions">Lab Sessions</string>
+    <string name="no_dept_schedule">No schedule has been created for your department yet.</string>
+    <string name="courses_this_day">%d courses</string>
+
+    <!-- ── Student Calendar ───────────────────────────────────── -->
+    <string name="student_schedule_title">My Schedule</string>
+    <string name="no_session_student">No class</string>
+
+    <!-- ── Receipt card ──────────────────────────────────────── -->
+    <string name="receipt_course_code">Course Code</string>
+    <string name="receipt_lecturer">Lecturer</string>
+    <string name="receipt_classroom">Classroom</string>
+    <string name="receipt_day">Day</string>
+    <string name="receipt_time">Time</string>
+    <string name="receipt_type">Type</string>
+    <string name="type_theory">Theory</string>
+    <string name="type_lab_full">Laboratory</string>
+
+    <!-- ── Announcements ──────────────────────────────────────── -->
+    <string name="announcements_title">Announcements</string>
+    <string name="announcements_count_one">%d announcement</string>
+    <string name="announcements_count">%d announcements</string>
+    <string name="no_announcements">No announcements yet</string>
+    <string name="add_announcement_title">New Announcement</string>
+    <string name="ann_title_field">Title</string>
+    <string name="ann_title_hint">Enter announcement title</string>
+    <string name="ann_message_field">Message</string>
+    <string name="ann_message_hint">Write the announcement content here…</string>
+    <string name="ann_type_field">Type</string>
+    <string name="publish_btn">Publish</string>
+    <string name="delete_ann_title">Delete Announcement</string>
+    <string name="delete_ann_msg">The announcement "%s" will be deleted.</string>
+    <string name="ann_type_info">Info</string>
+    <string name="ann_type_warning">Warning</string>
+    <string name="ann_type_cancelled">Cancelled</string>
+    <string name="ann_type_schedule_change">Schedule Change</string>
+    <string name="ann_course_label">Course: %s</string>
+
+    <!-- ── Profile / Settings ─────────────────────────────────── -->
+    <string name="profile_title">Profile Settings</string>
+    <string name="full_name_display">Full Name: %s</string>
+    <string name="username_display">Username: @%s</string>
+    <string name="role_display">Role: %s</string>
+    <string name="change_password_btn">Change Password</string>
+    <string name="pending_approvals">Pending Approvals</string>
+    <string name="appearance_section">Appearance</string>
+    <string name="theme_label">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language_section">Language</string>
+    <string name="lang_turkish">Türkçe</string>
+    <string name="lang_english">English</string>
+    <string name="language_changed">Language changed. Restarting…</string>
+    <string name="logout_btn">Logout</string>
+    <string name="update_password_title">Update Password</string>
+    <string name="verify_old_password">Verify Old Password</string>
+    <string name="password_updated">Password updated!</string>
+    <string name="old_password_incorrect">Old password incorrect</string>
+    <string name="inspect_user_title">User Details</string>
+    <string name="inspect_user_full_name">Full Name: %s</string>
+    <string name="inspect_user_username">Username: %s</string>
+    <string name="inspect_user_dept">Department: %s</string>
+    <string name="inspect_user_role">Applied Role: %s</string>
+    <string name="inspect_user_status">Current Status: %s</string>
+
+    <!-- ── Import / Data ─────────────────────────────────────── -->
+    <string name="nav_import_label">Import</string>
+
+    <!-- ── PDF ───────────────────────────────────────────────── -->
+    <string name="weekly_schedule_pdf">Weekly Schedule</string>
+    <string name="pdf_downloaded">PDF downloaded: %s</string>
+    <string name="pdf_failed">PDF creation failed: %s</string>
+
+    <!-- ── Lecturer Availability ─────────────────────────────── -->
+    <string name="avail_screen_title">Lecturer Availability</string>
+    <string name="avail_screen_desc">Select your available time slots. Admin will use this when creating the schedule.</string>
+    <string name="avail_select_all_day">All Day</string>
+    <string name="avail_clear_all">Clear All</string>
+    <string name="avail_submit_btn">Submit My Availability</string>
+    <string name="avail_confirm_title">Are You Sure?</string>
+    <string name="avail_confirm_msg">%d time slot(s) selected. Do you want to submit this availability for admin approval?</string>
+    <string name="avail_send">Send</string>
+    <string name="avail_sent_success">Availability submitted successfully!</string>
+    <string name="avail_no_selection">Please select at least one time slot</string>
+    <string name="avail_last_status_title">Last Submitted Availability</string>
+    <string name="avail_status_pending">Pending Approval</string>
+    <string name="avail_status_approved">Approved</string>
+    <string name="avail_status_rejected">Rejected</string>
+    <string name="avail_slots_total">%d slot(s) selected</string>
+    <string name="avail_new_submission">Submit New Availability</string>
+    <string name="avail_view_map">View My Availability Map</string>
+    <string name="avail_no_data">No availability submitted yet</string>
+    <string name="admin_avail_title">Availability Maps</string>
+    <string name="admin_avail_subtitle">Pending notifications and lecturer availability overview</string>
+    <string name="admin_avail_pending_section">Pending Availability Notifications</string>
+    <string name="admin_avail_all_maps">All Lecturer Availability Maps</string>
+    <string name="admin_avail_no_pending">No pending availability notifications</string>
+    <string name="admin_avail_view_btn">View All Maps</string>
+    <string name="admin_avail_select_lecturer">Select Lecturer</string>
+    <string name="admin_avail_all_lecturers">All Lecturers</string>
+    <string name="admin_avail_no_data">No availability data for this lecturer</string>
+    <string name="admin_avail_approve_success">Availability approved</string>
+    <string name="admin_avail_slots_count">%d slots</string>
 </resources>

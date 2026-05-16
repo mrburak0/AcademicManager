@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AcademicManager</string>
+
+    <!-- ── Auth / Login ───────────────────────────────────────── -->
+    <string name="sign_in">Giriş Yap</string>
+    <string name="sign_in_subtitle">Devam etmek için bilgilerinizi girin</string>
+    <string name="username">Kullanıcı Adı</string>
+    <string name="username_hint">Kullanıcı adınızı girin</string>
+    <string name="password">Şifre</string>
+    <string name="password_hint">Şifrenizi girin</string>
+    <string name="signing_in">Giriş yapılıyor…</string>
+    <string name="demo_accounts">Demo Hesaplar</string>
+    <string name="no_account_register">Hesabın yok mu?&#160;</string>
+    <string name="register_link">Kayıt Ol</string>
+    <string name="invalid_credentials">Kullanıcı adı veya şifre hatalı.</string>
+    <string name="account_pending">Hesabınız henüz admin tarafından onaylanmadı.</string>
+    <string name="no_internet">İnternet bağlantısı yok. Ağınızı kontrol edin.</string>
+
+    <!-- ── Change Password (first login) ──────────────────────── -->
+    <string name="first_time_title">İlk Güvenlik Güncellemesi</string>
+    <string name="first_time_subtitle">Devam etmek için varsayılan şifrenizi değiştirmeniz gerekiyor.</string>
+    <string name="old_password">Eski Şifre</string>
+    <string name="old_password_hint">Mevcut şifrenizi girin</string>
+    <string name="new_password">Yeni Şifre</string>
+    <string name="new_password_hint">En az 6 karakter</string>
+    <string name="confirm_password">Yeni Şifre Tekrar</string>
+    <string name="confirm_password_hint">Şifreyi tekrar girin</string>
+    <string name="update_password">Şifreyi Güncelle</string>
+
+    <!-- ── Register ───────────────────────────────────────────── -->
+    <string name="register_title">Hesap Oluştur</string>
+    <string name="register_title_admin">Yönetici Hesabı Oluştur</string>
+    <string name="register_subtitle">Kaydınız admin onayından sonra aktif olur.</string>
+    <string name="register_subtitle_admin">Admin kodu gerekli — yetkili kullanıcılar için.</string>
+    <string name="full_name">Ad Soyad</string>
+    <string name="full_name_hint">Örn. Ali Vural</string>
+    <string name="username_hint_detail">Örn. ali_vural (boşluksuz)</string>
+    <string name="department">Bölüm</string>
+    <string name="select_department">Bölüm Seçin</string>
+    <string name="account_type">Hesap Türü</string>
+    <string name="role_lecturer">Öğretim Görevlisi</string>
+    <string name="role_student">Öğrenci</string>
+    <string name="role_admin">Yönetici (Admin)</string>
+    <string name="role_admin_subtitle">Yetkilendirme kodu gerektirir</string>
+    <string name="admin_authorization">Yönetici Yetkilendirmesi</string>
+    <string name="admin_code">Admin Kodu</string>
+    <string name="admin_code_hint">Gizli kod</string>
+    <string name="admin_code_required">Yönetici kaydı için admin kodu gerekli</string>
+    <string name="register_btn">Kayıt Ol</string>
+    <string name="register_btn_admin">Yönetici Olarak Kayıt Ol</string>
+    <string name="reg_pending_title">Kayıt Alındı!</string>
+    <string name="reg_pending_msg">Hesabınız oluşturuldu. Admin tarafından onaylandıktan sonra giriş yapabilirsiniz.</string>
+    <string name="back_to_login">Giriş Ekranına Dön</string>
+    <string name="account_exists">Bu kullanıcı adı zaten alınmış.</string>
+    <string name="registration_failed">Kayıt başarısız: %s</string>
+
+    <!-- ── Navigation ─────────────────────────────────────────── -->
+    <string name="nav_home">Ana Sayfa</string>
+    <string name="nav_calendar">Takvim</string>
+    <string name="nav_classrooms">Sınıflar</string>
+    <string name="nav_schedule">Program</string>
+    <string name="nav_import">İçe Aktar</string>
+    <string name="nav_settings">Ayarlar</string>
+    <string name="nav_announcements">Duyurular</string>
+    <string name="nav_availability">Müsaitlik</string>
+
+    <!-- ── Common actions ─────────────────────────────────────── -->
+    <string name="cancel">İptal</string>
+    <string name="add">Ekle</string>
+    <string name="save">Kaydet</string>
+    <string name="delete">Sil</string>
+    <string name="close">Kapat</string>
+    <string name="approve">Onayla</string>
+    <string name="reject">Reddet</string>
+    <string name="confirm_change">Değişikliği Onayla</string>
+    <string name="fill_all_fields">Tüm alanları doldurun</string>
+    <string name="passwords_no_match">Şifreler eşleşmiyor!</string>
+    <string name="password_too_short">Şifre en az 6 karakter olmalı</string>
+    <string name="note_optional">Not (opsiyonel)</string>
+
+    <!-- ── Admin Dashboard ────────────────────────────────────── -->
+    <string name="admin_dashboard">Yönetici Paneli</string>
+    <string name="admin_dashboard_subtitle">Gerçek zamanlı genel bakış</string>
+    <string name="panel_unassigned_lecturers">Atanmamış Öğretim Görevlileri</string>
+    <string name="panel_unassigned_courses">Atanmamış Dersler</string>
+    <string name="panel_total_classrooms">Toplam\nSınıf</string>
+    <string name="panel_availability">Müsaitlik Bildirimleri</string>
+    <string name="panel_pending_reg">Onay Bekleyen Kayıtlar</string>
+    <string name="panel_student_mgmt">Öğrenci Yönetimi</string>
+    <string name="panel_schedule">Program Girişleri</string>
+    <string name="db_empty_title">Veritabanı Boş</string>
+    <string name="db_empty_desc">Başlamak için demo veriyi yükleyin: 3 hoca, 6 ders, 5 sınıf ve 1 öğrenci.</string>
+    <string name="load_demo_data">Demo Veriyi Yükle</string>
+    <string name="reload_demo_data">Demo Veriyi Yeniden Yükle</string>
+    <string name="demo_loaded">Demo veri yüklendi! 3 hoca, 6 ders, 4 sınıf ve 1 öğrenci eklendi.</string>
+    <string name="demo_failed">Yükleme başarısız. Bağlantınızı kontrol edin.</string>
+    <string name="all_lecturers_assigned">Tüm öğretim görevlileri atandı.</string>
+    <string name="all_courses_scheduled">Tüm dersler programlandı.</string>
+    <string name="no_schedule_yet">Henüz program girişi yok.</string>
+    <string name="no_students_yet">Henüz öğrenci eklenmedi.</string>
+
+    <!-- Lecturer info row -->
+    <string name="delete_lecturer_title">Öğretim Görevlisini Sil</string>
+    <string name="delete_lecturer_msg">%s adlı öğretim görevlisini silmek istediğinizden emin misiniz?</string>
+    <string name="lect_detail_title">Unvan</string>
+    <string name="lect_detail_username">Kullanıcı Adı</string>
+    <string name="lect_detail_dept">Bölüm</string>
+    <string name="lect_detail_working">Çalışma Türü</string>
+    <string name="lect_detail_role">Rol</string>
+
+    <!-- Course row -->
+    <string name="delete_course_title">Dersi Sil</string>
+    <string name="delete_course_msg">%s dersini silmek istediğinizden emin misiniz?</string>
+
+    <!-- Student management -->
+    <string name="delete_student_title">Öğrenciyi Sil</string>
+    <string name="delete_student_msg">%s adlı öğrenciyi silmek istediğinizden emin misiniz?</string>
+    <string name="add_student_title">Öğrenci Ekle</string>
+    <string name="student_name_label">Ad Soyad</string>
+    <string name="student_username_label">Kullanıcı Adı</string>
+    <string name="student_password_label">Şifre</string>
+    <string name="student_dept_label">Bölüm</string>
+    <string name="student_id_label">Öğrenci No</string>
+    <string name="student_id_hint">Örn. 20230001</string>
+    <string name="class_year_label">Sınıf Yılı</string>
+    <string name="year_1">1. Sınıf</string>
+    <string name="year_2">2. Sınıf</string>
+    <string name="year_3">3. Sınıf</string>
+    <string name="year_4">4. Sınıf</string>
+    <string name="masters_1">Yüksek Lisans 1. Yıl</string>
+    <string name="masters_2">Yüksek Lisans 2. Yıl</string>
+    <string name="phd_1">Doktora 1. Yıl</string>
+    <string name="phd_2">Doktora 2. Yıl</string>
+    <string name="phd_3">Doktora 3. Yıl</string>
+    <string name="phd_4">Doktora 4. Yıl</string>
+
+    <!-- Availability notifications -->
+    <string name="schedule_btn">Programla</string>
+    <string name="reject_notification_title">Bildirimi Reddet</string>
+    <string name="reject_notification_msg">%s adlı hocanın müsaitlik bildirimini reddedeceksiniz. Hoca bu zaman dilimi için müsait sayılmayacak.</string>
+    <string name="rejection_reason_label">Red Notu</string>
+    <string name="rejection_reason_hint">Reddedilme sebebini yazın (opsiyonel)</string>
+
+    <!-- Pending registrations -->
+    <string name="reject_reg_title">Kaydı Reddet</string>
+    <string name="reject_reg_msg">%s (@%s) kullanıcısının kaydı silinecek.</string>
+    <string name="reject_and_delete">Reddet &amp; Sil</string>
+
+    <!-- ── Classrooms ──────────────────────────────────────────── -->
+    <string name="classrooms_title">Sınıflar</string>
+    <string name="classrooms_subtitle_one">%d sınıf kayıtlı</string>
+    <string name="classrooms_subtitle">%d sınıf kayıtlı</string>
+    <string name="no_classrooms">Henüz sınıf eklenmedi</string>
+    <string name="tap_plus_add">+ butonuna basarak ilk sınıfı ekleyin</string>
+    <string name="add_classroom_title">Sınıf Ekle</string>
+    <string name="classroom_name_label">Sınıf Adı</string>
+    <string name="classroom_name_hint">Örn. A-101, Lab-2, BL-203</string>
+    <string name="capacity_label">Öğrenci Kapasitesi</string>
+    <string name="capacity_hint">Örn. 30, 60, 120</string>
+    <string name="classroom_type_label">Sınıf Tipi</string>
+    <string name="type_lecture">Derslik</string>
+    <string name="type_lab">Laboratuvar</string>
+    <string name="type_computer">Bilgisayar Lab</string>
+    <string name="capacity_display">Kapasite: %d öğrenci</string>
+    <string name="bookings_label">rezervasyon</string>
+    <string name="room_name_empty">Sınıf adı boş olamaz</string>
+
+    <!-- ── Assignment ─────────────────────────────────────────── -->
+    <string name="course_assignment_title">Ders Atama</string>
+    <string name="course_assignment_subtitle">Tüm alanları doldurun. Çakışmalar otomatik engellenir.</string>
+    <string name="select_course">Ders seçin</string>
+    <string name="select_lecturer">Öğretim görevlisi seçin</string>
+    <string name="select_classroom">Sınıf seçin</string>
+    <string name="select_day">Gün seçin</string>
+    <string name="select_time">Zaman dilimi seçin</string>
+    <string name="select_session">Seans tipi seçin</string>
+    <string name="label_course">Ders</string>
+    <string name="label_lecturer">Öğretim Görevlisi</string>
+    <string name="label_classroom">Sınıf</string>
+    <string name="label_day">Gün</string>
+    <string name="label_time_slot">Zaman Dilimi</string>
+    <string name="label_session_type">Seans Tipi</string>
+    <string name="session_theory">Teorik</string>
+    <string name="session_lab">Lab</string>
+    <string name="assign_btn">Ders Ata</string>
+    <string name="current_schedule">Mevcut Program (%d)</string>
+    <string name="assignment_saved">Atama başarıyla kaydedildi!</string>
+    <string name="remove_assignment_title">Atamayı Kaldır</string>
+    <string name="remove_assignment_msg">%s dersini %s gününde %s saatinden kaldır?</string>
+    <string name="remove">Kaldır</string>
+
+    <!-- ── Weekdays ───────────────────────────────────────────── -->
+    <string name="day_monday">Pazartesi</string>
+    <string name="day_tuesday">Salı</string>
+    <string name="day_wednesday">Çarşamba</string>
+    <string name="day_thursday">Perşembe</string>
+    <string name="day_friday">Cuma</string>
+    <string name="day_mon">Pzt</string>
+    <string name="day_tue">Sal</string>
+    <string name="day_wed">Çar</string>
+    <string name="day_thu">Per</string>
+    <string name="day_fri">Cum</string>
+
+    <!-- ── Lecturer Home ──────────────────────────────────────── -->
+    <string name="welcome_prefix">Hoş geldiniz, </string>
+    <string name="stat_total_courses">Toplam Ders</string>
+    <string name="stat_days_active">Aktif Gün</string>
+    <string name="stat_working_type">Çalışma Türü</string>
+    <string name="this_week">Bu Hafta</string>
+    <string name="no_courses_assigned">Henüz ders atanmadı</string>
+    <string name="contact_admin">Lütfen yöneticinizle iletişime geçin.</string>
+    <string name="courses_count">%d ders</string>
+    <string name="course_count_one">%d ders</string>
+
+    <!-- ── Lecturer Calendar ──────────────────────────────────── -->
+    <string name="my_schedule">Ders Programım</string>
+    <string name="sessions_per_week">%d seans/hafta</string>
+    <string name="pdf_btn">PDF</string>
+    <string name="notify_availability">Müsaitlik Bildir</string>
+    <string name="availability_dialog_title">Müsaitlik Bildir</string>
+    <string name="availability_desc">Müsait olduğunuz gün, saat ve sınıfı seçin. Admin ders programı oluştururken bu bilgiyi dikkate alacak.</string>
+    <string name="available_day_label">Müsait Gün: %s</string>
+    <string name="available_time_label">Müsait Saat</string>
+    <string name="available_time_hint">Müsait olduğunuz saati seçin</string>
+    <string name="preferred_course_label">Tercih Edilen Ders</string>
+    <string name="preferred_course_hint">Ders seçin (opsiyonel)</string>
+    <string name="preferred_class_label">Tercih Edilen Sınıf</string>
+    <string name="preferred_class_hint">Sınıf seçin (opsiyonel)</string>
+    <string name="note_label">Not</string>
+    <string name="note_hint">Ek bilgi veya tercih belirtebilirsiniz…</string>
+    <string name="notify_btn">Müsaitliği Bildir</string>
+    <string name="available_awaiting">Müsait — Onay Bekleniyor</string>
+    <string name="no_sessions">Seans yok</string>
+    <string name="sessions_count_one">%d seans</string>
+    <string name="sessions_count">%d seans</string>
+
+    <!-- ── Student Home ───────────────────────────────────────── -->
+    <string name="welcome_student">Hoş geldin,</string>
+    <string name="stat_weekly_courses">Haftalık Ders</string>
+    <string name="stat_active_days">Aktif Gün</string>
+    <string name="stat_lab_sessions">Lab Seansı</string>
+    <string name="no_dept_schedule">Bölümünüze ait ders programı henüz oluşturulmadı.</string>
+    <string name="courses_this_day">%d ders</string>
+
+    <!-- ── Student Calendar ───────────────────────────────────── -->
+    <string name="student_schedule_title">Ders Programım</string>
+    <string name="no_session_student">Ders yok</string>
+
+    <!-- ── Receipt card ──────────────────────────────────────── -->
+    <string name="receipt_course_code">Ders Kodu</string>
+    <string name="receipt_lecturer">Hoca</string>
+    <string name="receipt_classroom">Sınıf</string>
+    <string name="receipt_day">Gün</string>
+    <string name="receipt_time">Saat</string>
+    <string name="receipt_type">Tür</string>
+    <string name="type_theory">Teorik Ders</string>
+    <string name="type_lab_full">Laboratuvar</string>
+
+    <!-- ── Announcements ──────────────────────────────────────── -->
+    <string name="announcements_title">Duyurular</string>
+    <string name="announcements_count_one">%d duyuru</string>
+    <string name="announcements_count">%d duyuru</string>
+    <string name="no_announcements">Henüz duyuru yok</string>
+    <string name="add_announcement_title">Yeni Duyuru</string>
+    <string name="ann_title_field">Başlık</string>
+    <string name="ann_title_hint">Duyuru başlığını girin</string>
+    <string name="ann_message_field">Mesaj</string>
+    <string name="ann_message_hint">Duyuru içeriğini buraya yazın…</string>
+    <string name="ann_type_field">Tür</string>
+    <string name="publish_btn">Yayımla</string>
+    <string name="delete_ann_title">Duyuruyu Sil</string>
+    <string name="delete_ann_msg">\"%s\" duyurusu silinecek.</string>
+    <string name="ann_type_info">Bilgi</string>
+    <string name="ann_type_warning">Uyarı</string>
+    <string name="ann_type_cancelled">İptal</string>
+    <string name="ann_type_schedule_change">Program Değişikliği</string>
+    <string name="ann_course_label">Ders: %s</string>
+
+    <!-- ── Profile / Settings ─────────────────────────────────── -->
+    <string name="profile_title">Profil Ayarları</string>
+    <string name="full_name_display">Ad Soyad: %s</string>
+    <string name="username_display">Kullanıcı Adı: @%s</string>
+    <string name="role_display">Rol: %s</string>
+    <string name="change_password_btn">Şifre Değiştir</string>
+    <string name="pending_approvals">Bekleyen Onaylar</string>
+    <string name="appearance_section">Görünüm</string>
+    <string name="theme_label">Tema</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="language_section">Dil</string>
+    <string name="lang_turkish">Türkçe</string>
+    <string name="lang_english">İngilizce</string>
+    <string name="language_changed">Dil değiştirildi. Yeniden başlatılıyor…</string>
+    <string name="logout_btn">Çıkış Yap</string>
+    <string name="update_password_title">Şifre Güncelle</string>
+    <string name="verify_old_password">Eski Şifreyi Doğrula</string>
+    <string name="password_updated">Şifre güncellendi!</string>
+    <string name="old_password_incorrect">Eski şifre hatalı</string>
+    <string name="inspect_user_title">Kullanıcı Detayları</string>
+    <string name="inspect_user_full_name">Ad Soyad: %s</string>
+    <string name="inspect_user_username">Kullanıcı Adı: %s</string>
+    <string name="inspect_user_dept">Bölüm: %s</string>
+    <string name="inspect_user_role">Başvurulan Rol: %s</string>
+    <string name="inspect_user_status">Mevcut Durum: %s</string>
+
+    <!-- ── Import / Data ─────────────────────────────────────── -->
+    <string name="nav_import_label">İçe Aktar</string>
+
+    <!-- ── PDF ───────────────────────────────────────────────── -->
+    <string name="weekly_schedule_pdf">Haftalık Ders Programı</string>
+    <string name="pdf_downloaded">PDF indirildi: %s</string>
+    <string name="pdf_failed">PDF oluşturulamadı: %s</string>
+
+    <!-- ── Hoca Müsaitliği ───────────────────────────────────── -->
+    <string name="avail_screen_title">Hoca Müsaitliği</string>
+    <string name="avail_screen_desc">Müsait olduğunuz saat dilimlerini seçin. Admin ders programı oluştururken bu bilgiyi kullanacak.</string>
+    <string name="avail_select_all_day">Tüm Gün</string>
+    <string name="avail_clear_all">Temizle</string>
+    <string name="avail_submit_btn">Müsaitliğimi Gönder</string>
+    <string name="avail_confirm_title">Emin misiniz?</string>
+    <string name="avail_confirm_msg">%d saat dilimi seçildi. Bu müsaitlik bilgisini admin onayına göndermek istiyor musunuz?</string>
+    <string name="avail_send">Gönder</string>
+    <string name="avail_sent_success">Müsaitlik bildirimi gönderildi!</string>
+    <string name="avail_no_selection">Lütfen en az bir saat dilimi seçin</string>
+    <string name="avail_last_status_title">Son Gönderilen Müsaitlik</string>
+    <string name="avail_status_pending">Onay Bekliyor</string>
+    <string name="avail_status_approved">Onaylandı</string>
+    <string name="avail_status_rejected">Reddedildi</string>
+    <string name="avail_slots_total">%d saat dilimi seçildi</string>
+    <string name="avail_new_submission">Yeni Müsaitlik Gönder</string>
+    <string name="avail_view_map">Müsaitlik Haritamı Görüntüle</string>
+    <string name="avail_no_data">Henüz müsaitlik bilgisi gönderilmedi</string>
+    <string name="admin_avail_title">Müsaitlik Haritaları</string>
+    <string name="admin_avail_subtitle">Bekleyen bildirimler ve hoca müsaitlik haritaları</string>
+    <string name="admin_avail_pending_section">Bekleyen Müsaitlik Bildirimleri</string>
+    <string name="admin_avail_all_maps">Tüm Hoca Müsaitlik Haritaları</string>
+    <string name="admin_avail_no_pending">Bekleyen müsaitlik bildirimi yok</string>
+    <string name="admin_avail_view_btn">Tüm Haritaları Görüntüle</string>
+    <string name="admin_avail_select_lecturer">Hoca Seçin</string>
+    <string name="admin_avail_all_lecturers">Tüm Hocalar</string>
+    <string name="admin_avail_no_data">Bu hoca için müsaitlik bilgisi yok</string>
+    <string name="admin_avail_approve_success">Müsaitlik onaylandı</string>
+    <string name="admin_avail_slots_count">%d dilim</string>
+</resources>

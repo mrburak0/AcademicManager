@@ -1,10 +1,16 @@
 package com.example.academicmanager.util
 
+import java.security.MessageDigest
 import java.text.Normalizer
 import java.util.Locale
 import kotlin.random.Random
 
 object CredentialUtils {
+
+    fun hashPassword(password: String): String {
+        val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray(Charsets.UTF_8))
+        return bytes.joinToString("") { "%02x".format(it) }
+    }
 
     fun generateUsername(fullName: String, title: String): String {
         // Common academic titles to strip

@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 enum class ImportType { COURSES, LECTURERS }
@@ -27,6 +29,8 @@ sealed class ImportState {
     data class PreviewReady(val items: List<Any>, val type: ImportType) : ImportState()
     data class Success(val message: String) : ImportState()
     data class Error(val message: String) : ImportState()
+    /** Import tamamlandıktan sonra admin plaintext credential'ları görür */
+    data class CredentialSheet(val credentials: List<Pair<String, String>>) : ImportState()
 }
 
 class DataImportViewModel(private val repository: UniversityRepository) : ViewModel() {
@@ -41,9 +45,9 @@ class DataImportViewModel(private val repository: UniversityRepository) : ViewMo
                 val headerRow = sheet.createRow(0)
                 
                 val columns = if (type == ImportType.COURSES) {
-                    listOf("Course Code", "Course Name")
+                    listOf("Course Code", "Course Name", "Department")
                 } else {
-                    listOf("Name", "Title", "Working Type")
+                    listOf("Name", "Title", "Working Type", "Department")
                 }
 
                 columns.forEachIndexed { index, title ->
@@ -71,31 +75,32 @@ class DataImportViewModel(private val repository: UniversityRepository) : ViewMo
                 for (i in 1..sheet.lastRowNum) {
                     val row = sheet.getRow(i) ?: continue
                     if (type == ImportType.COURSES) {
-                        val code = row.getCell(0)?.toString() ?: ""
-                        val name = row.getCell(1)?.toString() ?: ""
+                        val code = row.getCell(0).safeString()
+                        val name = row.getCell(1).safeString()
+                        val dept = row.getCell(2).safeString()
                         if (code.isNotBlank()) {
                             items.add(Course(
                                 courseCode = code,
                                 courseName = name,
-                                department = "General"
+                                department = dept.ifBlank { "General" }
                             ))
                         }
                     } else {
-                        val name = row.getCell(0)?.toString() ?: ""
-                        val title = row.getCell(1)?.toString() ?: ""
-                        val workingType = row.getCell(2)?.toString() ?: ""
+                        val name = row.getCell(0).safeString()
+                        val title = row.getCell(1).safeString()
+                        val workingType = row.getCell(2).safeString()
+                        val dept = row.getCell(3).safeString()
                         if (name.isNotBlank()) {
-                            // GENERATE CREDENTIALS HERE
                             val username = CredentialUtils.generateUsername(name, title)
                             val password = CredentialUtils.generatePassword()
-                            
+
                             items.add(Lecturer(
                                 fullName = name,
                                 title = title,
                                 workingType = workingType,
                                 username = username,
                                 password = password,
-                                department = "General",
+                                department = dept.ifBlank { "General" },
                                 mustChangePassword = true,
                                 role = UserRole.LECTURER
                             ))
@@ -129,12 +134,20 @@ class DataImportViewModel(private val repository: UniversityRepository) : ViewMo
                         Log.w("FirestoreTest", "No Course objects found in items list!")
                     }
                 } else {
-                    val lecturers = items.filterIsInstance<Lecturer>()
-                    Log.d("FirestoreTest", "Filtered lecturers count: ${lecturers.size}")
-                    if (lecturers.isNotEmpty()) {
+                    val rawLecturers = items.filterIsInstance<Lecturer>()
+                    Log.d("FirestoreTest", "Filtered lecturers count: ${rawLecturers.size}")
+                    if (rawLecturers.isNotEmpty()) {
+                        // Plaintext credential'ları credential sheet için sakla
+                        val credentials = rawLecturers.map { it.username to it.password }
+                        // Hash'leyip Firestore'a kaydet
+                        val hashedLecturers = rawLecturers.map {
+                            it.copy(password = CredentialUtils.hashPassword(it.password))
+                        }
                         Log.d("FirestoreTest", "Saving to Firestore...")
-                        repository.addLecturers(lecturers)
+                        repository.addLecturers(hashedLecturers)
                         Log.d("FirestoreTest", "Firestore save completed successfully.")
+                        _uiState.value = ImportState.CredentialSheet(credentials)
+                        return@launch
                     } else {
                         Log.w("FirestoreTest", "No Lecturer objects found in items list!")
                     }
@@ -148,6 +161,17 @@ class DataImportViewModel(private val repository: UniversityRepository) : ViewMo
     }
 
     fun resetState() { _uiState.value = ImportState.Idle }
+
+    private fun Cell?.safeString(): String {
+        if (this == null) return ""
+        return when (cellType) {
+            CellType.STRING  -> stringCellValue?.trim() ?: ""
+            CellType.NUMERIC -> numericCellValue.toLong().toString()
+            CellType.BOOLEAN -> booleanCellValue.toString()
+            CellType.FORMULA -> try { stringCellValue?.trim() ?: "" } catch (_: Exception) { numericCellValue.toLong().toString() }
+            else             -> ""
+        }
+    }
 
     private fun saveWorkbookToDownloads(context: Context, workbook: XSSFWorkbook, fileName: String) {
         val contentValues = ContentValues().apply {

@@ -3,7 +3,7 @@ package com.example.academicmanager.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-enum class UserRole { ADMIN, LECTURER }
+enum class UserRole { ADMIN, LECTURER, STUDENT }
 enum class UserStatus { PENDING, APPROVED }
 
 @Entity(tableName = "users")

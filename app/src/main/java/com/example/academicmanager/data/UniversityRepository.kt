@@ -3,27 +3,61 @@ package com.example.academicmanager.data
 import kotlinx.coroutines.flow.Flow
 
 interface UniversityRepository {
-    // Departments
+    // Bölümler
     fun getDepartments(): Flow<List<Department>>
     suspend fun addDepartment(department: Department)
 
-    // Courses
+    // Dersler
     fun getCourses(): Flow<List<Course>>
     suspend fun addCourses(courses: List<Course>)
     suspend fun deleteCourse(courseCode: String)
 
-    // Lecturers
+    // Öğretim görevlileri (LECTURER + STUDENT aynı koleksiyon)
     fun getLecturers(): Flow<List<Lecturer>>
     suspend fun addLecturers(lecturers: List<Lecturer>)
     suspend fun updateLecturer(lecturer: Lecturer)
     suspend fun getLecturerByUsername(username: String): Lecturer?
 
-    // Classrooms
+    // Öğrenciler (lecturers koleksiyonundan role=STUDENT filtreli)
+    fun getStudents(): Flow<List<Lecturer>>
+    suspend fun addStudent(student: Lecturer)
+    fun getStudentsByDepartment(department: String): Flow<List<Lecturer>>
+
+    // Sınıflar
     fun getClassrooms(): Flow<List<Classroom>>
     suspend fun addClassroom(classroom: Classroom)
 
-    // Schedule Entries
+    // Program girişleri
     fun getScheduleEntries(): Flow<List<ScheduleEntry>>
     suspend fun addScheduleEntry(entry: ScheduleEntry)
+    suspend fun deleteScheduleEntry(entryId: String)
     fun getLecturerSchedule(lecturerName: String): Flow<List<ScheduleEntry>>
+
+    // Duyurular
+    fun getAnnouncements(): Flow<List<Announcement>>
+    suspend fun addAnnouncement(announcement: Announcement)
+    suspend fun deleteAnnouncement(id: String)
+
+    // Kayıt onay sistemi
+    fun getPendingRegistrations(): Flow<List<Lecturer>>
+
+    // Silme işlemleri
+    suspend fun deleteLecturer(username: String)
+    suspend fun deleteClassroom(classroomId: String)
+
+    // Seed temizleme (tüm koleksiyonu siler)
+    suspend fun clearScheduleEntries()
+    suspend fun clearClassrooms()
+
+    // Ders talep akışı
+    fun getScheduleRequests(): Flow<List<ScheduleRequest>>
+    fun getLecturerRequests(lecturerUsername: String): Flow<List<ScheduleRequest>>
+    suspend fun addScheduleRequest(request: ScheduleRequest)
+    suspend fun updateScheduleRequest(request: ScheduleRequest)
+
+    // Müsaitlik haritası
+    fun getAvailabilities(): Flow<List<LecturerAvailability>>
+    fun getLecturerAvailabilities(lecturerUsername: String): Flow<List<LecturerAvailability>>
+    suspend fun addAvailability(availability: LecturerAvailability)
+    suspend fun updateAvailability(availability: LecturerAvailability)
 }
