@@ -381,52 +381,104 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
     fun seedDemoData(onComplete: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             try {
-                // 0. Mevcut program ve sınıf kayıtlarını temizle (duplicate önleme)
+                // 0. Temizle
                 repository.clearScheduleEntries()
                 repository.clearClassrooms()
 
-                // 1. Sınıflar — id=name kullanılır, tekrar seed'de üzerine yazar
+                // 1. Sınıflar
                 listOf(
-                    Classroom(id = "A-101",  name = "A-101",  capacity = 60,  classroomType = ClassroomType.LECTURE),
-                    Classroom(id = "B-202",  name = "B-202",  capacity = 40,  classroomType = ClassroomType.LECTURE),
-                    Classroom(id = "C-303",  name = "C-303",  capacity = 30,  classroomType = ClassroomType.LECTURE),
-                    Classroom(id = "Lab-1",  name = "Lab-1",  capacity = 25,  classroomType = ClassroomType.LAB),
-                    Classroom(id = "BL-101", name = "BL-101", capacity = 30,  classroomType = ClassroomType.COMPUTER_LAB)
+                    Classroom(id = "A-101",  name = "A-101",  capacity = 60, classroomType = ClassroomType.LECTURE),
+                    Classroom(id = "B-202",  name = "B-202",  capacity = 40, classroomType = ClassroomType.LECTURE),
+                    Classroom(id = "C-303",  name = "C-303",  capacity = 30, classroomType = ClassroomType.LECTURE),
+                    Classroom(id = "D-104",  name = "D-104",  capacity = 50, classroomType = ClassroomType.LECTURE),
+                    Classroom(id = "Lab-1",  name = "Lab-1",  capacity = 25, classroomType = ClassroomType.LAB),
+                    Classroom(id = "Lab-2",  name = "Lab-2",  capacity = 20, classroomType = ClassroomType.LAB),
+                    Classroom(id = "BL-101", name = "BL-101", capacity = 30, classroomType = ClassroomType.COMPUTER_LAB)
                 ).forEach { repository.addClassroom(it) }
 
-                // 2. Dersler — hasLab ve expectedStudents eklendi
+                // 2. Dersler (bazıları atanmış, bazıları Yapay Zeka demosu için atanmamış)
                 repository.addCourses(listOf(
-                    Course(courseCode = "CS101",   courseName = "Introduction to Programming", department = "Computer Science", hasLab = true,  expectedStudents = 40, weeklyHours = 2, labHours = 2),
-                    Course(courseCode = "CS201",   courseName = "Data Structures",             department = "Computer Science", hasLab = false, expectedStudents = 35, weeklyHours = 3),
-                    Course(courseCode = "CS301",   courseName = "Algorithms",                  department = "Computer Science", hasLab = false, expectedStudents = 30, weeklyHours = 3),
-                    Course(courseCode = "MATH101", courseName = "Calculus I",                  department = "Mathematics",      hasLab = false, expectedStudents = 55, weeklyHours = 4),
-                    Course(courseCode = "MATH201", courseName = "Linear Algebra",              department = "Mathematics",      hasLab = false, expectedStudents = 40, weeklyHours = 3),
-                    Course(courseCode = "EE101",   courseName = "Circuit Analysis",            department = "Electrical Engineering", hasLab = true, expectedStudents = 20, weeklyHours = 2, labHours = 2)
+                    Course(courseCode = "CS101",   courseName = "Programlamaya Giriş",      department = "Computer Science",        hasLab = true,  expectedStudents = 40, weeklyHours = 2, labHours = 2),
+                    Course(courseCode = "CS201",   courseName = "Veri Yapıları",            department = "Computer Science",        hasLab = false, expectedStudents = 35, weeklyHours = 3),
+                    Course(courseCode = "CS301",   courseName = "Algoritmalar",             department = "Computer Science",        hasLab = false, expectedStudents = 30, weeklyHours = 3),
+                    Course(courseCode = "CS401",   courseName = "Yapay Zeka",               department = "Computer Science",        hasLab = true,  expectedStudents = 28, weeklyHours = 2, labHours = 2),
+                    Course(courseCode = "SW101",   courseName = "Web Geliştirme",           department = "Software Engineering",    hasLab = true,  expectedStudents = 30, weeklyHours = 2, labHours = 2),
+                    Course(courseCode = "SW201",   courseName = "Yazılım Mühendisliği",     department = "Software Engineering",    hasLab = false, expectedStudents = 35, weeklyHours = 3),
+                    Course(courseCode = "MATH101", courseName = "Matematik I",              department = "Mathematics",             hasLab = false, expectedStudents = 55, weeklyHours = 4),
+                    Course(courseCode = "MATH201", courseName = "Lineer Cebir",             department = "Mathematics",             hasLab = false, expectedStudents = 40, weeklyHours = 3),
+                    Course(courseCode = "EE101",   courseName = "Devre Analizi",            department = "Electrical Engineering",  hasLab = true,  expectedStudents = 20, weeklyHours = 2, labHours = 2),
+                    Course(courseCode = "EE201",   courseName = "Elektronik",               department = "Electrical Engineering",  hasLab = false, expectedStudents = 25, weeklyHours = 3)
                 ))
 
-                // 3. Öğretim görevlileri
+                // 3. Öğretim görevlileri (5 hoca — çeşitli bölüm ve unvanlar)
                 repository.addLecturers(listOf(
-                    Lecturer(username = "ahmet_yilmaz", password = CredentialUtils.hashPassword("ahmet123"),  fullName = "Ahmet Yılmaz",  title = "Dr.",       workingType = "Full-time", department = "Computer Science",       mustChangePassword = false, role = UserRole.LECTURER),
-                    Lecturer(username = "ayse_kaya",    password = CredentialUtils.hashPassword("ayse123"),   fullName = "Ayşe Kaya",    title = "Prof. Dr.", workingType = "Full-time", department = "Mathematics",            mustChangePassword = false, role = UserRole.LECTURER),
-                    Lecturer(username = "mehmet_demir", password = CredentialUtils.hashPassword("mehmet123"), fullName = "Mehmet Demir", title = "Dr.",       workingType = "Part-time", department = "Electrical Engineering", mustChangePassword = false, role = UserRole.LECTURER)
+                    Lecturer(username = "ahmet_yilmaz",  password = CredentialUtils.hashPassword("ahmet123"),   fullName = "Ahmet Yılmaz",   title = "Dr.",       workingType = "Full-time", department = "Computer Science",       mustChangePassword = false, role = UserRole.LECTURER, status = AccountStatus.APPROVED),
+                    Lecturer(username = "ayse_kaya",     password = CredentialUtils.hashPassword("ayse123"),    fullName = "Ayşe Kaya",      title = "Prof. Dr.", workingType = "Full-time", department = "Mathematics",             mustChangePassword = false, role = UserRole.LECTURER, status = AccountStatus.APPROVED),
+                    Lecturer(username = "mehmet_demir",  password = CredentialUtils.hashPassword("mehmet123"),  fullName = "Mehmet Demir",   title = "Dr.",       workingType = "Part-time", department = "Electrical Engineering",  mustChangePassword = false, role = UserRole.LECTURER, status = AccountStatus.APPROVED),
+                    Lecturer(username = "zeynep_arslan", password = CredentialUtils.hashPassword("zeynep123"),  fullName = "Zeynep Arslan",  title = "Dr.",       workingType = "Full-time", department = "Computer Science",        mustChangePassword = false, role = UserRole.LECTURER, status = AccountStatus.APPROVED),
+                    Lecturer(username = "ali_celik",     password = CredentialUtils.hashPassword("ali456"),     fullName = "Ali Çelik",      title = "Öğr. Gör.", workingType = "Full-time", department = "Software Engineering",    mustChangePassword = false, role = UserRole.LECTURER, status = AccountStatus.APPROVED)
                 ))
 
-                // 3b. Demo öğrenci
-                repository.addStudent(
-                    Lecturer(username = "ogrenci_ali", password = CredentialUtils.hashPassword("ali123"), fullName = "Ali Vural", department = "Computer Science", role = UserRole.STUDENT, mustChangePassword = false, studentYear = "1. Sınıf", studentId = "20230001")
-                )
-
-                // 4. Program girişleri — id deterministik: tekrar seed'de üzerine yazar
+                // 4. Öğrenciler (3 farklı bölüm)
                 listOf(
-                    ScheduleEntry(id = "CS101_Monday_09:00-10:00_LECTURE",    courseCode = "CS101",   courseName = "Introduction to Programming", lecturerName = "Ahmet Yılmaz",  classroomName = "A-101",  dayOfWeek = "Monday",   timeSlot = "09:00-10:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "CS201_Wednesday_10:00-11:00_LECTURE", courseCode = "CS201",   courseName = "Data Structures",             lecturerName = "Ahmet Yılmaz",  classroomName = "B-202",  dayOfWeek = "Wednesday", timeSlot = "10:00-11:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "CS301_Friday_13:00-14:00_LECTURE",    courseCode = "CS301",   courseName = "Algorithms",                  lecturerName = "Ahmet Yılmaz",  classroomName = "A-101",  dayOfWeek = "Friday",    timeSlot = "13:00-14:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "MATH101_Tuesday_08:00-09:00_LECTURE", courseCode = "MATH101", courseName = "Calculus I",                  lecturerName = "Ayşe Kaya",    classroomName = "C-303",  dayOfWeek = "Tuesday",   timeSlot = "08:00-09:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "MATH201_Thursday_11:00-12:00_LECTURE",courseCode = "MATH201", courseName = "Linear Algebra",              lecturerName = "Ayşe Kaya",    classroomName = "B-202",  dayOfWeek = "Thursday",  timeSlot = "11:00-12:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "EE101_Monday_14:00-15:00_LECTURE",    courseCode = "EE101",   courseName = "Circuit Analysis",            lecturerName = "Mehmet Demir", classroomName = "A-101",  dayOfWeek = "Monday",    timeSlot = "14:00-15:00", sessionType = SessionType.LECTURE),
-                    ScheduleEntry(id = "EE101_Wednesday_15:00-16:00_LAB",     courseCode = "EE101",   courseName = "Circuit Analysis Lab",        lecturerName = "Mehmet Demir", classroomName = "Lab-1",  dayOfWeek = "Wednesday", timeSlot = "15:00-16:00", sessionType = SessionType.LAB),
-                    ScheduleEntry(id = "CS101_Thursday_10:00-11:00_LAB",      courseCode = "CS101",   courseName = "Introduction to Prog. Lab",   lecturerName = "Ahmet Yılmaz",  classroomName = "BL-101", dayOfWeek = "Thursday",  timeSlot = "10:00-11:00", sessionType = SessionType.LAB)
+                    Lecturer(username = "ogrenci_ali",    password = CredentialUtils.hashPassword("ali123"),    fullName = "Ali Vural",    department = "Computer Science",       role = UserRole.STUDENT, mustChangePassword = false, studentYear = "1. Sınıf", studentId = "20230001", status = AccountStatus.APPROVED),
+                    Lecturer(username = "ogrenci_fatma",  password = CredentialUtils.hashPassword("fatma123"),  fullName = "Fatma Öz",     department = "Software Engineering",   role = UserRole.STUDENT, mustChangePassword = false, studentYear = "2. Sınıf", studentId = "20220042", status = AccountStatus.APPROVED),
+                    Lecturer(username = "ogrenci_burak",  password = CredentialUtils.hashPassword("burak123"),  fullName = "Burak Yıldız", department = "Electrical Engineering", role = UserRole.STUDENT, mustChangePassword = false, studentYear = "3. Sınıf", studentId = "20210087", status = AccountStatus.APPROVED)
+                ).forEach { repository.addStudent(it) }
+
+                // 5. Müsaitlik haritaları (APPROVED — deterministik id, re-seed'de üzerine yazar)
+                // Ahmet Yılmaz: Pzt/Çar/Per
+                repository.addAvailability(LecturerAvailability(
+                    id = "avail_ahmet_yilmaz", lecturerUsername = "ahmet_yilmaz", lecturerName = "Ahmet Yılmaz",
+                    monday    = listOf("09:00-10:00", "10:00-11:00", "13:00-14:00"),
+                    wednesday = listOf("09:00-10:00", "10:00-11:00", "13:00-14:00"),
+                    thursday  = listOf("10:00-11:00", "13:00-14:00", "14:00-15:00"),
+                    status = AvailabilityStatus.APPROVED
+                ))
+                // Ayşe Kaya: Sal/Per/Cum
+                repository.addAvailability(LecturerAvailability(
+                    id = "avail_ayse_kaya", lecturerUsername = "ayse_kaya", lecturerName = "Ayşe Kaya",
+                    tuesday   = listOf("08:00-09:00", "10:00-11:00", "11:00-12:00"),
+                    thursday  = listOf("11:00-12:00", "13:00-14:00"),
+                    friday    = listOf("09:00-10:00", "10:00-11:00"),
+                    status = AvailabilityStatus.APPROVED
+                ))
+                // Mehmet Demir: Pzt/Çar (part-time)
+                repository.addAvailability(LecturerAvailability(
+                    id = "avail_mehmet_demir", lecturerUsername = "mehmet_demir", lecturerName = "Mehmet Demir",
+                    monday    = listOf("14:00-15:00", "15:00-16:00"),
+                    wednesday = listOf("15:00-16:00", "16:00-17:00"),
+                    status = AvailabilityStatus.APPROVED
+                ))
+                // Zeynep Arslan: Pzt/Sal/Cum
+                repository.addAvailability(LecturerAvailability(
+                    id = "avail_zeynep_arslan", lecturerUsername = "zeynep_arslan", lecturerName = "Zeynep Arslan",
+                    monday    = listOf("09:00-10:00", "10:00-11:00"),
+                    tuesday   = listOf("13:00-14:00", "14:00-15:00"),
+                    friday    = listOf("09:00-10:00", "10:00-11:00", "11:00-12:00"),
+                    status = AvailabilityStatus.APPROVED
+                ))
+                // Ali Çelik: Sal/Çar/Per
+                repository.addAvailability(LecturerAvailability(
+                    id = "avail_ali_celik", lecturerUsername = "ali_celik", lecturerName = "Ali Çelik",
+                    tuesday   = listOf("09:00-10:00", "10:00-11:00"),
+                    wednesday = listOf("10:00-11:00", "11:00-12:00", "13:00-14:00"),
+                    thursday  = listOf("09:00-10:00", "14:00-15:00"),
+                    status = AvailabilityStatus.APPROVED
+                ))
+
+                // 6. Program (yalnızca 4 ders atanmış — geri kalan 6 ders Yapay Zeka demosu için bırakıldı)
+                listOf(
+                    ScheduleEntry(id = "CS101_Mon_0900_LECTURE",   courseCode = "CS101",   courseName = "Programlamaya Giriş", lecturerName = "Ahmet Yılmaz", classroomName = "A-101",  dayOfWeek = "Monday",    timeSlot = "09:00-10:00", sessionType = SessionType.LECTURE),
+                    ScheduleEntry(id = "CS101_Thu_1000_LAB",       courseCode = "CS101",   courseName = "Programlamaya Giriş Lab", lecturerName = "Ahmet Yılmaz", classroomName = "BL-101", dayOfWeek = "Thursday", timeSlot = "10:00-11:00", sessionType = SessionType.LAB),
+                    ScheduleEntry(id = "MATH101_Tue_0800_LECTURE", courseCode = "MATH101", courseName = "Matematik I",        lecturerName = "Ayşe Kaya",    classroomName = "A-101",  dayOfWeek = "Tuesday",   timeSlot = "08:00-09:00", sessionType = SessionType.LECTURE),
+                    ScheduleEntry(id = "EE101_Mon_1400_LECTURE",   courseCode = "EE101",   courseName = "Devre Analizi",      lecturerName = "Mehmet Demir", classroomName = "D-104",  dayOfWeek = "Monday",    timeSlot = "14:00-15:00", sessionType = SessionType.LECTURE),
+                    ScheduleEntry(id = "EE101_Wed_1500_LAB",       courseCode = "EE101",   courseName = "Devre Analizi Lab",  lecturerName = "Mehmet Demir", classroomName = "Lab-1",  dayOfWeek = "Wednesday", timeSlot = "15:00-16:00", sessionType = SessionType.LAB)
                 ).forEach { repository.addScheduleEntry(it) }
+
+                // ── Atanmamış bırakılan dersler (Yapay Zeka demo için) ──
+                // CS201, CS301, CS401, SW101, SW201, MATH201, EE201
+                // Zeynep Arslan ve Ali Çelik de atanmamış hoca olarak görünür
 
                 onComplete(true)
             } catch (e: Exception) {
