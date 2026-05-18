@@ -974,10 +974,14 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
     val displayDays  = weekDaysShort()
     val slots        = SCHEDULE_TIME_SLOTS
 
+    // İlk kez mi gönderiliyor? (daha önce hiç gönderilmemişse true)
+    val isFirstTime = myAvailabilities.isEmpty()
+
     // selectedSlots[dayIdx] = set of slotIdx — mevcut onaylı haritadan başlat
-    var selectedSlots by remember { mutableStateOf<Map<Int, Set<Int>>>(emptyMap()) }
-    var initialized   by remember { mutableStateOf(false) }
-    var isSaving      by remember { mutableStateOf(false) }
+    var selectedSlots        by remember { mutableStateOf<Map<Int, Set<Int>>>(emptyMap()) }
+    var initialized          by remember { mutableStateOf(false) }
+    var isSaving             by remember { mutableStateOf(false) }
+    var showFirstTimeConfirm by remember { mutableStateOf(false) }
     val context       = LocalContext.current
     val totalSelected = selectedSlots.values.sumOf { it.size }
 
@@ -1050,7 +1054,14 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(stringResource(R.string.avail_screen_title), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                    Text("Seçili slotları değiştirip 'Haritamı Güncelle' ile kaydet.", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        if (isFirstTime)
+                            "İlk gönderimde admin onayına gidecek. Sonraki güncellemeler anında uygulanır."
+                        else
+                            "Seçili slotları değiştirip 'Haritamı Güncelle' ile kaydet.",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         }
@@ -1202,7 +1213,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             }
         }
 
-        // ── Seçim özeti + Temizle + Güncelle ─────────────────
+        // ── Seçim özeti + Temizle + Gönder/Güncelle ──────────
         if (totalSelected > 0) {
             Text(
                 "$totalSelected slot seçili",
@@ -1227,7 +1238,11 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 onClick = {
                     if (totalSelected == 0) {
                         Toast.makeText(context, context.getString(R.string.avail_no_selection), Toast.LENGTH_SHORT).show()
+                    } else if (isFirstTime) {
+                        // İlk gönderim → onay dialogu göster
+                        showFirstTimeConfirm = true
                     } else {
+                        // Güncelleme → direkt APPROVED olarak kaydet
                         isSaving = true
                         adminViewModel.updateOwnAvailability(
                             lecturerUsername = user.username,
@@ -1244,7 +1259,11 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 enabled = !isSaving,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (totalSelected > 0) EmeraldGreen else TextSecondary.copy(alpha = 0.3f)
+                    containerColor = when {
+                        totalSelected == 0         -> TextSecondary.copy(alpha = 0.3f)
+                        isFirstTime                -> Color(0xFF6366F1)  // mor — ilk gönderim
+                        else                       -> EmeraldGreen
+                    }
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -1253,10 +1272,17 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     Spacer(Modifier.width(8.dp))
                     Text("Kaydediliyor...", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                 } else {
-                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Icon(
+                        if (isFirstTime) Icons.AutoMirrored.Filled.Send else Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        if (totalSelected > 0) "Haritamı Güncelle ($totalSelected slot)" else "Haritamı Güncelle",
+                        if (isFirstTime)
+                            if (totalSelected > 0) "Admin'e Gönder ($totalSelected slot)" else "Admin'e Gönder"
+                        else
+                            if (totalSelected > 0) "Haritamı Güncelle ($totalSelected slot)" else "Haritamı Güncelle",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -1265,6 +1291,79 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
         }
 
         Spacer(Modifier.height(80.dp))
+    }
+
+    // ── İlk gönderim onay dialogu ─────────────────────────────
+    if (showFirstTimeConfirm) {
+        AlertDialog(
+            onDismissRequest = { showFirstTimeConfirm = false },
+            containerColor = Slate800,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.EventAvailable, contentDescription = null, tint = Color(0xFF6366F1), modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text("Müsaitlik Gönder", color = Color(0xFF6366F1), fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        "Müsaitlik haritanız admin onayına gönderilecek.",
+                        color = TextPrimary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        "Onaylandıktan sonra ders atama sürecinde kullanılacak. Sonraki güncellemeleriniz anında geçerli olur.",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF6366F1).copy(alpha = 0.1f))
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Info, null, tint = Color(0xFF6366F1), modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            "${totalSelected} slot seçili",
+                            color = Color(0xFF6366F1),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showFirstTimeConfirm = false
+                        isSaving = true
+                        adminViewModel.submitAvailability(
+                            lecturerUsername = user.username,
+                            lecturerName     = user.fullName,
+                            slots            = buildSlotsMap()
+                        )
+                        isSaving = false
+                        Toast.makeText(context, "Müsaitliğiniz admin onayına gönderildi!", Toast.LENGTH_LONG).show()
+                        selectedSlots = emptyMap()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Send, null, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Evet, Gönder", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showFirstTimeConfirm = false }) {
+                    Text("İptal", color = TextSecondary)
+                }
+            }
+        )
     }
 }
 
