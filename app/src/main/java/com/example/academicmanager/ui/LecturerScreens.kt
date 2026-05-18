@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.academicmanager.R
+import androidx.navigation.NavController
 import com.example.academicmanager.data.AvailabilityStatus
 import com.example.academicmanager.data.LecturerAvailability
 import com.example.academicmanager.data.ScheduleEntry
@@ -89,7 +90,7 @@ private val DAY_COLORS = listOf(
 // ─────────────────────────────────────────────────────────────
 
 @Composable
-fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewModel) {
+fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewModel, navController: NavController) {
     val user = authViewModel.currentUser ?: return
     val allEntries by adminViewModel.scheduleEntries.collectAsState()
     val myEntries = allEntries.filter { it.lecturerName == user.fullName }
@@ -114,12 +115,12 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
             shape = RoundedCornerShape(20.dp)
         ) {
             Row(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(EmeraldGreen.copy(alpha = 0.25f))
                         .border(2.dp, EmeraldGreen, CircleShape),
@@ -132,8 +133,8 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Spacer(Modifier.width(16.dp))
-                Column {
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
                     Text(
                         buildString {
                             append(stringResource(R.string.welcome_prefix))
@@ -153,6 +154,10 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                             fontWeight = FontWeight.SemiBold
                         )
                     }
+                }
+                // Duyurular bell ikonu
+                IconButton(onClick = { navController.navigate("announcements") }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Duyurular", tint = EmeraldGreen, modifier = Modifier.size(22.dp))
                 }
             }
         }
@@ -962,17 +967,36 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
     val myAvailabilities  = allAvailabilities
         .filter { it.lecturerUsername == user.username }
         .sortedByDescending { it.timestamp }
-    val latestMine = myAvailabilities.firstOrNull()
+    // Onaylı harita önce, yoksa en son gönderim
+    val approvedMine = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.APPROVED }
+    val latestMine   = approvedMine ?: myAvailabilities.firstOrNull()
 
     val displayDays  = weekDaysShort()
     val slots        = SCHEDULE_TIME_SLOTS
 
-    // selectedSlots[dayIdx] = set of slotIdx values that are selected
+    // selectedSlots[dayIdx] = set of slotIdx — mevcut onaylı haritadan başlat
     var selectedSlots by remember { mutableStateOf<Map<Int, Set<Int>>>(emptyMap()) }
-    var showConfirm   by remember { mutableStateOf(false) }
-    var showMap       by remember { mutableStateOf(false) }
+    var initialized   by remember { mutableStateOf(false) }
+    var isSaving      by remember { mutableStateOf(false) }
     val context       = LocalContext.current
     val totalSelected = selectedSlots.values.sumOf { it.size }
+
+    // Onaylı harita gelince grid'e yükle (sadece bir kez — null iken initialized=true YAPMA)
+    LaunchedEffect(approvedMine) {
+        if (!initialized && approvedMine != null) {
+            val loaded = mutableMapOf<Int, Set<Int>>()
+            WEEK_DAYS_FULL.forEachIndexed { dayIdx, day ->
+                val daySlots = approvedMine.slotsForDay(day)
+                if (daySlots.isNotEmpty()) {
+                    loaded[dayIdx] = daySlots
+                        .mapNotNull { s -> slots.indexOf(s).takeIf { it >= 0 } }
+                        .toSet()
+                }
+            }
+            selectedSlots = loaded
+            initialized = true
+        }
+    }
 
     fun toggleSlot(dayIdx: Int, slotIdx: Int) {
         selectedSlots = selectedSlots.toMutableMap().apply {
@@ -988,6 +1012,14 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             else put(dayIdx, slots.indices.toSet())
         }
     }
+
+    fun buildSlotsMap(): Map<String, List<String>> =
+        WEEK_DAYS_FULL.indices.associate { dayIdx ->
+            WEEK_DAYS_FULL[dayIdx] to (selectedSlots[dayIdx]
+                ?.sorted()
+                ?.map { slotIdx -> slots[slotIdx] }
+                ?: emptyList())
+        }.filter { it.value.isNotEmpty() }
 
     Column(
         modifier = Modifier
@@ -1018,93 +1050,76 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(stringResource(R.string.avail_screen_title), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                    Text(stringResource(R.string.avail_screen_desc), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text("Seçili slotları değiştirip 'Haritamı Güncelle' ile kaydet.", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
 
-        // ── Son Gönderilen Müsaitlik Durumu ───────────────────
-        latestMine?.let { avail ->
-            val (statusColor, statusLabel) = when (avail.status) {
-                com.example.academicmanager.data.AvailabilityStatus.APPROVED -> EmeraldGreen to stringResource(R.string.avail_status_approved)
-                com.example.academicmanager.data.AvailabilityStatus.REJECTED -> ErrorRed    to stringResource(R.string.avail_status_rejected)
-                else                                                          -> Color(0xFFF59E0B) to stringResource(R.string.avail_status_pending)
-            }
+        // ── Reddedildi notu (varsa) ───────────────────────────
+        val rejected = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.REJECTED }
+        if (rejected != null && rejected.adminNote.isNotBlank()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = statusColor.copy(alpha = 0.09f)),
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.dp, statusColor.copy(alpha = 0.35f))
+                colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.08f)),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, ErrorRed.copy(alpha = 0.3f))
             ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = statusColor, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.avail_last_status_title), color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
-                        Spacer(Modifier.weight(1f))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(statusColor.copy(alpha = 0.18f))
-                                .padding(horizontal = 8.dp, vertical = 3.dp)
-                        ) {
-                            Text(statusLabel, color = statusColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        stringResource(R.string.avail_slots_total, avail.totalSlots),
-                        color = TextSecondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    if (avail.adminNote.isNotBlank()) {
-                        Spacer(Modifier.height(4.dp))
-                        Text("\"${avail.adminNote}\"", color = statusColor, style = MaterialTheme.typography.labelSmall)
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = { showMap = !showMap },
-                        modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, statusColor.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = statusColor),
-                        shape = RoundedCornerShape(10.dp),
-                        contentPadding = PaddingValues(vertical = 6.dp)
-                    ) {
-                        Icon(if (showMap) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.avail_view_map), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                    }
-                    if (showMap) {
-                        Spacer(Modifier.height(10.dp))
-                        AvailabilityGridReadOnly(avail, displayDays, statusColor)
+                Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Info, contentDescription = null, tint = ErrorRed, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Column {
+                        Text("Admin Notu:", color = ErrorRed, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
+                        Text("\"${rejected.adminNote}\"", color = TextPrimary, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
         }
 
-        // ── Yeni Müsaitlik Başlığı ────────────────────────────
+        // ── Durum özeti ──────────────────────────────────────
+        if (latestMine != null) {
+            val statusColor = when (latestMine.status) {
+                AvailabilityStatus.APPROVED -> EmeraldGreen
+                AvailabilityStatus.REJECTED -> ErrorRed
+                else                        -> Color(0xFFF59E0B)
+            }
+            val statusLabel = when (latestMine.status) {
+                AvailabilityStatus.APPROVED -> "Haritanız aktif (${latestMine.totalSlots} slot)"
+                AvailabilityStatus.REJECTED -> "Reddedildi — lütfen düzenleyin"
+                else                        -> "Admin onayı bekleniyor"
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(statusColor.copy(alpha = 0.09f))
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(statusColor))
+                Spacer(Modifier.width(10.dp))
+                Text(statusLabel, color = statusColor, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
+            }
+        }
+
+        // ── Haftalık Grid (Interactive) ────────────────────────
         Text(
-            stringResource(R.string.avail_new_submission),
+            "Müsait olduğunuz saatleri seçin:",
             color = TextPrimary,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall
         )
 
-        // ── Haftalık Tablo (Interactive Grid) ─────────────────
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Slate800),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                // Gün başlıkları
+                // Gün başlıkları + "Tümü" butonları
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(modifier = Modifier.width(58.dp))
                     WEEK_DAYS_FULL.indices.forEach { dayIdx ->
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     displayDays[dayIdx],
@@ -1118,7 +1133,38 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                         }
                     }
                 }
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
+
+                // Tüm Gün seç butonları (başta, grid üstünde)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Box(modifier = Modifier.width(58.dp))
+                    WEEK_DAYS_FULL.indices.forEach { dayIdx ->
+                        val allSelected = (selectedSlots[dayIdx]?.size ?: 0) == slots.size
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(24.dp)
+                                .padding(horizontal = 2.dp)
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(
+                                    if (allSelected) DAY_COLORS[dayIdx].copy(alpha = 0.25f)
+                                    else DAY_COLORS[dayIdx].copy(alpha = 0.07f)
+                                )
+                                .border(1.dp, DAY_COLORS[dayIdx].copy(alpha = if (allSelected) 0.7f else 0.2f), RoundedCornerShape(5.dp))
+                                .clickable { toggleDay(dayIdx) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                if (allSelected) "✓" else stringResource(R.string.avail_select_all_day),
+                                color = DAY_COLORS[dayIdx],
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 9.sp
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
 
                 // Saat dilimleri
                 slots.forEachIndexed { slotIdx, slot ->
@@ -1141,69 +1187,30 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                                     .height(34.dp)
                                     .padding(horizontal = 2.dp)
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(
-                                        if (isSelected) EmeraldGreen else Slate700
-                                    )
-                                    .border(
-                                        1.dp,
-                                        if (isSelected) EmeraldGreen else TextSecondary.copy(alpha = 0.15f),
-                                        RoundedCornerShape(6.dp)
-                                    )
+                                    .background(if (isSelected) EmeraldGreen else Slate700)
+                                    .border(1.dp, if (isSelected) EmeraldGreen else TextSecondary.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
                                     .clickable { toggleSlot(dayIdx, slotIdx) },
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (isSelected) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = Color.White,
-                                        modifier = Modifier.size(14.dp)
-                                    )
+                                    Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                                 }
                             }
-                        }
-                    }
-                }
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp), color = TextSecondary.copy(alpha = 0.1f))
-
-                // Tüm Gün seçim butonları
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Box(modifier = Modifier.width(58.dp))
-                    WEEK_DAYS_FULL.indices.forEach { dayIdx ->
-                        val allSelected = (selectedSlots[dayIdx]?.size ?: 0) == slots.size
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(28.dp)
-                                .padding(horizontal = 2.dp)
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(
-                                    if (allSelected) DAY_COLORS[dayIdx].copy(alpha = 0.2f)
-                                    else DAY_COLORS[dayIdx].copy(alpha = 0.07f)
-                                )
-                                .border(
-                                    1.dp,
-                                    DAY_COLORS[dayIdx].copy(alpha = if (allSelected) 0.6f else 0.25f),
-                                    RoundedCornerShape(6.dp)
-                                )
-                                .clickable { toggleDay(dayIdx) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                if (allSelected) "✓" else stringResource(R.string.avail_select_all_day),
-                                color = DAY_COLORS[dayIdx],
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 9.sp
-                            )
                         }
                     }
                 }
             }
         }
 
-        // ── Temizle + Gönder Butonları ─────────────────────────
+        // ── Seçim özeti + Temizle + Güncelle ─────────────────
+        if (totalSelected > 0) {
+            Text(
+                "$totalSelected slot seçili",
+                color = EmeraldGreen,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             if (totalSelected > 0) {
                 OutlinedButton(
@@ -1218,82 +1225,46 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             }
             Button(
                 onClick = {
-                    if (totalSelected > 0) showConfirm = true
-                    else Toast.makeText(context, context.getString(R.string.avail_no_selection), Toast.LENGTH_SHORT).show()
+                    if (totalSelected == 0) {
+                        Toast.makeText(context, context.getString(R.string.avail_no_selection), Toast.LENGTH_SHORT).show()
+                    } else {
+                        isSaving = true
+                        adminViewModel.updateOwnAvailability(
+                            lecturerUsername = user.username,
+                            lecturerName     = user.fullName,
+                            slots            = buildSlotsMap(),
+                            onComplete       = { success ->
+                                isSaving = false
+                                val msg = if (success) "Müsaitlik haritanız güncellendi!" else "Güncelleme başarısız, tekrar deneyin."
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
                 },
+                enabled = !isSaving,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (totalSelected > 0) EmeraldGreen else TextSecondary.copy(alpha = 0.3f)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    if (totalSelected > 0)
-                        stringResource(R.string.avail_submit_btn) + " ($totalSelected)"
-                    else
-                        stringResource(R.string.avail_submit_btn),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelLarge
-                )
+                if (isSaving) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Kaydediliyor...", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                } else {
+                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        if (totalSelected > 0) "Haritamı Güncelle ($totalSelected slot)" else "Haritamı Güncelle",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
         }
 
         Spacer(Modifier.height(80.dp))
-    }
-
-    // ── Onay Dialogu ──────────────────────────────────────────
-    if (showConfirm) {
-        AlertDialog(
-            onDismissRequest = { showConfirm = false },
-            containerColor = Slate800,
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.EventAvailable, contentDescription = null, tint = EmeraldGreen, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.avail_confirm_title), color = EmeraldGreen, fontWeight = FontWeight.Bold)
-                }
-            },
-            text = {
-                Text(
-                    stringResource(R.string.avail_confirm_msg, totalSelected),
-                    color = TextPrimary,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showConfirm = false
-                        val slotsMap = WEEK_DAYS_FULL.indices.associate { dayIdx ->
-                            WEEK_DAYS_FULL[dayIdx] to (selectedSlots[dayIdx]
-                                ?.sorted()
-                                ?.map { slotIdx -> SCHEDULE_TIME_SLOTS[slotIdx] }
-                                ?: emptyList())
-                        }.filter { it.value.isNotEmpty() }
-                        adminViewModel.submitAvailability(
-                            lecturerUsername = user.username,
-                            lecturerName     = user.fullName,
-                            slots            = slotsMap
-                        )
-                        selectedSlots = emptyMap()
-                        Toast.makeText(context, context.getString(R.string.avail_sent_success), Toast.LENGTH_SHORT).show()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.avail_send), fontWeight = FontWeight.Bold)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showConfirm = false }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
-                }
-            }
-        )
     }
 }
 

@@ -16,6 +16,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -126,14 +127,15 @@ fun AcademicLogo(modifier: Modifier = Modifier) {
 }
 
 sealed class Screen(val route: String, @androidx.annotation.StringRes val labelRes: Int, val icon: ImageVector) {
-    object Login          : Screen("login",           R.string.nav_home,          Icons.Default.Lock)
-    object Register       : Screen("register",        R.string.nav_home,          Icons.Default.Person)
-    object ChangePassword : Screen("change_password", R.string.nav_settings,      Icons.Default.Lock)
-    object Home           : Screen("home",            R.string.nav_home,          Icons.Default.Home)
-    object Calendar       : Screen("calendar",        R.string.nav_calendar,      Icons.Default.DateRange)
-    object AdminHome      : Screen("admin_home",      R.string.nav_home,          Icons.Default.Home)
-    object Classrooms     : Screen("classrooms",      R.string.nav_classrooms,    Icons.Default.MeetingRoom)
-    object Assignment     : Screen("assignment",      R.string.nav_schedule,      Icons.Default.Edit)
+    object Login             : Screen("login",             R.string.nav_home,          Icons.Default.Lock)
+    object Register          : Screen("register",          R.string.nav_home,          Icons.Default.Person)
+    object ChangePassword    : Screen("change_password",   R.string.nav_settings,      Icons.Default.Lock)
+    object Home              : Screen("home",              R.string.nav_home,          Icons.Default.Home)
+    object Calendar          : Screen("calendar",          R.string.nav_calendar,      Icons.Default.DateRange)
+    object AdminHome         : Screen("admin_home",        R.string.nav_home,          Icons.Default.Home)
+    object Classrooms        : Screen("classrooms",        R.string.nav_classrooms,    Icons.Default.MeetingRoom)
+    object Assignment        : Screen("assignment",        R.string.nav_schedule,      Icons.Default.Edit)
+    object ScheduleCalendar  : Screen("schedule_calendar", R.string.nav_calendar,      Icons.Default.CalendarMonth)
     object LecturerHome         : Screen("lecturer_home",         R.string.nav_home,          Icons.Default.Home)
     object LecturerCalendar     : Screen("lecturer_calendar",     R.string.nav_calendar,      Icons.Default.DateRange)
     object LecturerAvailability : Screen("lecturer_availability", R.string.nav_availability,  Icons.Default.EventAvailable)
@@ -143,6 +145,7 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object Profile              : Screen("profile",               R.string.nav_settings,      Icons.Default.Settings)
     object Announcements        : Screen("announcements",         R.string.nav_announcements, Icons.Default.Notifications)
     object AdminAvailability    : Screen("admin_availability",    R.string.nav_availability,  Icons.Default.CalendarMonth)
+    object AutoAssign           : Screen("auto_assign",           R.string.nav_schedule,      Icons.Default.AutoAwesome)
 }
 
 @Composable
@@ -180,9 +183,9 @@ fun MainScreen(
 
     val bottomNavItems = remember(currentRole) {
         when (currentRole) {
-            UserRole.ADMIN   -> listOf(Screen.AdminHome, Screen.Classrooms, Screen.Assignment, Screen.Data, Screen.Announcements, Screen.Profile)
-            UserRole.STUDENT -> listOf(Screen.StudentHome, Screen.StudentCalendar, Screen.Announcements, Screen.Profile)
-            else             -> listOf(Screen.LecturerHome, Screen.LecturerCalendar, Screen.LecturerAvailability, Screen.Announcements, Screen.Profile)
+            UserRole.ADMIN   -> listOf(Screen.AdminHome, Screen.Assignment, Screen.ScheduleCalendar, Screen.Data, Screen.Profile)
+            UserRole.STUDENT -> listOf(Screen.StudentHome, Screen.StudentCalendar, Screen.Profile)
+            else             -> listOf(Screen.LecturerHome, Screen.LecturerCalendar, Screen.LecturerAvailability, Screen.Profile)
         }
     }
 
@@ -266,17 +269,19 @@ fun MainScreen(
                 // ── Admin ekranları ───────────────────────────────
                 composable(Screen.AdminHome.route)          { AdminHomeScreen(adminViewModel, navController) }
                 composable(Screen.Classrooms.route)         { ClassroomsScreen(adminViewModel) }
-                composable(Screen.Assignment.route)         { AssignmentScreen(adminViewModel) }
+                composable(Screen.Assignment.route)         { AssignmentScreen(adminViewModel, navController) }
+                composable(Screen.ScheduleCalendar.route)   { ScheduleCalendarScreen(adminViewModel, navController) }
+                composable(Screen.AutoAssign.route)         { AutoAssignScreen(adminViewModel, navController) }
                 composable(Screen.AdminAvailability.route)  { AdminAvailabilityScreen(adminViewModel, navController) }
                 // ── Öğretim görevlisi ekranları ───────────────────
-                composable(Screen.LecturerHome.route)           { LecturerHomeScreen(authViewModel, adminViewModel) }
+                composable(Screen.LecturerHome.route)           { LecturerHomeScreen(authViewModel, adminViewModel, navController) }
                 composable(Screen.LecturerCalendar.route)       { LecturerCalendarScreen(authViewModel, adminViewModel) }
                 composable(Screen.LecturerAvailability.route)   { LecturerAvailabilityScreen(authViewModel, adminViewModel) }
                 // ── Öğrenci ekranları ─────────────────────────────
-                composable(Screen.StudentHome.route)     { StudentHomeScreen(authViewModel, adminViewModel) }
+                composable(Screen.StudentHome.route)     { StudentHomeScreen(authViewModel, adminViewModel, navController) }
                 composable(Screen.StudentCalendar.route) { StudentCalendarScreen(authViewModel, adminViewModel) }
                 // ── Ortak ekranlar ────────────────────────────────
-                composable(Screen.Data.route)          { DataScreen(viewModel(factory = ViewModelFactory(dao, repository))) }
+                composable(Screen.Data.route)          { DataScreen(viewModel(factory = ViewModelFactory(dao, repository)), adminViewModel) }
                 composable(Screen.Announcements.route) { AnnouncementsScreen(announcementsViewModel, authViewModel) }
                 composable(Screen.Profile.route)       {
                     ProfileScreen(
@@ -1194,49 +1199,79 @@ fun StatCard(label: String, count: String, icon: ImageVector, modifier: Modifier
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DataScreen(viewModel: DataImportViewModel) {
-    val state by viewModel.uiState.collectAsState()
+fun DataScreen(importVM: DataImportViewModel, adminVM: AdminViewModel) {
+    val importState by importVM.uiState.collectAsState()
+    val classrooms  by adminVM.classrooms.collectAsState()
+    val schedEntries by adminVM.scheduleEntries.collectAsState()
     val context = LocalContext.current
-    var selectedType by remember { mutableStateOf(ImportType.COURSES) }
+
+    var selectedTab by remember { mutableStateOf(0) }
+    var pickType    by remember { mutableStateOf(ImportType.COURSES) }
 
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { viewModel.parseExcel(context, it, selectedType) }
+        uri?.let { importVM.parseExcel(context, it, pickType) }
+    }
+    val launch = { type: ImportType ->
+        pickType = type
+        filePicker.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     }
 
-    val launchCourses   = { selectedType = ImportType.COURSES;   filePicker.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") }
-    val launchLecturers = { selectedType = ImportType.LECTURERS; filePicker.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") }
-
-    when (val s = state) {
-        is ImportState.Idle -> ImportIdleScreen(
-            onDownloadCourses   = { viewModel.downloadTemplate(context, ImportType.COURSES) },
-            onImportCourses     = launchCourses,
-            onDownloadLecturers = { viewModel.downloadTemplate(context, ImportType.LECTURERS) },
-            onImportLecturers   = launchLecturers
-        )
-        is ImportState.Loading -> ImportLoadingScreen()
-        is ImportState.PreviewReady -> ImportPreviewScreen(
-            state    = s,
-            onDiscard = { viewModel.resetState() },
-            onSave    = { viewModel.commitToDb(s.items, s.type) }
-        )
-        is ImportState.Error -> ImportIdleScreen(
-            onDownloadCourses   = { viewModel.downloadTemplate(context, ImportType.COURSES) },
-            onImportCourses     = launchCourses,
-            onDownloadLecturers = { viewModel.downloadTemplate(context, ImportType.LECTURERS) },
-            onImportLecturers   = launchLecturers,
-            errorMessage        = s.message
-        )
+    // Non-idle import states take over the full screen
+    when (val s = importState) {
+        is ImportState.Loading      -> { ImportLoadingScreen(); return }
+        is ImportState.PreviewReady -> {
+            ImportPreviewScreen(s, { importVM.resetState() }, { importVM.commitToDb(s.items, s.type) })
+            return
+        }
+        is ImportState.CredentialSheet -> {
+            CredentialSheetScreen(s.credentials) { importVM.resetState() }
+            return
+        }
         is ImportState.Success -> {
-            LaunchedEffect(Unit) {
-                Toast.makeText(context, s.message, Toast.LENGTH_LONG).show()
-                viewModel.resetState()
+            LaunchedEffect(Unit) { Toast.makeText(context, s.message, Toast.LENGTH_LONG).show(); importVM.resetState() }
+            return
+        }
+        else -> {}
+    }
+
+    val errorMsg = (importState as? ImportState.Error)?.message
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // ── Tab bar ──────────────────────────────────────────────
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor   = Slate800,
+            contentColor     = EmeraldGreen,
+            indicator        = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier  = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                    color     = EmeraldGreen
+                )
+            }
+        ) {
+            listOf("Dersler", "Öğretmenler", "Sınıflar").forEachIndexed { i, label ->
+                Tab(
+                    selected = selectedTab == i,
+                    onClick  = { selectedTab = i; if (errorMsg != null) importVM.resetState() },
+                    text     = {
+                        Text(
+                            label,
+                            fontWeight = if (selectedTab == i) FontWeight.Bold else FontWeight.Normal,
+                            color      = if (selectedTab == i) EmeraldGreen else TextSecondary
+                        )
+                    }
+                )
             }
         }
-        is ImportState.CredentialSheet -> CredentialSheetScreen(
-            credentials = s.credentials,
-            onDone      = { viewModel.resetState() }
-        )
+
+        // ── Tab content ──────────────────────────────────────────
+        when (selectedTab) {
+            0 -> CourseImportTab(importVM, context, launch, errorMsg)
+            1 -> LecturerImportTab(importVM, context, launch, errorMsg)
+            2 -> ClassroomDataTab(importVM, adminVM, context, launch, classrooms, schedEntries)
+        }
     }
 }
 
@@ -1538,7 +1573,9 @@ fun ProfileScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        if (CredentialUtils.hashPassword(oldPassword) != user.password) {
+                        if (user.username == "admin") {
+                            Toast.makeText(context, "Admin şifresi sistem tarafından yönetilir, değiştirilemez.", Toast.LENGTH_SHORT).show()
+                        } else if (CredentialUtils.hashPassword(oldPassword) != user.password) {
                             Toast.makeText(context, context.getString(R.string.old_password_incorrect), Toast.LENGTH_SHORT).show()
                         } else if (newPassword != confirmPassword) {
                             Toast.makeText(context, context.getString(R.string.passwords_no_match), Toast.LENGTH_SHORT).show()

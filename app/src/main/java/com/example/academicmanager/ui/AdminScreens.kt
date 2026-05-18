@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,6 +69,8 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     val pendingRegistrations   by viewModel.pendingRegistrations.collectAsState()
     val pendingAvailabilities  by viewModel.pendingAvailabilities.collectAsState()
     val students               by viewModel.students.collectAsState()
+    val allAvailabilities      by viewModel.availabilities.collectAsState()
+    val courses                by viewModel.courses.collectAsState()
     val context = LocalContext.current
 
     var lecturerExpanded  by remember { mutableStateOf(true) }
@@ -81,6 +84,8 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     // Reject dialog state (availability)
     var rejectAvailTarget  by remember { mutableStateOf<LecturerAvailability?>(null) }
     var rejectAvailNote    by remember { mutableStateOf("") }
+    // View availability + schedule dialog
+    var viewAvailTarget    by remember { mutableStateOf<LecturerAvailability?>(null) }
 
     // Student add dialog state
     var showAddStudentDialog  by remember { mutableStateOf(false) }
@@ -165,12 +170,12 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
         // ── Header ──────────────────────────────────────────
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AcademicLogo(modifier = Modifier.size(44.dp))
+                AcademicLogo(modifier = Modifier.size(40.dp))
                 Spacer(Modifier.width(12.dp))
-                Column {
+                Column(Modifier.weight(1f)) {
                     Text(
                         stringResource(R.string.admin_dashboard),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.titleLarge,
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
                     )
@@ -179,6 +184,10 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                         style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary
                     )
+                }
+                // Duyurular bell ikonu
+                IconButton(onClick = { navController.navigate("announcements") }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Duyurular", tint = EmeraldGreen, modifier = Modifier.size(24.dp))
                 }
             }
         }
@@ -233,7 +242,8 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     PendingAvailabilityCard(
                         avail     = avail,
                         onApprove = { viewModel.approveAvailability(avail) },
-                        onReject  = { rejectAvailTarget = avail; rejectAvailNote = "" }
+                        onReject  = { rejectAvailTarget = avail; rejectAvailNote = "" },
+                        onView    = { viewAvailTarget = avail }
                     )
                 }
             }
@@ -313,9 +323,20 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                 }
             } else {
                 items(unassignedLecturers) { lecturer ->
+                    val lecturerAvail = allAvailabilities
+                        .filter { it.lecturerUsername == lecturer.username && it.status == AvailabilityStatus.APPROVED }
+                        .maxByOrNull { it.timestamp }
                     LecturerInfoRow(
                         lecturer = lecturer,
-                        onDelete = { viewModel.deleteLecturer(lecturer.username) }
+                        onDelete = { viewModel.deleteLecturer(lecturer.username) },
+                        onResetPassword = { newPwd, cb -> viewModel.resetLecturerPassword(lecturer, newPwd, cb) },
+                        availability = lecturerAvail,
+                        unassignedCourses = unassignedCourses,
+                        classrooms = classrooms,
+                        onAssignCourse = { course, classroom, day, time, session ->
+                            viewModel.assignCourse(course, lecturer, classroom, day, time, session)
+                        },
+                        assignmentResult = viewModel.assignmentResult
                     )
                 }
             }
@@ -500,6 +521,82 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
             },
             dismissButton = {
                 TextButton(onClick = { rejectRegTarget = null }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            }
+        )
+    }
+
+    // ── Availability View Dialog (müsaitlik haritası + ders takvimi) ──
+    viewAvailTarget?.let { avail ->
+        val lecturerEntries = scheduleEntries.filter { it.lecturerName == avail.lecturerName }
+        AlertDialog(
+            onDismissRequest = { viewAvailTarget = null },
+            containerColor = Slate800,
+            modifier = Modifier.fillMaxWidth(),
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier.size(36.dp).clip(CircleShape).background(EmeraldGreen.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(avail.lecturerName.firstOrNull()?.uppercase() ?: "?", color = EmeraldGreen, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text(avail.lecturerName, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Text("${avail.totalSlots} müsait slot", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Müsaitlik haritası
+                    Text("Müsaitlik Haritası", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                    AdminAvailabilityGrid(avail = avail, accentColor = EmeraldGreen)
+
+                    if (lecturerEntries.isNotEmpty()) {
+                        HorizontalDivider(color = TextSecondary.copy(alpha = 0.12f))
+                        Text("Mevcut Ders Takvimi (${lecturerEntries.size} ders)", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        lecturerEntries.sortedWith(compareBy({ WEEK_DAYS.indexOf(it.dayOfWeek) }, { it.timeSlot })).forEach { entry ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color(0xFFF59E0B).copy(alpha = 0.08f))
+                                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(28.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(dayToTurkishShort(entry.dayOfWeek), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(entry.courseName, color = TextPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text("${entry.timeSlot} · ${entry.classroomName}", color = TextSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+                                }
+                            }
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(TextSecondary.copy(alpha = 0.06f)).padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.DateRange, null, tint = TextSecondary, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Henüz ders atanmamış", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { viewAvailTarget = null }) {
+                    Text(stringResource(R.string.close), color = EmeraldGreen, fontWeight = FontWeight.Bold)
+                }
             }
         )
     }
@@ -729,10 +826,55 @@ private fun PanelCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LecturerInfoRow(lecturer: Lecturer, onDelete: () -> Unit = {}) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var showDetailDialog by remember { mutableStateOf(false) }
+private fun LecturerInfoRow(
+    lecturer: Lecturer,
+    onDelete: () -> Unit = {},
+    onResetPassword: ((String, (Boolean) -> Unit) -> Unit)? = null,
+    availability: LecturerAvailability? = null,
+    unassignedCourses: List<Course> = emptyList(),
+    classrooms: List<Classroom> = emptyList(),
+    onAssignCourse: ((Course, Classroom, String, String, String) -> Unit)? = null,
+    assignmentResult: kotlinx.coroutines.flow.SharedFlow<AssignmentResult>? = null
+) {
+    var showDeleteDialog   by remember { mutableStateOf(false) }
+    var showDetailDialog   by remember { mutableStateOf(false) }  // now = availability+assign dialog
+    var showResetPwdDialog by remember { mutableStateOf(false) }
+    var newPwd             by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    // Assignment form state
+    var selCourse    by remember { mutableStateOf<Course?>(null) }
+    var selClassroom by remember { mutableStateOf<Classroom?>(null) }
+    var selDay       by remember { mutableStateOf("") }
+    var selTime      by remember { mutableStateOf("") }
+    var selSession   by remember { mutableStateOf(SessionType.LECTURE) }
+    var assignError  by remember { mutableStateOf<String?>(null) }
+
+    // Collect assignment results for this dialog
+    LaunchedEffect(showDetailDialog) {
+        if (!showDetailDialog || assignmentResult == null) return@LaunchedEffect
+        assignmentResult.collect { result ->
+            when (result) {
+                is AssignmentResult.Success -> { showDetailDialog = false }
+                is AssignmentResult.LecturerClash   -> assignError = "Çakışma: ${result.existing.courseName} aynı saatte!"
+                is AssignmentResult.ClassroomClash  -> assignError = "Sınıf meşgul: ${result.existing.courseName}"
+                is AssignmentResult.CapacityWarning -> assignError = result.message
+                is AssignmentResult.Error           -> assignError = result.message
+            }
+        }
+    }
+
+    // Müsaitlik bazlı gün/saat filtreleme
+    val availDays = remember(availability) {
+        if (availability == null) WEEK_DAYS
+        else WEEK_DAYS.filter { day -> availability.slotsForDay(day).isNotEmpty() }
+    }
+    val availTimesForDay = remember(selDay, availability) {
+        if (availability == null || selDay.isEmpty()) TIME_SLOTS
+        else availability.slotsForDay(selDay).filter { it in TIME_SLOTS }
+    }
 
     Card(
         modifier = Modifier
@@ -771,6 +913,11 @@ private fun LecturerInfoRow(lecturer: Lecturer, onDelete: () -> Unit = {}) {
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+            if (onResetPassword != null) {
+                IconButton(onClick = { showResetPwdDialog = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.Lock, contentDescription = "Şifre sıfırla", tint = IndigoAccent.copy(alpha = 0.8f), modifier = Modifier.size(16.dp))
+                }
+            }
             IconButton(onClick = { showDeleteDialog = true }, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = ErrorRed.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
             }
@@ -792,21 +939,238 @@ private fun LecturerInfoRow(lecturer: Lecturer, onDelete: () -> Unit = {}) {
         )
     }
 
+    // ── Müsaitlik + Ders Atama Dialog ──────────────────────────
     if (showDetailDialog) {
         AlertDialog(
-            onDismissRequest = { showDetailDialog = false },
+            onDismissRequest = { showDetailDialog = false; assignError = null; selCourse = null; selClassroom = null; selDay = ""; selTime = "" },
             containerColor = Slate800,
-            title = { Text(lecturer.fullName, color = EmeraldGreen, fontWeight = FontWeight.Bold) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    if (lecturer.title.isNotBlank()) Text("${stringResource(R.string.lect_detail_title)}: ${lecturer.title}", color = TextPrimary)
-                    Text("${stringResource(R.string.lect_detail_username)}: @${lecturer.username}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-                    Text("${stringResource(R.string.lect_detail_dept)}: ${lecturer.department}", color = TextPrimary)
-                    if (lecturer.workingType.isNotBlank()) Text("${stringResource(R.string.lect_detail_working)}: ${lecturer.workingType}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-                    Text("${stringResource(R.string.lect_detail_role)}: ${lecturer.role}", color = EmeraldGreen, fontWeight = FontWeight.SemiBold)
+            modifier = Modifier.fillMaxWidth(),
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(40.dp).clip(CircleShape).background(EmeraldGreen.copy(alpha = 0.2f)), contentAlignment = Alignment.Center) {
+                        Text(lecturer.fullName.firstOrNull()?.uppercase() ?: "?", color = EmeraldGreen, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text(lecturer.fullName, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Text(lecturer.department, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             },
-            confirmButton = { TextButton(onClick = { showDetailDialog = false }) { Text(stringResource(R.string.close), color = TextSecondary) } }
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Müsaitlik haritası
+                    if (availability != null) {
+                        Text("Müsaitlik Haritası", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        AdminAvailabilityGrid(avail = availability, accentColor = EmeraldGreen)
+                    } else {
+                        Row(
+                            Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.08f)).padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Onaylı müsaitlik haritası yok — tüm saatler gösterilir", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+
+                    if (onAssignCourse != null) {
+                        HorizontalDivider(color = TextSecondary.copy(alpha = 0.12f))
+                        Text("Ders Ata", color = IndigoAccent, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+
+                        // Hata mesajı
+                        assignError?.let { err ->
+                            Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(ErrorRed.copy(alpha = 0.1f)).padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Warning, null, tint = ErrorRed, modifier = Modifier.size(13.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(err, color = ErrorRed, style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                                IconButton(onClick = { assignError = null }, modifier = Modifier.size(20.dp)) {
+                                    Icon(Icons.Default.Close, null, tint = ErrorRed, modifier = Modifier.size(12.dp))
+                                }
+                            }
+                        }
+
+                        val fieldColors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = Slate700,
+                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = TextSecondary,
+                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
+                        )
+
+                        // Ders seç
+                        var courseExp by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = courseExp, onExpandedChange = { courseExp = !courseExp }) {
+                            OutlinedTextField(
+                                value = selCourse?.let { "${it.courseCode} – ${it.courseName}" } ?: "Ders seçin",
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Ders") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = courseExp) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp), colors = fieldColors
+                            )
+                            ExposedDropdownMenu(expanded = courseExp, onDismissRequest = { courseExp = false }, modifier = Modifier.background(Slate800).heightIn(max = 200.dp)) {
+                                unassignedCourses.forEach { c ->
+                                    DropdownMenuItem(text = { Text("${c.courseCode} – ${c.courseName}", color = TextPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selCourse = c; courseExp = false })
+                                }
+                            }
+                        }
+
+                        // Gün seç (müsait günler)
+                        var dayExp by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = dayExp, onExpandedChange = { dayExp = !dayExp }) {
+                            OutlinedTextField(
+                                value = if (selDay.isEmpty()) "Gün seçin" else dayToTurkish(selDay),
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Gün${if (availability != null) " (müsait günler)" else ""}") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayExp) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp), colors = fieldColors
+                            )
+                            ExposedDropdownMenu(expanded = dayExp, onDismissRequest = { dayExp = false }, modifier = Modifier.background(Slate800)) {
+                                availDays.forEach { day ->
+                                    DropdownMenuItem(text = { Text(dayToTurkish(day), color = TextPrimary) }, onClick = { selDay = day; selTime = ""; dayExp = false })
+                                }
+                            }
+                        }
+
+                        // Saat seç (müsait saatler)
+                        var timeExp by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = timeExp, onExpandedChange = { if (selDay.isNotEmpty()) timeExp = !timeExp }) {
+                            OutlinedTextField(
+                                value = selTime.ifEmpty { "Önce gün seçin" },
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Saat${if (availability != null) " (müsait saatler)" else ""}") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = timeExp) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp), colors = fieldColors,
+                                enabled = selDay.isNotEmpty()
+                            )
+                            ExposedDropdownMenu(expanded = timeExp, onDismissRequest = { timeExp = false }, modifier = Modifier.background(Slate800)) {
+                                availTimesForDay.forEach { t ->
+                                    DropdownMenuItem(text = { Text(t, color = TextPrimary) }, onClick = { selTime = t; timeExp = false })
+                                }
+                            }
+                        }
+
+                        // Sınıf seç
+                        var clsExp by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = clsExp, onExpandedChange = { clsExp = !clsExp }) {
+                            OutlinedTextField(
+                                value = selClassroom?.let { "${it.name} (${it.capacity})" } ?: "Sınıf seçin",
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Sınıf") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = clsExp) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp), colors = fieldColors
+                            )
+                            ExposedDropdownMenu(expanded = clsExp, onDismissRequest = { clsExp = false }, modifier = Modifier.background(Slate800).heightIn(max = 200.dp)) {
+                                classrooms.forEach { cls ->
+                                    DropdownMenuItem(text = { Text("${cls.name} · ${cls.capacity} kişi · ${ClassroomType.displayName(cls.classroomType)}", color = TextPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selClassroom = cls; clsExp = false })
+                                }
+                            }
+                        }
+
+                        // Seans tipi
+                        var sessExp by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(expanded = sessExp, onExpandedChange = { sessExp = !sessExp }) {
+                            OutlinedTextField(
+                                value = SessionType.displayName(selSession),
+                                onValueChange = {}, readOnly = true,
+                                label = { Text("Seans Tipi") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sessExp) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                                shape = RoundedCornerShape(10.dp), colors = fieldColors
+                            )
+                            ExposedDropdownMenu(expanded = sessExp, onDismissRequest = { sessExp = false }, modifier = Modifier.background(Slate800)) {
+                                DropdownMenuItem(text = { Text("Teorik", color = TextPrimary) }, onClick = { selSession = SessionType.LECTURE; sessExp = false })
+                                DropdownMenuItem(text = { Text("Lab", color = TextPrimary) }, onClick = { selSession = SessionType.LAB; sessExp = false })
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (onAssignCourse != null) {
+                        val canAssign = selCourse != null && selClassroom != null && selDay.isNotEmpty() && selTime.isNotEmpty()
+                        Button(
+                            onClick = {
+                                if (canAssign) {
+                                    assignError = null
+                                    onAssignCourse(selCourse!!, selClassroom!!, selDay, selTime, selSession)
+                                }
+                            },
+                            enabled = canAssign,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent, disabledContainerColor = Slate700),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(Icons.Default.Check, null, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("Ata", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                    TextButton(onClick = { showDetailDialog = false; assignError = null }) {
+                        Text(stringResource(R.string.close), color = TextSecondary)
+                    }
+                }
+            },
+            dismissButton = null
+        )
+    }
+
+    if (showResetPwdDialog && onResetPassword != null) {
+        AlertDialog(
+            onDismissRequest = { showResetPwdDialog = false; newPwd = "" },
+            containerColor = Slate800,
+            title = { Text("Şifre Sıfırla", color = IndigoAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("${lecturer.fullName} (@${lecturer.username}) için yeni şifre belirleyin.", color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                    OutlinedTextField(
+                        value = newPwd,
+                        onValueChange = { newPwd = it },
+                        label = { Text("Yeni Şifre") },
+                        placeholder = { Text("En az 6 karakter", color = TextSecondary.copy(alpha = 0.5f)) },
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = Slate700,
+                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = TextSecondary,
+                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            cursorColor = IndigoAccent, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
+                        )
+                    )
+                    if (newPwd.isNotEmpty()) PasswordStrengthRow(newPwd)
+                    Text("Hoca bir sonraki girişte şifresini değiştirmek zorunda kalacak.", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (newPwd.length < 6) {
+                            Toast.makeText(context, "Şifre en az 6 karakter olmalıdır", Toast.LENGTH_SHORT).show()
+                        } else {
+                            onResetPassword(newPwd) { success ->
+                                if (success) {
+                                    Toast.makeText(context, "${lecturer.fullName} şifresi sıfırlandı.", Toast.LENGTH_SHORT).show()
+                                    showResetPwdDialog = false; newPwd = ""
+                                } else {
+                                    Toast.makeText(context, "Şifre sıfırlama başarısız.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent)
+                ) { Text("Sıfırla") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetPwdDialog = false; newPwd = "" }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            }
         )
     }
 }
@@ -1105,7 +1469,8 @@ private fun AllAssignedBanner(message: String) {
 private fun PendingAvailabilityCard(
     avail: LecturerAvailability,
     onApprove: () -> Unit,
-    onReject: () -> Unit
+    onReject: () -> Unit,
+    onView: () -> Unit = {}
 ) {
     val accentColor = Color(0xFF10B981)
     Card(
@@ -1131,7 +1496,10 @@ private fun PendingAvailabilityCard(
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
-                Icon(Icons.Default.EventAvailable, contentDescription = null, tint = accentColor, modifier = Modifier.size(18.dp))
+                // Görüntüle ikonu
+                IconButton(onClick = onView, modifier = Modifier.size(32.dp)) {
+                    Icon(Icons.Default.CalendarMonth, contentDescription = "Görüntüle", tint = accentColor, modifier = Modifier.size(18.dp))
+                }
             }
             // Day summary chips
             val days = listOf("Monday" to avail.monday, "Tuesday" to avail.tuesday, "Wednesday" to avail.wednesday, "Thursday" to avail.thursday, "Friday" to avail.friday)
@@ -1153,7 +1521,20 @@ private fun PendingAvailabilityCard(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Üç buton: Görüntüle | Onayla | Reddet
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedButton(
+                    onClick = onView,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor),
+                    border = BorderStroke(1.dp, accentColor.copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(vertical = 6.dp)
+                ) {
+                    Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text("Görüntüle", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+                }
                 Button(
                     onClick = onApprove,
                     modifier = Modifier.weight(1f),
@@ -1161,9 +1542,9 @@ private fun PendingAvailabilityCard(
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(vertical = 6.dp)
                 ) {
-                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.approve), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text(stringResource(R.string.approve), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
                 OutlinedButton(
                     onClick = onReject,
@@ -1173,9 +1554,9 @@ private fun PendingAvailabilityCard(
                     shape = RoundedCornerShape(8.dp),
                     contentPadding = PaddingValues(vertical = 6.dp)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.reject), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text(stringResource(R.string.reject), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -1794,7 +2175,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AssignmentScreen(viewModel: AdminViewModel) {
+fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
     val courses         by viewModel.courses.collectAsState()
     val lecturers       by viewModel.lecturers.collectAsState()
     val classrooms      by viewModel.classrooms.collectAsState()
@@ -1851,17 +2232,31 @@ fun AssignmentScreen(viewModel: AdminViewModel) {
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            stringResource(R.string.course_assignment_title),
-            style = MaterialTheme.typography.headlineSmall,
-            color = TextPrimary,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            stringResource(R.string.course_assignment_subtitle),
-            color = TextSecondary,
-            style = MaterialTheme.typography.bodySmall
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.course_assignment_title),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    stringResource(R.string.course_assignment_subtitle),
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Button(
+                onClick = { navController.navigate("auto_assign") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8B5CF6)),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Otomatik Ata", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+            }
+        }
 
         Spacer(Modifier.height(4.dp))
 
@@ -2049,6 +2444,439 @@ private fun DropdownSelector(
                     }
                 )
             }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUTO-ASSIGN SCREEN
+// ─────────────────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AutoAssignScreen(viewModel: AdminViewModel, navController: NavController) {
+    val state       by viewModel.autoAssignState.collectAsState()
+    val unassignedLecturers by viewModel.unassignedLecturers.collectAsState()
+    val unassignedCourses   by viewModel.unassignedCourses.collectAsState()
+    val availabilities      by viewModel.availabilities.collectAsState()
+    val classrooms          by viewModel.classrooms.collectAsState()
+    val context = LocalContext.current
+
+    val accentColor = Color(0xFF8B5CF6)
+
+    // Done → kısa süre sonra geri dön
+    LaunchedEffect(state) {
+        if (state is AdminViewModel.AutoAssignState.Done) {
+            val s = state as AdminViewModel.AutoAssignState.Done
+            Toast.makeText(
+                context,
+                "${s.saved} ders atandı${if (s.failed > 0) ", ${s.failed} hata" else ""}",
+                Toast.LENGTH_LONG
+            ).show()
+            kotlinx.coroutines.delay(1500)
+            viewModel.resetAutoAssign()
+            navController.popBackStack()
+        }
+    }
+
+    Scaffold(
+        containerColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text("Otomatik Ders Atama", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                        Text("Müsaitlik haritasına göre dersler otomatik atanır", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        viewModel.resetAutoAssign()
+                        navController.popBackStack()
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = accentColor)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = TextPrimary)
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            when (val s = state) {
+
+                // ── IDLE ─────────────────────────────────────────
+                is AdminViewModel.AutoAssignState.Idle -> {
+                    item { AutoAssignIdleSection(viewModel, accentColor, unassignedCourses, availabilities, classrooms) }
+                }
+
+                // ── COMPUTING ─────────────────────────────────────
+                is AdminViewModel.AutoAssignState.Computing -> {
+                    item {
+                        Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                CircularProgressIndicator(color = accentColor, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
+                                Text("Hesaplanıyor...", color = TextSecondary, fontWeight = FontWeight.SemiBold)
+                                Text("Müsaitlikler ve sınıflar kontrol ediliyor", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                }
+
+                // ── READY ─────────────────────────────────────────
+                is AdminViewModel.AutoAssignState.Ready -> {
+                    // Summary row
+                    item {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            AutoAssignStatChip("${s.proposals.count { it.included }} seçili", accentColor, Modifier.weight(1f))
+                            AutoAssignStatChip("${s.unassigned.size} atanamadı", ErrorRed, Modifier.weight(1f))
+                            if (s.warnings.isNotEmpty())
+                                AutoAssignStatChip("${s.warnings.size} uyarı", Color(0xFFF59E0B), Modifier.weight(1f))
+                        }
+                    }
+
+                    // Select all / none row
+                    item {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { viewModel.selectAllProposals(true) },
+                                modifier = Modifier.weight(1f),
+                                border = BorderStroke(1.dp, accentColor.copy(alpha = 0.4f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) { Text("Tümünü Seç", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                            OutlinedButton(
+                                onClick = { viewModel.selectAllProposals(false) },
+                                modifier = Modifier.weight(1f),
+                                border = BorderStroke(1.dp, TextSecondary.copy(alpha = 0.3f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) { Text("Tümünü Kaldır", style = MaterialTheme.typography.labelSmall) }
+                            OutlinedButton(
+                                onClick = { viewModel.runAutoAssign() },
+                                modifier = Modifier.weight(1f),
+                                border = BorderStroke(1.dp, TextSecondary.copy(alpha = 0.3f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.Refresh, null, modifier = Modifier.size(13.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text("Yenile", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
+                    }
+
+                    // Proposals
+                    if (s.proposals.isEmpty()) {
+                        item {
+                            Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Slate800), shape = RoundedCornerShape(14.dp)) {
+                                Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(Icons.Default.SearchOff, null, tint = TextSecondary, modifier = Modifier.size(36.dp))
+                                    Spacer(Modifier.height(8.dp))
+                                    Text("Atanacak ders bulunamadı", color = TextSecondary)
+                                    Text("Hocaların müsaitlik haritası girilmiş olmalı", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                                }
+                            }
+                        }
+                    } else {
+                        item {
+                            Text(
+                                "Önerilen Atamalar (${s.proposals.size})",
+                                color = accentColor, fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
+                        itemsIndexed(s.proposals) { index, proposal ->
+                            AutoAssignProposalCard(
+                                proposal = proposal,
+                                accentColor = accentColor,
+                                onToggle = { viewModel.toggleProposal(index) }
+                            )
+                        }
+                    }
+
+                    // Unassigned courses
+                    if (s.unassigned.isNotEmpty()) {
+                        item {
+                            Text(
+                                "Atanamayan Dersler (${s.unassigned.size})",
+                                color = ErrorRed, fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                        items(s.unassigned) { course ->
+                            Card(
+                                Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = ErrorRed.copy(alpha = 0.07f)),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, ErrorRed.copy(alpha = 0.25f))
+                            ) {
+                                Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)).background(ErrorRed.copy(alpha = 0.15f)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(course.courseCode.take(3), color = ErrorRed, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                    }
+                                    Spacer(Modifier.width(10.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(course.courseName, color = TextPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text("Uygun hoca/saat/sınıf bulunamadı", color = ErrorRed, style = MaterialTheme.typography.labelSmall)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Warnings
+                    if (s.warnings.isNotEmpty()) {
+                        item {
+                            Text("Uyarılar", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
+                        }
+                        items(s.warnings) { warning ->
+                            Row(
+                                Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.08f)).padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(warning, color = Color(0xFFF59E0B), style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+
+                    // Save button
+                    item {
+                        val selectedCount = s.proposals.count { it.included }
+                        Spacer(Modifier.height(8.dp))
+                        Button(
+                            onClick = { viewModel.confirmAutoAssign() },
+                            enabled = selectedCount > 0,
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accentColor,
+                                disabledContainerColor = Slate700
+                            )
+                        ) {
+                            Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                if (selectedCount > 0) "$selectedCount Atamayı Kaydet" else "Atama Seçilmedi",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                        }
+                        Spacer(Modifier.height(80.dp))
+                    }
+                }
+
+                // ── SAVING ───────────────────────────────────────
+                is AdminViewModel.AutoAssignState.Saving -> {
+                    item {
+                        Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                CircularProgressIndicator(color = EmeraldGreen, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
+                                Text("Firebase'e kaydediliyor...", color = TextSecondary, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
+                }
+
+                // ── DONE (LaunchedEffect handles nav) ────────────
+                is AdminViewModel.AutoAssignState.Done -> {
+                    item {
+                        Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Icon(Icons.Default.CheckCircle, null, tint = EmeraldGreen, modifier = Modifier.size(64.dp))
+                                Text("Tamamlandı!", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AutoAssignIdleSection(
+    viewModel: AdminViewModel,
+    accentColor: Color,
+    unassignedCourses: List<Course>,
+    availabilities: List<com.example.academicmanager.data.LecturerAvailability>,
+    classrooms: List<Classroom>
+) {
+    val approvedAvailCount = availabilities.count { it.status == AvailabilityStatus.APPROVED }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Info card
+        Card(
+            Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = accentColor.copy(alpha = 0.1f)),
+            shape = RoundedCornerShape(18.dp),
+            border = BorderStroke(1.dp, accentColor.copy(alpha = 0.3f))
+        ) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.AutoAwesome, null, tint = accentColor, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text("Nasıl Çalışır?", color = accentColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                }
+                listOf(
+                    "Hocaların müsaitlik haritaları incelenir",
+                    "Her ders için uygun hoca, saat ve sınıf bulunur",
+                    "Çakışmalar otomatik engellenir",
+                    "Lab dersleri için ayrı lab seansı eklenir",
+                    "Yük dengeleme ile adil dağılım sağlanır"
+                ).forEachIndexed { i, text ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(20.dp).clip(CircleShape).background(accentColor.copy(alpha = 0.2f)),
+                            contentAlignment = Alignment.Center
+                        ) { Text("${i+1}", color = accentColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                        Spacer(Modifier.width(10.dp))
+                        Text(text, color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            }
+        }
+
+        // Stats
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AutoAssignStatChip("${unassignedCourses.size} ders bekliyor", accentColor, Modifier.weight(1f))
+            AutoAssignStatChip("$approvedAvailCount hoca müsait", EmeraldGreen, Modifier.weight(1f))
+            AutoAssignStatChip("${classrooms.size} sınıf var", Color(0xFFF59E0B), Modifier.weight(1f))
+        }
+
+        // Requirements check
+        val hasIssues = unassignedCourses.isEmpty() || approvedAvailCount == 0 || classrooms.isEmpty()
+        if (hasIssues) {
+            Card(
+                Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF59E0B).copy(alpha = 0.08f)),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.3f))
+            ) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Ön Koşullar", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                    }
+                    RequirementRow("Atanacak ders var", unassignedCourses.isNotEmpty())
+                    RequirementRow("Onaylı müsaitlik var", approvedAvailCount > 0)
+                    RequirementRow("Sınıf tanımlı", classrooms.isNotEmpty())
+                }
+            }
+        }
+
+        Button(
+            onClick = { viewModel.runAutoAssign() },
+            enabled = !hasIssues,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = accentColor, disabledContainerColor = Slate700)
+        ) {
+            Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("Otomatik Atamayı Başlat", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        }
+    }
+}
+
+@Composable
+private fun RequirementRow(label: String, met: Boolean) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            if (met) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+            null, tint = if (met) EmeraldGreen else ErrorRed, modifier = Modifier.size(14.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(label, color = if (met) TextPrimary else ErrorRed, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun AutoAssignStatChip(label: String, color: Color, modifier: Modifier = Modifier) {
+    Box(
+        modifier.clip(RoundedCornerShape(10.dp)).background(color.copy(alpha = 0.12f)).padding(vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(label, color = color, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+private fun AutoAssignProposalCard(
+    proposal: AdminViewModel.AutoAssignProposal,
+    accentColor: Color,
+    onToggle: () -> Unit
+) {
+    val isLab = proposal.entry.sessionType == SessionType.LAB
+    val cardColor  = if (proposal.included) (if (isLab) Color(0xFFF59E0B) else accentColor) else TextSecondary
+    val bgAlpha    = if (proposal.included) 0.08f else 0.04f
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = cardColor.copy(alpha = bgAlpha)),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, cardColor.copy(alpha = if (proposal.included) 0.35f else 0.15f))
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Gün badge
+            Box(
+                modifier = Modifier.size(44.dp).clip(RoundedCornerShape(10.dp)).background(cardColor.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(dayToTurkishShort(proposal.entry.dayOfWeek), color = cardColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text(proposal.entry.timeSlot.take(5), color = cardColor, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        proposal.entry.courseName,
+                        color = if (proposal.included) TextPrimary else TextSecondary,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (isLab) {
+                        Spacer(Modifier.width(6.dp))
+                        Box(Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
+                            Text("LAB", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                        }
+                    }
+                }
+                Text(proposal.entry.lecturerName, color = cardColor, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
+                Text("${proposal.entry.classroomName} · ${proposal.entry.timeSlot}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+            }
+            // Toggle switch
+            Switch(
+                checked = proposal.included,
+                onCheckedChange = { onToggle() },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = cardColor,
+                    uncheckedTrackColor = Slate700
+                )
+            )
         }
     }
 }

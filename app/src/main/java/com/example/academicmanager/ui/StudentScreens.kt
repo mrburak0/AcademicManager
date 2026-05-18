@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.academicmanager.R
 import com.example.academicmanager.data.ScheduleEntry
 import com.example.academicmanager.data.SessionType
@@ -70,7 +71,7 @@ private val STUDENT_DAY_COLORS = listOf(
 // ─────────────────────────────────────────────────────────────
 
 @Composable
-fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewModel) {
+fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewModel, navController: NavController) {
     val user        = authViewModel.currentUser ?: return
     val allEntries  by adminViewModel.scheduleEntries.collectAsState()
     val allCourses  by adminViewModel.courses.collectAsState()
@@ -99,12 +100,12 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
             shape    = RoundedCornerShape(20.dp)
         ) {
             Row(
-                modifier          = Modifier.padding(20.dp),
+                modifier          = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(IndigoAccent.copy(alpha = 0.25f))
                         .border(2.dp, IndigoAccent, CircleShape),
@@ -117,8 +118,8 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
                         fontWeight = FontWeight.Bold
                     )
                 }
-                Spacer(Modifier.width(16.dp))
-                Column {
+                Spacer(Modifier.width(14.dp))
+                Column(Modifier.weight(1f)) {
                     Text(stringResource(R.string.welcome_student), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
                     Text(user.fullName, color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     if (user.department.isNotBlank()) {
@@ -128,6 +129,10 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
                     if (user.studentYear.isNotBlank()) {
                         Text(user.studentYear, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
                     }
+                }
+                // Duyurular bell ikonu
+                IconButton(onClick = { navController.navigate("announcements") }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Duyurular", tint = IndigoAccent, modifier = Modifier.size(22.dp))
                 }
             }
         }

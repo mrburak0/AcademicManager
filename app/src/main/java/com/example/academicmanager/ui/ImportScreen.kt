@@ -28,8 +28,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import com.example.academicmanager.data.*
 import com.example.academicmanager.ui.theme.*
+import com.example.academicmanager.ui.viewmodels.AdminViewModel
+import com.example.academicmanager.ui.viewmodels.DataImportViewModel
 import com.example.academicmanager.ui.viewmodels.ImportState
 import com.example.academicmanager.ui.viewmodels.ImportType
 
@@ -876,5 +883,311 @@ fun CredentialSheetScreen(
                 Text("Anladım, Devam Et", fontWeight = FontWeight.Bold)
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// TAB COMPOSABLES — called from DataScreen in MainScreen.kt
+// ─────────────────────────────────────────────────────────────
+
+@Composable
+fun CourseImportTab(
+    importVM: DataImportViewModel,
+    context: Context,
+    onLaunch: (ImportType) -> Unit,
+    errorMsg: String?
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        item {
+            Column {
+                Text("Ders İçe Aktar", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text("Excel dosyasından ders kataloğunu yükle", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        if (errorMsg != null) {
+            item { ErrorBanner(errorMsg) }
+        }
+        item { WorkflowStepsCard() }
+        item {
+            ImportTypeCard(
+                title = "Dersler",
+                subtitle = "Ders kataloğunu içe aktar",
+                accentColor = IndigoAccent,
+                expectedColumns = listOf("Course Code", "Course Name", "Department"),
+                note = null,
+                onDownload = { importVM.downloadTemplate(context, ImportType.COURSES) },
+                onImport   = { onLaunch(ImportType.COURSES) }
+            )
+        }
+    }
+}
+
+@Composable
+fun LecturerImportTab(
+    importVM: DataImportViewModel,
+    context: Context,
+    onLaunch: (ImportType) -> Unit,
+    errorMsg: String?
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        item {
+            Column {
+                Text("Öğretmen İçe Aktar", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text("Excel dosyasından öğretim görevlilerini yükle", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+        if (errorMsg != null) {
+            item { ErrorBanner(errorMsg) }
+        }
+        item { WorkflowStepsCard() }
+        item {
+            ImportTypeCard(
+                title = "Öğretmenler",
+                subtitle = "Öğretim görevlilerini içe aktar",
+                accentColor = EmeraldGreen,
+                expectedColumns = listOf("Name", "Title", "Working Type", "Department"),
+                note = "Giriş bilgileri (kullanıcı adı + 6 karakterli şifre) otomatik oluşturulur.",
+                onDownload = { importVM.downloadTemplate(context, ImportType.LECTURERS) },
+                onImport   = { onLaunch(ImportType.LECTURERS) }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ClassroomDataTab(
+    importVM: DataImportViewModel,
+    adminVM: AdminViewModel,
+    context: Context,
+    onLaunch: (ImportType) -> Unit,
+    classrooms: List<Classroom>,
+    scheduleEntries: List<ScheduleEntry>
+) {
+    val accentColor = Color(0xFFF59E0B)
+
+    // Manuel giriş state
+    var roomName     by remember { mutableStateOf("") }
+    var capacityText by remember { mutableStateOf("") }
+    var roomType     by remember { mutableStateOf(ClassroomType.LECTURE) }
+    var typeExpanded by remember { mutableStateOf(false) }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        // Başlık
+        item {
+            Column {
+                Text("Sınıf Yönetimi", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text("Manuel ekle veya Excel ile içe aktar", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+
+        // Manuel giriş formu
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors   = CardDefaults.cardColors(containerColor = Slate800),
+                shape    = RoundedCornerShape(18.dp)
+            ) {
+                Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(accentColor.copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) { Icon(Icons.Default.Add, null, tint = accentColor, modifier = Modifier.size(18.dp)) }
+                        Spacer(Modifier.width(10.dp))
+                        Text("Manuel Sınıf Ekle", color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                    }
+
+                    // Sınıf adı
+                    OutlinedTextField(
+                        value = roomName,
+                        onValueChange = { roomName = it },
+                        label = { Text("Sınıf Adı (Örn. A-101, Lab-2)") },
+                        placeholder = { Text("Metin girin", color = TextSecondary.copy(alpha = 0.5f)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
+                            focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
+                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            cursorColor = accentColor, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
+                        )
+                    )
+
+                    // Kapasite (yalnızca sayı)
+                    OutlinedTextField(
+                        value = capacityText,
+                        onValueChange = { capacityText = it.filter { c -> c.isDigit() }.take(4) },
+                        label = { Text("Kapasite (1–2000)") },
+                        placeholder = { Text("Sayı girin", color = TextSecondary.copy(alpha = 0.5f)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
+                            focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
+                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            cursorColor = accentColor, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
+                        )
+                    )
+
+                    // Tip dropdown
+                    ExposedDropdownMenuBox(expanded = typeExpanded, onExpandedChange = { typeExpanded = !typeExpanded }) {
+                        OutlinedTextField(
+                            value = ClassroomType.displayName(roomType),
+                            onValueChange = {}, readOnly = true,
+                            label = { Text("Sınıf Tipi") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
+                                focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
+                                focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                                focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
+                            )
+                        )
+                        ExposedDropdownMenu(expanded = typeExpanded, onDismissRequest = { typeExpanded = false }, modifier = Modifier.background(Slate800)) {
+                            ClassroomType.all.forEach { t ->
+                                DropdownMenuItem(
+                                    text = { Text(ClassroomType.displayName(t), color = TextPrimary) },
+                                    onClick = { roomType = t; typeExpanded = false }
+                                )
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            val cap = capacityText.toIntOrNull() ?: 0
+                            when {
+                                roomName.isBlank() -> Toast.makeText(context, "Sınıf adı boş olamaz", Toast.LENGTH_SHORT).show()
+                                cap < 1 || cap > 2000 -> Toast.makeText(context, "Kapasite 1–2000 arasında olmalı", Toast.LENGTH_SHORT).show()
+                                else -> {
+                                    adminVM.addClassroom(roomName.trim(), cap, roomType)
+                                    roomName = ""; capacityText = ""
+                                    Toast.makeText(context, "Sınıf eklendi: ${roomName.trim().ifBlank { "OK" }}", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                    ) {
+                        Icon(Icons.Default.Add, null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Sınıfı Kaydet", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+
+        // Excel import kartı
+        item {
+            ImportTypeCard(
+                title = "Sınıflar (Excel)",
+                subtitle = "Excel dosyasından toplu sınıf ekle",
+                accentColor = accentColor,
+                expectedColumns = listOf("Name", "Capacity", "Type"),
+                note = "Type sütunu: LECTURE, LAB veya COMPUTER_LAB değerlerinden biri olmalı.",
+                onDownload = { importVM.downloadClassroomTemplate(context) },
+                onImport   = { onLaunch(ImportType.CLASSROOMS) }
+            )
+        }
+
+        // Mevcut sınıf listesi
+        if (classrooms.isNotEmpty()) {
+            item {
+                Text(
+                    "Kayıtlı Sınıflar (${classrooms.size})",
+                    color = accentColor, fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            items(classrooms) { classroom ->
+                val bookingCount = scheduleEntries.count { it.classroomName == classroom.name }
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier.size(42.dp).clip(RoundedCornerShape(10.dp)).background(accentColor.copy(alpha = 0.15f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Default.MeetingRoom, null, tint = accentColor, modifier = Modifier.size(20.dp))
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(classroom.name, color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                                Spacer(Modifier.width(8.dp))
+                                Box(Modifier.clip(RoundedCornerShape(5.dp)).background(accentColor.copy(alpha = 0.15f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
+                                    Text(ClassroomType.displayName(classroom.classroomType), color = accentColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                            Text("Kapasite: ${classroom.capacity} · $bookingCount rezervasyon", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        }
+                        var showDel by remember { mutableStateOf(false) }
+                        IconButton(onClick = { showDel = true }, modifier = Modifier.size(32.dp)) {
+                            Icon(Icons.Default.Delete, null, tint = ErrorRed.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
+                        }
+                        if (showDel) {
+                            AlertDialog(
+                                onDismissRequest = { showDel = false },
+                                containerColor = Slate800,
+                                title = { Text("Sınıfı Sil", color = ErrorRed) },
+                                text  = { Text("${classroom.name} sınıfını silmek istiyor musunuz?", color = TextPrimary) },
+                                confirmButton = {
+                                    Button(onClick = { adminVM.deleteClassroom(classroom.id); showDel = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text("Sil") }
+                                },
+                                dismissButton = { TextButton(onClick = { showDel = false }) { Text("İptal", color = TextSecondary) } }
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            item {
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Icon(Icons.Default.MeetingRoom, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
+                        Text("Henüz sınıf eklenmedi", color = TextSecondary)
+                    }
+                }
+            }
+        }
+        item { Spacer(Modifier.height(80.dp)) }
+    }
+}
+
+@Composable
+private fun ErrorBanner(message: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(ErrorRed.copy(alpha = 0.1f)).padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.Close, null, tint = ErrorRed, modifier = Modifier.size(16.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(message, color = ErrorRed, style = MaterialTheme.typography.bodySmall)
     }
 }

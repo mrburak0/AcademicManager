@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.academicmanager.data.*
 import com.example.academicmanager.util.CredentialUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -84,6 +85,22 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
             try {
                 repository.deleteLecturer(username)
             } catch (_: Exception) { }
+        }
+    }
+
+    fun resetLecturerPassword(lecturer: Lecturer, newPassword: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                repository.updateLecturer(
+                    lecturer.copy(
+                        password = CredentialUtils.hashPassword(newPassword),
+                        mustChangePassword = true
+                    )
+                )
+                onResult(true)
+            } catch (_: Exception) {
+                onResult(false)
+            }
         }
     }
 
@@ -303,6 +320,42 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
         }
     }
 
+    // Hocanın kendi haritasını admin onayı olmadan direkt APPROVED olarak günceller
+    fun updateOwnAvailability(
+        lecturerUsername: String,
+        lecturerName: String,
+        slots: Map<String, List<String>>,
+        onComplete: (Boolean) -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            try {
+                val existing = availabilities.value
+                    .filter { it.lecturerUsername == lecturerUsername && it.status == AvailabilityStatus.APPROVED }
+                    .maxByOrNull { it.timestamp }
+
+                val updated = LecturerAvailability(
+                    id               = existing?.id ?: "",
+                    lecturerUsername = lecturerUsername,
+                    lecturerName     = lecturerName,
+                    monday           = slots["Monday"]    ?: emptyList(),
+                    tuesday          = slots["Tuesday"]   ?: emptyList(),
+                    wednesday        = slots["Wednesday"] ?: emptyList(),
+                    thursday         = slots["Thursday"]  ?: emptyList(),
+                    friday           = slots["Friday"]    ?: emptyList(),
+                    status           = AvailabilityStatus.APPROVED
+                )
+                if (existing != null) {
+                    repository.updateAvailability(updated)
+                } else {
+                    repository.addAvailability(updated)
+                }
+                onComplete(true)
+            } catch (_: Exception) {
+                onComplete(false)
+            }
+        }
+    }
+
     fun approveAvailability(availability: LecturerAvailability) {
         viewModelScope.launch {
             try {
@@ -380,5 +433,228 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
                 onComplete(false)
             }
         }
+    }
+
+    // ── Otomatik Ders Atama ───────────────────────────────────
+
+    data class AutoAssignProposal(
+        val entry: ScheduleEntry,
+        val course: Course,
+        val included: Boolean = true
+    )
+
+    sealed class AutoAssignState {
+        object Idle : AutoAssignState()
+        object Computing : AutoAssignState()
+        data class Ready(
+            val proposals: List<AutoAssignProposal>,
+            val unassigned: List<Course>,
+            val warnings: List<String> = emptyList()
+        ) : AutoAssignState()
+        object Saving : AutoAssignState()
+        data class Done(val saved: Int, val failed: Int) : AutoAssignState()
+    }
+
+    private val _autoAssignState = MutableStateFlow<AutoAssignState>(AutoAssignState.Idle)
+    val autoAssignState: StateFlow<AutoAssignState> = _autoAssignState
+
+    fun runAutoAssign() {
+        viewModelScope.launch(Dispatchers.Default) {
+            _autoAssignState.value = AutoAssignState.Computing
+
+            val allCourses      = courses.value
+            val allLecturers    = lecturers.value
+            val allAvails       = availabilities.value.filter { it.status == AvailabilityStatus.APPROVED }
+            val allClassrooms   = classrooms.value
+            val existingEntries = scheduleEntries.value
+
+            // Teorik seansı henüz atanmamış dersler
+            val unassignedCourses = allCourses.filter { c ->
+                existingEntries.none { it.courseCode == c.courseCode && it.sessionType == SessionType.LECTURE }
+            }
+
+            _autoAssignState.value = computeAutoAssign(
+                unassignedCourses = unassignedCourses,
+                allLecturers      = allLecturers,
+                availabilities    = allAvails,
+                classrooms        = allClassrooms,
+                existingEntries   = existingEntries
+            )
+        }
+    }
+
+    fun toggleProposal(index: Int) {
+        val current = _autoAssignState.value as? AutoAssignState.Ready ?: return
+        val updated = current.proposals.toMutableList().apply {
+            this[index] = this[index].copy(included = !this[index].included)
+        }
+        _autoAssignState.value = current.copy(proposals = updated)
+    }
+
+    fun selectAllProposals(select: Boolean) {
+        val current = _autoAssignState.value as? AutoAssignState.Ready ?: return
+        _autoAssignState.value = current.copy(
+            proposals = current.proposals.map { it.copy(included = select) }
+        )
+    }
+
+    fun confirmAutoAssign() {
+        val current = _autoAssignState.value as? AutoAssignState.Ready ?: return
+        val toSave = current.proposals.filter { it.included }
+        viewModelScope.launch {
+            _autoAssignState.value = AutoAssignState.Saving
+            var saved = 0; var failed = 0
+            toSave.forEach { proposal ->
+                try { repository.addScheduleEntry(proposal.entry); saved++ }
+                catch (_: Exception) { failed++ }
+            }
+            _autoAssignState.value = AutoAssignState.Done(saved, failed)
+        }
+    }
+
+    fun resetAutoAssign() { _autoAssignState.value = AutoAssignState.Idle }
+
+    private fun computeAutoAssign(
+        unassignedCourses: List<Course>,
+        allLecturers:      List<Lecturer>,
+        availabilities:    List<LecturerAvailability>,
+        classrooms:        List<Classroom>,
+        existingEntries:   List<ScheduleEntry>
+    ): AutoAssignState.Ready {
+
+        val DAYS  = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+        val SLOTS = listOf(
+            "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
+            "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00"
+        )
+
+        // Mevcut doluluk haritaları
+        val lecturerOccupied  = mutableMapOf<String, MutableSet<String>>()
+        val classroomOccupied = mutableMapOf<String, MutableSet<String>>()
+        existingEntries.forEach { e ->
+            lecturerOccupied .getOrPut(e.lecturerName)  { mutableSetOf() }.add("${e.dayOfWeek}|${e.timeSlot}")
+            classroomOccupied.getOrPut(e.classroomName) { mutableSetOf() }.add("${e.dayOfWeek}|${e.timeSlot}")
+        }
+
+        // Müsaitlik haritası: username → liste<(gün, saat)>
+        val availMap = mutableMapOf<String, List<Pair<String, String>>>()
+        availabilities.forEach { avail ->
+            val pairs = DAYS.flatMap { day ->
+                // Saat sıralamasını SLOTS sırasına göre koru
+                SLOTS.filter { slot -> slot in avail.slotsForDay(day) }.map { day to it }
+            }
+            if (pairs.isNotEmpty()) availMap[avail.lecturerUsername] = pairs
+        }
+
+        // Ders yükü takibi (yük dengeleme)
+        val lecturerLoad = mutableMapOf<String, Int>()
+        existingEntries.forEach { e ->
+            lecturerLoad[e.lecturerName] = (lecturerLoad[e.lecturerName] ?: 0) + 1
+        }
+
+        val proposals  = mutableListOf<AutoAssignProposal>()
+        val unassigned = mutableListOf<Course>()
+        val warnings   = mutableListOf<String>()
+
+        unassignedCourses.forEach { course ->
+            // Aday sıralama: 1) aynı bölüm, 2) diğer bölüm — her iki grupta yük sıralı
+            val sameDept = allLecturers
+                .filter { it.department.equals(course.department, ignoreCase = true) && availMap.containsKey(it.username) }
+                .sortedBy { lecturerLoad[it.fullName] ?: 0 }
+            val otherDept = allLecturers
+                .filter { !it.department.equals(course.department, ignoreCase = true) && availMap.containsKey(it.username) }
+                .sortedBy { lecturerLoad[it.fullName] ?: 0 }
+            val candidates = sameDept + otherDept
+
+            var lectureAssigned = false
+
+            outer@ for (lecturer in candidates) {
+                val availSlots = availMap[lecturer.username] ?: continue
+
+                for ((day, slot) in availSlots) {
+                    val key = "$day|$slot"
+                    if (lecturerOccupied[lecturer.fullName]?.contains(key) == true) continue
+
+                    val lectureRoom = findBestClassroom(
+                        classrooms, classroomOccupied, key,
+                        expectedType = ClassroomType.LECTURE,
+                        minCapacity  = course.expectedStudents
+                    ) ?: continue
+
+                    val entryId = "${course.courseCode}_${day}_${slot.replace(":", "")}_LECTURE"
+                    proposals.add(AutoAssignProposal(
+                        entry = ScheduleEntry(
+                            id            = entryId,
+                            courseCode    = course.courseCode,
+                            courseName    = course.courseName,
+                            lecturerName  = lecturer.fullName,
+                            classroomName = lectureRoom.name,
+                            dayOfWeek     = day,
+                            timeSlot      = slot,
+                            sessionType   = SessionType.LECTURE
+                        ),
+                        course = course
+                    ))
+                    lecturerOccupied .getOrPut(lecturer.fullName) { mutableSetOf() }.add(key)
+                    classroomOccupied.getOrPut(lectureRoom.name)  { mutableSetOf() }.add(key)
+                    lecturerLoad[lecturer.fullName] = (lecturerLoad[lecturer.fullName] ?: 0) + 1
+                    lectureAssigned = true
+
+                    // Lab seansı
+                    if (course.hasLab) {
+                        var labFound = false
+                        for ((labDay, labSlot) in availSlots) {
+                            val labKey = "$labDay|$labSlot"
+                            if (labKey == key) continue
+                            if (lecturerOccupied[lecturer.fullName]?.contains(labKey) == true) continue
+
+                            val labRoom = findBestClassroom(classrooms, classroomOccupied, labKey, ClassroomType.LAB, course.expectedStudents)
+                                ?: findBestClassroom(classrooms, classroomOccupied, labKey, ClassroomType.COMPUTER_LAB, course.expectedStudents)
+                                ?: continue
+
+                            val labId = "${course.courseCode}_${labDay}_${labSlot.replace(":", "")}_LAB"
+                            proposals.add(AutoAssignProposal(
+                                entry = ScheduleEntry(
+                                    id            = labId,
+                                    courseCode    = course.courseCode,
+                                    courseName    = "${course.courseName} Lab",
+                                    lecturerName  = lecturer.fullName,
+                                    classroomName = labRoom.name,
+                                    dayOfWeek     = labDay,
+                                    timeSlot      = labSlot,
+                                    sessionType   = SessionType.LAB
+                                ),
+                                course = course
+                            ))
+                            lecturerOccupied .getOrPut(lecturer.fullName) { mutableSetOf() }.add(labKey)
+                            classroomOccupied.getOrPut(labRoom.name)       { mutableSetOf() }.add(labKey)
+                            labFound = true
+                            break
+                        }
+                        if (!labFound) warnings.add("${course.courseName}: uygun lab saati/sınıfı bulunamadı.")
+                    }
+                    break@outer
+                }
+            }
+
+            if (!lectureAssigned) unassigned.add(course)
+        }
+
+        return AutoAssignState.Ready(proposals, unassigned, warnings)
+    }
+
+    private fun findBestClassroom(
+        classrooms: List<Classroom>,
+        occupied: MutableMap<String, MutableSet<String>>,
+        key: String,
+        expectedType: String,
+        minCapacity: Int
+    ): Classroom? {
+        val free = classrooms.filter {
+            it.classroomType == expectedType && occupied[it.name]?.contains(key) != true
+        }
+        val needed = minCapacity.coerceAtLeast(1)
+        return free.filter { it.capacity >= needed }.minByOrNull { it.capacity }
+            ?: free.maxByOrNull { it.capacity }  // en büyük mevcut oda (sığmasa da)
     }
 }

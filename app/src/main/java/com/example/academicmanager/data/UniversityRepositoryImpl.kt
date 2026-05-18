@@ -197,16 +197,20 @@ class UniversityRepositoryImpl(
 
     override suspend fun clearScheduleEntries() {
         val docs = firestore.collection("schedule_entries").get().await()
-        val batch = firestore.batch()
-        docs.documents.forEach { batch.delete(it.reference) }
-        if (docs.documents.isNotEmpty()) batch.commit().await()
+        docs.documents.chunked(499).forEach { chunk ->
+            val batch = firestore.batch()
+            chunk.forEach { batch.delete(it.reference) }
+            batch.commit().await()
+        }
     }
 
     override suspend fun clearClassrooms() {
         val docs = firestore.collection("classrooms").get().await()
-        val batch = firestore.batch()
-        docs.documents.forEach { batch.delete(it.reference) }
-        if (docs.documents.isNotEmpty()) batch.commit().await()
+        docs.documents.chunked(499).forEach { chunk ->
+            val batch = firestore.batch()
+            chunk.forEach { batch.delete(it.reference) }
+            batch.commit().await()
+        }
     }
 
     // ── Ders Talep Akışı ─────────────────────────────────────

@@ -59,11 +59,12 @@
     <string name="nav_home">Home</string>
     <string name="nav_calendar">Calendar</string>
     <string name="nav_classrooms">Classrooms</string>
-    <string name="nav_schedule">Schedule</string>
-    <string name="nav_import">Import</string>
+    <string name="nav_schedule">Calendar</string>
+    <string name="nav_import">Data</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_announcements">Announcements</string>
     <string name="nav_availability">Availability</string>
+    <string name="nav_data">Data</string>
 
     <!-- ── Common actions ─────────────────────────────────────── -->
     <string name="cancel">Cancel</string>
@@ -306,7 +307,25 @@
     <string name="inspect_user_status">Current Status: %s</string>
 
     <!-- ── Import / Data ─────────────────────────────────────── -->
-    <string name="nav_import_label">Import</string>
+    <string name="nav_import_label">Data</string>
+    <string name="data_screen_title">Data</string>
+    <string name="tab_courses">Courses</string>
+    <string name="tab_lecturers">Lecturers</string>
+    <string name="tab_classrooms">Classrooms</string>
+    <string name="classroom_manual_add">Manual Entry</string>
+    <string name="classroom_excel_import">Excel Import</string>
+    <string name="add_classroom_btn">Add Classroom</string>
+    <string name="capacity_range_error">Capacity must be between 1 and 2000</string>
+
+    <!-- ── Schedule Calendar ─────────────────────────────────── -->
+    <string name="schedule_calendar_title">Weekly Schedule</string>
+    <string name="filter_all_lecturers">All Lecturers</string>
+    <string name="pdf_export_btn">Download PDF</string>
+    <string name="calendar_pdf_saved">Schedule saved as PDF</string>
+    <string name="assign_course_to_lecturer">Assign Course to This Lecturer</string>
+    <string name="lecturer_availability_map">Availability Map</string>
+    <string name="no_availability_set">No availability submitted yet</string>
+    <string name="view_calendar_btn">View Calendar</string>
 
     <!-- ── PDF ───────────────────────────────────────────────── -->
     <string name="weekly_schedule_pdf">Weekly Schedule</string>

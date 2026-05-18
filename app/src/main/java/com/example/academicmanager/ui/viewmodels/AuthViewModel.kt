@@ -51,6 +51,7 @@ class AuthViewModel(
                 val adminUser = Lecturer(
                     fullName = "System Administrator",
                     username = "admin",
+                    password = CredentialUtils.hashPassword("admin"),
                     role = UserRole.ADMIN,
                     mustChangePassword = false
                 )
@@ -107,7 +108,7 @@ class AuthViewModel(
     fun restoreSession(username: String) {
         viewModelScope.launch {
             if (username == "admin") {
-                val adminUser = Lecturer(fullName = "System Administrator", username = "admin", role = UserRole.ADMIN, mustChangePassword = false)
+                val adminUser = Lecturer(fullName = "System Administrator", username = "admin", password = CredentialUtils.hashPassword("admin"), role = UserRole.ADMIN, mustChangePassword = false)
                 currentUser = adminUser
                 _authState.value = AuthState.Authenticated(adminUser)
                 return@launch
