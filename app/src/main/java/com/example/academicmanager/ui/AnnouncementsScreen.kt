@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.academicmanager.R
 import com.example.academicmanager.data.Announcement
 import com.example.academicmanager.data.AnnouncementType
@@ -53,7 +55,8 @@ private fun announcementIcon(type: String) = when (type) {
 @Composable
 fun AnnouncementsScreen(
     announcementsViewModel: AnnouncementsViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    navController: NavController? = null
 ) {
     val announcements by announcementsViewModel.announcements.collectAsState()
     val currentUser   = authViewModel.currentUser
@@ -80,6 +83,43 @@ fun AnnouncementsScreen(
 
     Scaffold(
         containerColor = Color.Transparent,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Column {
+                        Text(
+                            stringResource(R.string.announcements_title),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TextPrimary
+                        )
+                        Text(
+                            if (sorted.size == 1)
+                                stringResource(R.string.announcements_count_one, sorted.size)
+                            else
+                                stringResource(R.string.announcements_count, sorted.size),
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                },
+                navigationIcon = {
+                    if (navController != null) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Geri",
+                                tint = EmeraldGreen
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = TextPrimary
+                )
+            )
+        },
         floatingActionButton = {
             if (isAdmin) {
                 FloatingActionButton(
@@ -97,26 +137,12 @@ fun AnnouncementsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Column {
-                    Text(
-                        stringResource(R.string.announcements_title),
-                        style      = MaterialTheme.typography.headlineSmall,
-                        color      = TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        if (sorted.size == 1)
-                            stringResource(R.string.announcements_count_one, sorted.size)
-                        else
-                            stringResource(R.string.announcements_count, sorted.size),
-                        color = TextSecondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+                // Başlık artık TopAppBar'da — boş bırak
+                Spacer(Modifier.height(4.dp))
             }
 
             if (sorted.isEmpty()) {

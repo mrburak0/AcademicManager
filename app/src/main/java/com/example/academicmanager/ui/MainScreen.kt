@@ -282,7 +282,7 @@ fun MainScreen(
                 composable(Screen.StudentCalendar.route) { StudentCalendarScreen(authViewModel, adminViewModel) }
                 // ── Ortak ekranlar ────────────────────────────────
                 composable(Screen.Data.route)          { DataScreen(viewModel(factory = ViewModelFactory(dao, repository)), adminViewModel) }
-                composable(Screen.Announcements.route) { AnnouncementsScreen(announcementsViewModel, authViewModel) }
+                composable(Screen.Announcements.route) { AnnouncementsScreen(announcementsViewModel, authViewModel, navController) }
                 composable(Screen.Profile.route)       {
                     ProfileScreen(
                         authViewModel  = authViewModel,
