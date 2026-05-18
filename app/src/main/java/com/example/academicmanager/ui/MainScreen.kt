@@ -134,7 +134,7 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object Calendar          : Screen("calendar",          R.string.nav_calendar,      Icons.Default.DateRange)
     object AdminHome         : Screen("admin_home",        R.string.nav_home,          Icons.Default.Home)
     object Classrooms        : Screen("classrooms",        R.string.nav_classrooms,    Icons.Default.MeetingRoom)
-    object Assignment        : Screen("assignment",        R.string.nav_schedule,      Icons.Default.Edit)
+    object Assignment        : Screen("assignment",        R.string.nav_assignment,    Icons.Default.Edit)
     object ScheduleCalendar  : Screen("schedule_calendar", R.string.nav_calendar,      Icons.Default.CalendarMonth)
     object LecturerHome         : Screen("lecturer_home",         R.string.nav_home,          Icons.Default.Home)
     object LecturerCalendar     : Screen("lecturer_calendar",     R.string.nav_calendar,      Icons.Default.DateRange)

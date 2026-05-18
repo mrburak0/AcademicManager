@@ -965,7 +965,8 @@ private fun LecturerInfoRow(
                     // Müsaitlik haritası
                     if (availability != null) {
                         Text("Müsaitlik Haritası", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
-                        AdminAvailabilityGrid(avail = availability, accentColor = EmeraldGreen)
+                        // Müsait = yeşil, müsait değil = kırmızı
+                        AdminAvailabilityGrid(avail = availability, accentColor = EmeraldGreen, showUnavailableRed = true)
                     } else {
                         Row(
                             Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.08f)).padding(10.dp),
@@ -1824,13 +1825,25 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
 }
 
 @Composable
-private fun AdminAvailabilityGrid(avail: LecturerAvailability, accentColor: Color) {
+private fun AdminAvailabilityGrid(
+    avail: LecturerAvailability,
+    accentColor: Color,
+    showUnavailableRed: Boolean = false
+) {
     Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+        // Gün başlıkları
         Row(modifier = Modifier.fillMaxWidth()) {
             Box(modifier = Modifier.width(54.dp))
             AVAIL_DAYS_TR_SHORT.forEachIndexed { i, day ->
+                val dayHasSlots = avail.slotsForDay(AVAIL_DAYS_EN[i]).isNotEmpty()
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    Text(day, color = AVAIL_DAY_COLORS[i], style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text(
+                        day,
+                        color = if (showUnavailableRed && !dayHasSlots) ErrorRed else AVAIL_DAY_COLORS[i],
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp
+                    )
                 }
             }
         }
@@ -1840,21 +1853,28 @@ private fun AdminAvailabilityGrid(avail: LecturerAvailability, accentColor: Colo
                 Text(slot.take(5), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, modifier = Modifier.width(54.dp))
                 AVAIL_DAYS_EN.forEachIndexed { dayIdx, day ->
                     val selected = slot in avail.slotsForDay(day)
+                    val unavailColor = if (showUnavailableRed) ErrorRed.copy(alpha = 0.18f) else Slate700
+                    val unavailBorder = if (showUnavailableRed) ErrorRed.copy(alpha = 0.25f) else Color.Transparent
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .height(28.dp)
                             .padding(horizontal = 2.dp)
                             .clip(RoundedCornerShape(5.dp))
-                            .background(
-                                if (selected) accentColor.copy(alpha = 0.75f)
-                                else Slate700
-                            )
-                            .border(1.dp, if (selected) accentColor.copy(alpha = 0.5f) else Color.Transparent, RoundedCornerShape(5.dp)),
+                            .background(if (selected) accentColor.copy(alpha = 0.75f) else unavailColor)
+                            .border(1.dp, if (selected) accentColor.copy(alpha = 0.5f) else unavailBorder, RoundedCornerShape(5.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         if (selected) {
                             Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.8f)))
+                        } else if (showUnavailableRed) {
+                            // Müsait olmayan hücrelerde ince kırmızı X işareti
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = null,
+                                tint = ErrorRed.copy(alpha = 0.45f),
+                                modifier = Modifier.size(9.dp)
+                            )
                         }
                     }
                 }

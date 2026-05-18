@@ -58,6 +58,7 @@
     <!-- ── Navigation ─────────────────────────────────────────── -->
     <string name="nav_home">Home</string>
     <string name="nav_calendar">Calendar</string>
+    <string name="nav_assignment">Assign</string>
     <string name="nav_classrooms">Classrooms</string>
     <string name="nav_schedule">Calendar</string>
     <string name="nav_import">Data</string>

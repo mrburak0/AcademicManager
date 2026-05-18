@@ -58,6 +58,7 @@
     <!-- ── Navigation ─────────────────────────────────────────── -->
     <string name="nav_home">Ana Sayfa</string>
     <string name="nav_calendar">Takvim</string>
+    <string name="nav_assignment">Atama</string>
     <string name="nav_classrooms">Sınıflar</string>
     <string name="nav_schedule">Takvim</string>
     <string name="nav_import">Veriler</string>
