@@ -157,7 +157,7 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                 }
                 // Duyurular bell ikonu
                 IconButton(onClick = { navController.navigate("announcements") }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "Duyurular", tint = EmeraldGreen, modifier = Modifier.size(22.dp))
+                    Icon(Icons.Default.Notifications, contentDescription = stringResource(R.string.nav_announcements), tint = EmeraldGreen, modifier = Modifier.size(22.dp))
                 }
             }
         }
@@ -187,6 +187,33 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                 icon = Icons.Default.Person,
                 color = Color(0xFFF59E0B),
                 modifier = Modifier.weight(1f)
+            )
+        }
+
+        // ── Quick Actions ─────────────────────────────────────
+        Text(
+            stringResource(R.string.quick_actions),
+            color = TextPrimary,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            LecturerActionCard(
+                label = stringResource(R.string.grade_entry_action),
+                icon = Icons.Default.Grade,
+                color = EmeraldGreen,
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("grade_entry") }
+            )
+            LecturerActionCard(
+                label = stringResource(R.string.attendance_action),
+                icon = Icons.Default.HowToReg,
+                color = Color(0xFFF59E0B),
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("attendance_entry") }
             )
         }
 
@@ -274,6 +301,29 @@ private fun LecturerStatCard(
             Spacer(Modifier.height(6.dp))
             Text(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
             Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, lineHeight = 13.sp)
+        }
+    }
+}
+
+@Composable
+private fun LecturerActionCard(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color, modifier: Modifier, onClick: () -> Unit) {
+    Card(
+        modifier = modifier.clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.10f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(color.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(label, color = color, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
         }
     }
 }
@@ -635,7 +685,7 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                         )
                         ExposedDropdownMenu(expanded = classDropExpanded, onDismissRequest = { classDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.Slate800)) {
                             classrooms.forEach { cl ->
-                                DropdownMenuItem(text = { Text("${cl.name} (kap: ${cl.capacity})", color = com.example.academicmanager.ui.theme.TextPrimary) }, onClick = { reqSelectedClass = cl; classDropExpanded = false })
+                                DropdownMenuItem(text = { Text("${cl.name} ${stringResource(R.string.classroom_cap_short, cl.capacity)}", color = com.example.academicmanager.ui.theme.TextPrimary) }, onClick = { reqSelectedClass = cl; classDropExpanded = false })
                             }
                         }
                     }
@@ -880,7 +930,11 @@ private suspend fun exportSchedulePdf(
         canvas.drawText(ownerName, 20f, 44f, subPaint)
         canvas.drawText(java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).format(java.util.Date()), 20f, 56f, subPaint)
 
-        val days      = listOf("Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma")
+        val days      = listOf(
+            context.getString(R.string.day_monday), context.getString(R.string.day_tuesday),
+            context.getString(R.string.day_wednesday), context.getString(R.string.day_thursday),
+            context.getString(R.string.day_friday)
+        )
         val dayKeys   = WEEK_DAYS_FULL
         val slots     = SCHEDULE_TIME_SLOTS
         val startX    = 20f
@@ -894,7 +948,7 @@ private suspend fun exportSchedulePdf(
             canvas.drawText(day, x + 4f, startY + rowH / 2f + 3f, whiteText)
         }
         canvas.drawRect(startX, startY, startX + colW, startY + rowH, headerBgPt)
-        canvas.drawText("Saat", startX + 4f, startY + rowH / 2f + 3f, whiteText)
+        canvas.drawText(context.getString(R.string.pdf_time_col), startX + 4f, startY + rowH / 2f + 3f, whiteText)
 
         slots.forEachIndexed { row, slot ->
             val y = startY + (row + 1) * rowH
@@ -914,7 +968,7 @@ private suspend fun exportSchedulePdf(
                     canvas.drawText(name, x + 2f, y + rowH * 0.35f + 3f, cellText)
                     canvas.drawText(entry.classroomName, x + 2f, y + rowH * 0.65f + 3f, cellSub)
                     if (entry.sessionType == SessionType.LAB) {
-                        canvas.drawText("LAB", x + colW - 18f, y + 9f,
+                        canvas.drawText(context.getString(R.string.session_lab), x + colW - 18f, y + 9f,
                             Paint().apply { color = android.graphics.Color.rgb(245, 158, 11); textSize = 6f; typeface = boldFace; isAntiAlias = true })
                     }
                 }
@@ -1055,10 +1109,8 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 Column {
                     Text(stringResource(R.string.avail_screen_title), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        if (isFirstTime)
-                            "İlk gönderimde admin onayına gidecek. Sonraki güncellemeler anında uygulanır."
-                        else
-                            "Seçili slotları değiştirip 'Haritamı Güncelle' ile kaydet.",
+                        if (isFirstTime) stringResource(R.string.avail_first_time_hint)
+                        else stringResource(R.string.avail_update_hint),
                         color = TextSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -1079,7 +1131,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     Icon(Icons.Default.Info, contentDescription = null, tint = ErrorRed, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
                     Column {
-                        Text("Admin Notu:", color = ErrorRed, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.admin_note_label), color = ErrorRed, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
                         Text("\"${rejected.adminNote}\"", color = TextPrimary, style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -1094,9 +1146,9 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 else                        -> Color(0xFFF59E0B)
             }
             val statusLabel = when (latestMine.status) {
-                AvailabilityStatus.APPROVED -> "Haritanız aktif (${latestMine.totalSlots} slot)"
-                AvailabilityStatus.REJECTED -> "Reddedildi — lütfen düzenleyin"
-                else                        -> "Admin onayı bekleniyor"
+                AvailabilityStatus.APPROVED -> stringResource(R.string.avail_map_active, latestMine.totalSlots)
+                AvailabilityStatus.REJECTED -> stringResource(R.string.avail_rejected_edit)
+                else                        -> stringResource(R.string.avail_pending_approval)
             }
             Row(
                 modifier = Modifier
@@ -1114,7 +1166,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
 
         // ── Haftalık Grid (Interactive) ────────────────────────
         Text(
-            "Müsait olduğunuz saatleri seçin:",
+            stringResource(R.string.avail_select_slots),
             color = TextPrimary,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall
@@ -1216,7 +1268,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
         // ── Seçim özeti + Temizle + Gönder/Güncelle ──────────
         if (totalSelected > 0) {
             Text(
-                "$totalSelected slot seçili",
+                stringResource(R.string.avail_slots_count_info, totalSelected),
                 color = EmeraldGreen,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold
@@ -1250,7 +1302,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                             slots            = buildSlotsMap(),
                             onComplete       = { success ->
                                 isSaving = false
-                                val msg = if (success) "Müsaitlik haritanız güncellendi!" else "Güncelleme başarısız, tekrar deneyin."
+                                val msg = if (success) context.getString(R.string.avail_update_success) else context.getString(R.string.avail_update_failed)
                                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                             }
                         )
@@ -1270,7 +1322,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 if (isSaving) {
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("Kaydediliyor...", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.avail_saving), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                 } else {
                     Icon(
                         if (isFirstTime) Icons.AutoMirrored.Filled.Send else Icons.Default.Check,
@@ -1280,9 +1332,9 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     Spacer(Modifier.width(8.dp))
                     Text(
                         if (isFirstTime)
-                            if (totalSelected > 0) "Admin'e Gönder ($totalSelected slot)" else "Admin'e Gönder"
+                            if (totalSelected > 0) stringResource(R.string.avail_send_admin_slots, totalSelected) else stringResource(R.string.avail_send_admin)
                         else
-                            if (totalSelected > 0) "Haritamı Güncelle ($totalSelected slot)" else "Haritamı Güncelle",
+                            if (totalSelected > 0) stringResource(R.string.avail_update_map_slots, totalSelected) else stringResource(R.string.avail_update_map),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -1302,18 +1354,18 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.EventAvailable, contentDescription = null, tint = Color(0xFF6366F1), modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(10.dp))
-                    Text("Müsaitlik Gönder", color = Color(0xFF6366F1), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.avail_submit_dialog_title), color = Color(0xFF6366F1), fontWeight = FontWeight.Bold)
                 }
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "Müsaitlik haritanız admin onayına gönderilecek.",
+                        stringResource(R.string.avail_submit_msg1),
                         color = TextPrimary,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        "Onaylandıktan sonra ders atama sürecinde kullanılacak. Sonraki güncellemeleriniz anında geçerli olur.",
+                        stringResource(R.string.avail_submit_msg2),
                         color = TextSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -1328,7 +1380,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                         Icon(Icons.Default.Info, null, tint = Color(0xFF6366F1), modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            "${totalSelected} slot seçili",
+                            stringResource(R.string.avail_slots_count_info, totalSelected),
                             color = Color(0xFF6366F1),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold
@@ -1347,7 +1399,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                             slots            = buildSlotsMap()
                         )
                         isSaving = false
-                        Toast.makeText(context, "Müsaitliğiniz admin onayına gönderildi!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, context.getString(R.string.avail_sent_admin_msg), Toast.LENGTH_LONG).show()
                         selectedSlots = emptyMap()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6366F1)),
@@ -1355,12 +1407,12 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 ) {
                     Icon(Icons.AutoMirrored.Filled.Send, null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Evet, Gönder", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.avail_yes_send), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showFirstTimeConfirm = false }) {
-                    Text("İptal", color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = TextSecondary)
                 }
             }
         )

@@ -60,4 +60,19 @@ interface UniversityRepository {
     fun getLecturerAvailabilities(lecturerUsername: String): Flow<List<LecturerAvailability>>
     suspend fun addAvailability(availability: LecturerAvailability)
     suspend fun updateAvailability(availability: LecturerAvailability)
+
+    // Not yönetimi
+    fun getGrades(): Flow<List<GradeRecord>>
+    fun getGradesByCourse(courseCode: String): Flow<List<GradeRecord>>
+    fun getGradesByStudent(studentUsername: String): Flow<List<GradeRecord>>
+    fun getGradesByLecturer(lecturerUsername: String): Flow<List<GradeRecord>>
+    suspend fun saveGrade(grade: GradeRecord)
+    suspend fun deleteGrade(gradeId: String)
+
+    // Yoklama takibi
+    fun getAttendanceRecords(): Flow<List<AttendanceRecord>>
+    fun getAttendanceByCourse(courseCode: String): Flow<List<AttendanceRecord>>
+    fun getAttendanceByLecturer(lecturerUsername: String): Flow<List<AttendanceRecord>>
+    suspend fun saveAttendance(record: AttendanceRecord)
+    suspend fun updateAttendance(record: AttendanceRecord)
 }

@@ -30,6 +30,18 @@ class ViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return AnnouncementsViewModel(repository) as T
         }
+        if (modelClass.isAssignableFrom(UniversityApiViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return UniversityApiViewModel() as T
+        }
+        if (modelClass.isAssignableFrom(GradeViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return GradeViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(AttendanceViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AttendanceViewModel(repository) as T
+        }
         throw IllegalArgumentException("Bilinmeyen ViewModel sınıfı: ${modelClass.name}")
     }
 }

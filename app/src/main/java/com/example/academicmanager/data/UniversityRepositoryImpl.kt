@@ -280,4 +280,86 @@ class UniversityRepositoryImpl(
     override suspend fun updateAvailability(availability: LecturerAvailability) {
         firestore.collection("lecturer_availability").document(availability.id).set(availability).await()
     }
+
+    // ── Not Yönetimi ──────────────────────────────────────────
+
+    override fun getGrades(): Flow<List<GradeRecord>> {
+        return firestore.collection("grades")
+            .snapshots()
+            .map { it.toObjects(GradeRecord::class.java) }
+    }
+
+    override fun getGradesByCourse(courseCode: String): Flow<List<GradeRecord>> {
+        return firestore.collection("grades")
+            .whereEqualTo("courseCode", courseCode)
+            .snapshots()
+            .map { it.toObjects(GradeRecord::class.java) }
+    }
+
+    override fun getGradesByStudent(studentUsername: String): Flow<List<GradeRecord>> {
+        return firestore.collection("grades")
+            .whereEqualTo("studentUsername", studentUsername)
+            .snapshots()
+            .map { it.toObjects(GradeRecord::class.java) }
+    }
+
+    override fun getGradesByLecturer(lecturerUsername: String): Flow<List<GradeRecord>> {
+        return firestore.collection("grades")
+            .whereEqualTo("lecturerUsername", lecturerUsername)
+            .snapshots()
+            .map { it.toObjects(GradeRecord::class.java) }
+    }
+
+    override suspend fun saveGrade(grade: GradeRecord) {
+        val docRef = if (grade.id.isEmpty())
+            firestore.collection("grades").document()
+        else
+            firestore.collection("grades").document(grade.id)
+        docRef.set(grade.copy(id = docRef.id)).await()
+    }
+
+    override suspend fun deleteGrade(gradeId: String) {
+        firestore.collection("grades").document(gradeId).delete().await()
+    }
+
+    // ── Yoklama Takibi ────────────────────────────────────────
+
+    override fun getAttendanceRecords(): Flow<List<AttendanceRecord>> {
+        return try {
+            firestore.collection("attendance")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .snapshots()
+                .map { it.toObjects(AttendanceRecord::class.java) }
+        } catch (_: Exception) {
+            firestore.collection("attendance")
+                .snapshots()
+                .map { it.toObjects(AttendanceRecord::class.java) }
+        }
+    }
+
+    override fun getAttendanceByCourse(courseCode: String): Flow<List<AttendanceRecord>> {
+        return firestore.collection("attendance")
+            .whereEqualTo("courseCode", courseCode)
+            .snapshots()
+            .map { it.toObjects(AttendanceRecord::class.java) }
+    }
+
+    override fun getAttendanceByLecturer(lecturerUsername: String): Flow<List<AttendanceRecord>> {
+        return firestore.collection("attendance")
+            .whereEqualTo("lecturerUsername", lecturerUsername)
+            .snapshots()
+            .map { it.toObjects(AttendanceRecord::class.java) }
+    }
+
+    override suspend fun saveAttendance(record: AttendanceRecord) {
+        val docRef = if (record.id.isEmpty())
+            firestore.collection("attendance").document()
+        else
+            firestore.collection("attendance").document(record.id)
+        docRef.set(record.copy(id = docRef.id)).await()
+    }
+
+    override suspend fun updateAttendance(record: AttendanceRecord) {
+        firestore.collection("attendance").document(record.id).set(record).await()
+    }
 }

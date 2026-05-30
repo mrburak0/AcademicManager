@@ -45,10 +45,27 @@ import com.example.academicmanager.ui.viewmodels.*
 
 // English keys must match Firestore values — do not localize
 private val WEEK_DAYS = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-private val WEEK_DAYS_TR = listOf("Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma")
-private val WEEK_DAYS_TR_SHORT = listOf("Pzt", "Sal", "Çar", "Per", "Cum")
-private fun dayToTurkish(englishDay: String) = WEEK_DAYS_TR.getOrElse(WEEK_DAYS.indexOf(englishDay)) { englishDay }
-private fun dayToTurkishShort(englishDay: String) = WEEK_DAYS_TR_SHORT.getOrElse(WEEK_DAYS.indexOf(englishDay)) { englishDay.take(3) }
+
+// Localized composable helpers — use these in UI, not hardcoded lists
+@Composable
+private fun weekDaysFull() = listOf(
+    stringResource(R.string.day_monday), stringResource(R.string.day_tuesday),
+    stringResource(R.string.day_wednesday), stringResource(R.string.day_thursday),
+    stringResource(R.string.day_friday)
+)
+
+@Composable
+private fun weekDaysShort() = listOf(
+    stringResource(R.string.day_mon), stringResource(R.string.day_tue),
+    stringResource(R.string.day_wed), stringResource(R.string.day_thu),
+    stringResource(R.string.day_fri)
+)
+
+private fun dayLocalizedName(englishDay: String, localizedList: List<String>) =
+    localizedList.getOrElse(WEEK_DAYS.indexOf(englishDay)) { englishDay }
+
+private fun dayLocalizedShort(englishDay: String, localizedList: List<String>) =
+    localizedList.getOrElse(WEEK_DAYS.indexOf(englishDay)) { englishDay.take(3) }
 private val TIME_SLOTS = listOf(
     "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
     "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00"
@@ -426,6 +443,37 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
             }
         }
 
+        // ── Grades & Attendance Overview ──────────────────────
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton(
+                    onClick = { navController.navigate("admin_grades") },
+                    modifier = Modifier.weight(1f),
+                    border = BorderStroke(1.dp, EmeraldGreen.copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = EmeraldGreen),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Grade, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.panel_grades), fontWeight = FontWeight.SemiBold)
+                }
+                OutlinedButton(
+                    onClick = { navController.navigate("announcements") },
+                    modifier = Modifier.weight(1f),
+                    border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFF59E0B)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.nav_announcements), fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+
         item { Spacer(Modifier.height(80.dp)) }
     }
 
@@ -553,7 +601,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Müsaitlik haritası
-                    Text("Müsaitlik Haritası", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.lecturer_availability_map), color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                     AdminAvailabilityGrid(avail = avail, accentColor = EmeraldGreen)
 
                     if (lecturerEntries.isNotEmpty()) {
@@ -572,7 +620,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                                     modifier = Modifier.size(28.dp).clip(RoundedCornerShape(6.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(dayToTurkishShort(entry.dayOfWeek), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                                    Text(dayLocalizedShort(entry.dayOfWeek, weekDaysShort()), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
                                 }
                                 Spacer(Modifier.width(8.dp))
                                 Column(modifier = Modifier.weight(1f)) {
@@ -912,6 +960,13 @@ private fun LecturerInfoRow(
                     color = TextSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
+                if (lecturer.mustChangePassword) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(10.dp))
+                        Spacer(Modifier.width(3.dp))
+                        Text("Şifre değiştirilmedi", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
             }
             if (onResetPassword != null) {
                 IconButton(onClick = { showResetPwdDialog = true }, modifier = Modifier.size(32.dp)) {
@@ -964,7 +1019,7 @@ private fun LecturerInfoRow(
                 ) {
                     // Müsaitlik haritası
                     if (availability != null) {
-                        Text("Müsaitlik Haritası", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.lecturer_availability_map), color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                         // Müsait = yeşil, müsait değil = kırmızı
                         AdminAvailabilityGrid(avail = availability, accentColor = EmeraldGreen, showUnavailableRed = true)
                     } else {
@@ -1005,7 +1060,7 @@ private fun LecturerInfoRow(
                         var courseExp by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(expanded = courseExp, onExpandedChange = { courseExp = !courseExp }) {
                             OutlinedTextField(
-                                value = selCourse?.let { "${it.courseCode} – ${it.courseName}" } ?: "Ders seçin",
+                                value = selCourse?.let { "${it.courseCode} – ${it.courseName}" } ?: stringResource(R.string.select_course),
                                 onValueChange = {}, readOnly = true,
                                 label = { Text("Ders") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = courseExp) },
@@ -1023,16 +1078,16 @@ private fun LecturerInfoRow(
                         var dayExp by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(expanded = dayExp, onExpandedChange = { dayExp = !dayExp }) {
                             OutlinedTextField(
-                                value = if (selDay.isEmpty()) "Gün seçin" else dayToTurkish(selDay),
+                                value = if (selDay.isEmpty()) stringResource(R.string.select_day) else dayLocalizedName(selDay, weekDaysFull()),
                                 onValueChange = {}, readOnly = true,
-                                label = { Text("Gün${if (availability != null) " (müsait günler)" else ""}") },
+                                label = { Text(stringResource(R.string.label_day)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dayExp) },
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
                             ExposedDropdownMenu(expanded = dayExp, onDismissRequest = { dayExp = false }, modifier = Modifier.background(Slate800)) {
                                 availDays.forEach { day ->
-                                    DropdownMenuItem(text = { Text(dayToTurkish(day), color = TextPrimary) }, onClick = { selDay = day; selTime = ""; dayExp = false })
+                                    DropdownMenuItem(text = { Text(dayLocalizedName(day, weekDaysFull()), color = TextPrimary) }, onClick = { selDay = day; selTime = ""; dayExp = false })
                                 }
                             }
                         }
@@ -1060,7 +1115,7 @@ private fun LecturerInfoRow(
                         var clsExp by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(expanded = clsExp, onExpandedChange = { clsExp = !clsExp }) {
                             OutlinedTextField(
-                                value = selClassroom?.let { "${it.name} (${it.capacity})" } ?: "Sınıf seçin",
+                                value = selClassroom?.let { "${it.name} (${it.capacity})" } ?: stringResource(R.string.select_classroom),
                                 onValueChange = {}, readOnly = true,
                                 label = { Text("Sınıf") },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = clsExp) },
@@ -1271,6 +1326,13 @@ private fun StudentInfoRow(student: Lecturer, onDelete: () -> Unit = {}) {
                     color = TextSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
+                if (student.mustChangePassword) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(10.dp))
+                        Spacer(Modifier.width(3.dp))
+                        Text("Şifre değiştirilmedi", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
             }
             IconButton(onClick = { showDeleteDialog = true }, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = ErrorRed.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
@@ -1438,7 +1500,7 @@ private fun ScheduleEntryInfoRow(entry: ScheduleEntry) {
             }
             Spacer(Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
-                Text(dayToTurkishShort(entry.dayOfWeek), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                Text(dayLocalizedShort(entry.dayOfWeek, weekDaysShort()), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 Text(entry.timeSlot, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
             }
         }
@@ -2308,8 +2370,8 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
         SectionLabel(stringResource(R.string.label_day))
         DropdownSelector(
             placeholder = stringResource(R.string.select_day),
-            selected = dayToTurkish(selectedDay),
-            options = WEEK_DAYS_TR,
+            selected = dayLocalizedName(selectedDay, weekDaysFull()),
+            options = weekDaysFull(),
             onSelect = { idx -> selectedDay = WEEK_DAYS[idx] }
         )
 
@@ -2474,7 +2536,7 @@ private fun DropdownSelector(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AutoAssignScreen(viewModel: AdminViewModel, navController: NavController) {
+fun AutoAssignScreen(viewModel: AdminViewModel) {
     val state       by viewModel.autoAssignState.collectAsState()
     val unassignedLecturers by viewModel.unassignedLecturers.collectAsState()
     val unassignedCourses   by viewModel.unassignedCourses.collectAsState()
@@ -2484,7 +2546,6 @@ fun AutoAssignScreen(viewModel: AdminViewModel, navController: NavController) {
 
     val accentColor = Color(0xFF8B5CF6)
 
-    // Done → kısa süre sonra geri dön
     LaunchedEffect(state) {
         if (state is AdminViewModel.AutoAssignState.Done) {
             val s = state as AdminViewModel.AutoAssignState.Done
@@ -2495,7 +2556,6 @@ fun AutoAssignScreen(viewModel: AdminViewModel, navController: NavController) {
             ).show()
             kotlinx.coroutines.delay(1500)
             viewModel.resetAutoAssign()
-            navController.popBackStack()
         }
     }
 
@@ -2507,14 +2567,6 @@ fun AutoAssignScreen(viewModel: AdminViewModel, navController: NavController) {
                     Column {
                         Text("Otomatik Ders Atama", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                         Text("Müsaitlik haritasına göre dersler otomatik atanır", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        viewModel.resetAutoAssign()
-                        navController.popBackStack()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = accentColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = TextPrimary)
@@ -2862,7 +2914,7 @@ private fun AutoAssignProposalCard(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(dayToTurkishShort(proposal.entry.dayOfWeek), color = cardColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text(dayLocalizedShort(proposal.entry.dayOfWeek, weekDaysShort()), color = cardColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                     Text(proposal.entry.timeSlot.take(5), color = cardColor, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -2924,7 +2976,7 @@ private fun ScheduleEntryCard(entry: ScheduleEntry, onDelete: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    dayToTurkishShort(entry.dayOfWeek).uppercase(java.util.Locale("tr", "TR")),
+                    dayLocalizedShort(entry.dayOfWeek, weekDaysShort()).uppercase(),
                     color = EmeraldGreen,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold

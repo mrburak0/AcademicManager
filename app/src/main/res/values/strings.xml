@@ -58,7 +58,7 @@
     <!-- ── Navigation ─────────────────────────────────────────── -->
     <string name="nav_home">Home</string>
     <string name="nav_calendar">Calendar</string>
-    <string name="nav_assignment">AI</string>
+    <string name="nav_assignment">Auto Assign</string>
     <string name="nav_classrooms">Classrooms</string>
     <string name="nav_schedule">Calendar</string>
     <string name="nav_import">Data</string>
@@ -363,4 +363,199 @@
     <string name="admin_avail_no_data">No availability data for this lecturer</string>
     <string name="admin_avail_approve_success">Availability approved</string>
     <string name="admin_avail_slots_count">%d slots</string>
+
+    <!-- ── Register form fields &amp; validation ──────────────── -->
+    <string name="email_label">E-mail</string>
+    <string name="email_hint">E.g. ali@gmail.com</string>
+    <string name="email_required">E-mail address is required</string>
+    <string name="email_invalid">Enter a valid e-mail address</string>
+    <string name="full_name_required">Full name cannot be empty</string>
+    <string name="username_required">Username cannot be empty</string>
+    <string name="dept_required">Please select a department</string>
+    <string name="password_required">Password cannot be empty</string>
+    <string name="confirm_pass_required">Password confirmation cannot be empty</string>
+    <string name="admin_code_empty">Admin code cannot be empty</string>
+
+    <!-- ── City / University dropdowns ───────────────────────── -->
+    <string name="select_city">Select City</string>
+    <string name="city_label">City</string>
+    <string name="city_required">Please select a city</string>
+    <string name="select_first_city">Select a city first</string>
+    <string name="loading">Loading…</string>
+    <string name="select_university">Select University</string>
+    <string name="university_label">University</string>
+    <string name="university_required">Please select a university</string>
+    <string name="no_uni_in_city">No universities registered for this city</string>
+    <string name="not_in_list_manual">Not in list — Enter manually</string>
+    <string name="select_first_uni">Select a university first</string>
+    <string name="loading_departments">Loading departments…</string>
+    <string name="dept_not_found">Department not found</string>
+    <string name="university_manual_label">University Name (Manual)</string>
+    <string name="university_manual_hint">Enter your university\'s full name</string>
+    <string name="university_name_required">University name cannot be empty</string>
+    <string name="dept_manual_label">Department Name (Manual)</string>
+    <string name="dept_manual_hint">Enter your department\'s full name</string>
+    <string name="dept_name_required">Department name cannot be empty</string>
+    <string name="email_verify_sent">Verification e-mail sent to %s.</string>
+    <string name="verify_email_then_wait">Please verify your e-mail first, then wait for admin approval.</string>
+
+    <!-- ── Overview / Home ────────────────────────────────────── -->
+    <string name="overview_title">Overview</string>
+    <string name="stat_courses_label">Courses</string>
+    <string name="stat_faculty_label">Faculty</string>
+
+    <!-- ── Data / Import screen ───────────────────────────────── -->
+    <string name="import_data_title">Data Import</string>
+    <string name="import_data_subtitle">Upload courses and lecturers via Excel spreadsheet</string>
+    <string name="how_it_works">How it works</string>
+    <string name="step_download">Download\nTemplate</string>
+    <string name="step_fill">Fill in\nData</string>
+    <string name="step_import">Import\n&amp; Preview</string>
+    <string name="step_save">Save to\nFirebase</string>
+    <string name="excel_columns_label">EXCEL COLUMNS</string>
+    <string name="btn_template">Template</string>
+    <string name="btn_import_xlsx">Import .xlsx</string>
+    <string name="importing_excel">Parsing Excel file</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="preview_verify">Verify %s</string>
+    <string name="preview_rows">%d rows</string>
+    <string name="preview_review_msg">Review all entries carefully before uploading to Firebase.</string>
+    <string name="btn_discard">Discard</string>
+    <string name="btn_save_count">Save %1$d %2$s</string>
+    <string name="cred_title">Login Credentials</string>
+    <string name="cred_subtitle">%d lecturers added — passwords shown only once!</string>
+    <string name="cred_warning">Passwords are stored hashed. Please note them or copy immediately.</string>
+    <string name="copied_all">All passwords copied!</string>
+    <string name="copied_one">Copied: %s</string>
+    <string name="btn_copy_all">Copy All</string>
+    <string name="btn_got_it">Got It, Continue</string>
+    <string name="course_import_title">Course Import</string>
+    <string name="course_import_subtitle">Load course catalog from Excel file</string>
+    <string name="lecturer_import_title">Lecturer Import</string>
+    <string name="lecturer_import_subtitle">Load lecturers from Excel file</string>
+    <string name="tab_courses_name">Courses</string>
+    <string name="tab_courses_sub">Import course catalog</string>
+    <string name="tab_lecturers_name">Lecturers</string>
+    <string name="tab_lecturers_sub">Import faculty members</string>
+    <string name="lecturer_creds_auto">Login credentials (username + 6-char password) are auto-generated per lecturer.</string>
+    <string name="classroom_mgmt_title">Classroom Management</string>
+    <string name="classroom_mgmt_subtitle">Add manually or import via Excel</string>
+    <string name="manual_classroom_add_btn">Add Classroom Manually</string>
+    <string name="classroom_name_ex">Room Name (e.g. A-101, Lab-2)</string>
+    <string name="enter_text_hint">Enter text</string>
+    <string name="capacity_ex">Capacity (1–2000)</string>
+    <string name="enter_number_hint">Enter number</string>
+    <string name="btn_save_room">Save Classroom</string>
+    <string name="classrooms_excel_title">Classrooms (Excel)</string>
+    <string name="classrooms_excel_subtitle">Add classrooms in bulk from Excel</string>
+    <string name="classroom_type_note">Type column must be one of: LECTURE, LAB, or COMPUTER_LAB.</string>
+    <string name="registered_classrooms">Registered Classrooms (%d)</string>
+    <string name="capacity_bookings">Capacity: %1$d · %2$d bookings</string>
+    <string name="delete_classroom_title">Delete Classroom</string>
+    <string name="delete_classroom_msg">Do you want to delete classroom %s?</string>
+    <string name="classroom_added_toast">Classroom added!</string>
+
+    <!-- ── Schedule Calendar ──────────────────────────────────── -->
+    <string name="schedule_showing_count">%d courses shown</string>
+    <string name="filter_lecturer">Lecturer Filter</string>
+    <string name="no_courses_to_show">No courses to show</string>
+    <string name="load_demo_or_assign">Load demo data or assign a course.</string>
+    <string name="more_items">+%d more</string>
+    <string name="calendar_pdf_ok">Schedule saved as PDF</string>
+    <string name="calendar_pdf_err">Failed to create PDF</string>
+    <string name="pdf_time_col">Time</string>
+
+    <!-- ── Availability screen ────────────────────────────────── -->
+    <string name="avail_first_time_hint">First submission requires admin approval. Subsequent updates apply immediately.</string>
+    <string name="avail_update_hint">Change selected slots and save with \'Update My Map\'.</string>
+    <string name="admin_note_label">Admin Note:</string>
+    <string name="avail_select_slots">Select your available time slots:</string>
+    <string name="avail_saving">Saving…</string>
+    <string name="avail_send_admin_slots">Send to Admin (%d slots)</string>
+    <string name="avail_send_admin">Send to Admin</string>
+    <string name="avail_update_map_slots">Update My Map (%d slots)</string>
+    <string name="avail_update_map">Update My Map</string>
+    <string name="avail_submit_dialog_title">Submit Availability</string>
+    <string name="avail_submit_msg1">Your availability map will be sent for admin approval.</string>
+    <string name="avail_submit_msg2">After approval, it will be used in course assignment. Future updates apply immediately.</string>
+    <string name="avail_slots_count_info">%d slots selected</string>
+    <string name="avail_yes_send">Yes, Send</string>
+    <string name="avail_update_success">Your availability map has been updated!</string>
+    <string name="avail_update_failed">Update failed, please try again.</string>
+    <string name="avail_sent_admin_msg">Your availability has been sent for admin approval!</string>
+    <string name="avail_map_active">Map active (%d slots)</string>
+    <string name="avail_rejected_edit">Rejected — please edit</string>
+    <string name="avail_pending_approval">Awaiting admin approval</string>
+    <string name="classroom_cap_short">(cap: %d)</string>
+
+    <!-- ── Common ─────────────────────────────────────────────── -->
+    <string name="back">Back</string>
+    <string name="copy">Copy</string>
+
+    <!-- ── Navigation (new) ──────────────────────────────────── -->
+    <string name="nav_grades">Grades</string>
+    <string name="nav_attendance">Attendance</string>
+
+    <!-- ── Quick Actions ─────────────────────────────────────── -->
+    <string name="quick_actions">Quick Actions</string>
+    <string name="grade_entry_action">Enter Grades</string>
+    <string name="attendance_action">Attendance</string>
+    <string name="my_grades_action">My Grades</string>
+    <string name="my_attendance_action">Attendance</string>
+
+    <!-- ── Grade Entry (Lecturer) ─────────────────────────────── -->
+    <string name="grade_entry_title">Grade Entry</string>
+    <string name="grade_entry_subtitle">Select a course to enter student grades</string>
+    <string name="no_assigned_courses">No courses assigned to you yet.</string>
+    <string name="students_label">students</string>
+    <string name="no_students_in_dept">No students found in this department.</string>
+    <string name="grade_midterm">Midterm</string>
+    <string name="grade_assignment">Assignment</string>
+    <string name="grade_lab">Lab</string>
+    <string name="grade_final">Final</string>
+    <string name="grade_preview">Weighted Average / Letter Grade</string>
+    <string name="grade_save">Save Grade</string>
+
+    <!-- ── My Grades (Student) ────────────────────────────────── -->
+    <string name="my_grades_title">My Grades</string>
+    <string name="no_dept_courses">No courses found for your department.</string>
+    <string name="grade_not_entered">Not entered</string>
+    <string name="grade_midterm_short">Vize: %d</string>
+    <string name="grade_assignment_short">Ödev: %d</string>
+    <string name="grade_lab_short">Lab: %d</string>
+    <string name="grade_final_short">Final: %d</string>
+    <string name="gpa_summary">GPA Summary</string>
+    <string name="cumulative_gpa">GPA</string>
+    <string name="grade_passed">Passed</string>
+    <string name="grade_failed">Failed</string>
+
+    <!-- ── Admin Grades Overview ──────────────────────────────── -->
+    <string name="admin_grades_title">Grades Overview</string>
+    <string name="admin_grades_subtitle">System-wide grade statistics</string>
+    <string name="avg_gpa">Avg GPA</string>
+    <string name="total_entered">Entries</string>
+    <string name="pass_rate">Pass Rate</string>
+    <string name="grade_distribution">Grade Distribution</string>
+    <string name="course_grade_summary">By Course</string>
+    <string name="n_students">%d students</string>
+    <string name="panel_grades">Grades</string>
+
+    <!-- ── Attendance Entry (Lecturer) ───────────────────────── -->
+    <string name="attendance_entry_title">Take Attendance</string>
+    <string name="attendance_entry_subtitle">Select a course to record attendance</string>
+    <string name="sessions_recorded">%d sessions recorded</string>
+    <string name="attendance_save">Save Attendance</string>
+    <string name="change_date">Change</string>
+    <string name="today">Today</string>
+    <string name="present_count">%1$d / %2$d present</string>
+    <string name="select_all">All Present</string>
+    <string name="deselect_all">All Absent</string>
+
+    <!-- ── My Attendance (Student) ───────────────────────────── -->
+    <string name="my_attendance_title">My Attendance</string>
+    <string name="overall_attendance">Overall Attendance</string>
+    <string name="attended_of">%1$d of %2$d sessions attended</string>
+    <string name="attendance_warning">Attendance below 70%% — at risk!</string>
+    <string name="low_attendance_warning">⚠ Below 70%%</string>
+    <string name="no_sessions_yet">No sessions recorded yet</string>
 </resources>

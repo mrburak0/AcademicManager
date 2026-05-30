@@ -14,7 +14,6 @@ import com.example.academicmanager.ui.theme.AcademicManagerTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import java.util.Locale
-
 class MainActivity : ComponentActivity() {
 
     // Uygulama başlamadan önce dil locale'ini uygula

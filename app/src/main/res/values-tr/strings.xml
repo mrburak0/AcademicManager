@@ -58,7 +58,7 @@
     <!-- ── Navigation ─────────────────────────────────────────── -->
     <string name="nav_home">Ana Sayfa</string>
     <string name="nav_calendar">Takvim</string>
-    <string name="nav_assignment">Yapay Zeka</string>
+    <string name="nav_assignment">Ders Atama</string>
     <string name="nav_classrooms">Sınıflar</string>
     <string name="nav_schedule">Takvim</string>
     <string name="nav_import">Veriler</string>
@@ -345,4 +345,217 @@
     <string name="admin_avail_no_data">Bu hoca için müsaitlik bilgisi yok</string>
     <string name="admin_avail_approve_success">Müsaitlik onaylandı</string>
     <string name="admin_avail_slots_count">%d dilim</string>
+
+    <!-- ── Kayıt formu alanları ve doğrulama ──────────────────── -->
+    <string name="email_label">E-posta</string>
+    <string name="email_hint">Örn. ali@gmail.com</string>
+    <string name="email_required">E-posta adresi zorunludur</string>
+    <string name="email_invalid">Geçerli bir e-posta adresi girin</string>
+    <string name="full_name_required">Ad soyad boş bırakılamaz</string>
+    <string name="username_required">Kullanıcı adı boş bırakılamaz</string>
+    <string name="dept_required">Lütfen bir bölüm seçin</string>
+    <string name="password_required">Şifre boş bırakılamaz</string>
+    <string name="confirm_pass_required">Şifre tekrar boş bırakılamaz</string>
+    <string name="admin_code_empty">Admin kodu boş bırakılamaz</string>
+
+    <!-- ── Şehir / Üniversite dropdownları ───────────────────── -->
+    <string name="select_city">Şehir Seçin</string>
+    <string name="city_label">Şehir</string>
+    <string name="city_required">Şehir seçiniz</string>
+    <string name="select_first_city">Önce şehir seçin</string>
+    <string name="loading">Yükleniyor…</string>
+    <string name="select_university">Üniversite Seçin</string>
+    <string name="university_label">Üniversite</string>
+    <string name="university_required">Üniversite seçiniz</string>
+    <string name="no_uni_in_city">Bu şehirde kayıtlı üniversite yok</string>
+    <string name="not_in_list_manual">Listede Yok — Manuel Gir</string>
+    <string name="select_first_uni">Önce üniversite seçin</string>
+    <string name="loading_departments">Bölümler yükleniyor…</string>
+    <string name="dept_not_found">Bölüm bulunamadı</string>
+    <string name="university_manual_label">Üniversite Adı (Manuel)</string>
+    <string name="university_manual_hint">Üniversitenizin tam adını girin</string>
+    <string name="university_name_required">Üniversite adı boş bırakılamaz</string>
+    <string name="dept_manual_label">Bölüm Adı (Manuel)</string>
+    <string name="dept_manual_hint">Bölümünüzün tam adını girin</string>
+    <string name="dept_name_required">Bölüm adı boş bırakılamaz</string>
+    <string name="email_verify_sent">%s adresine doğrulama maili gönderildi.</string>
+    <string name="verify_email_then_wait">Lütfen önce e-postanızı doğrulayın, ardından admin onayını bekleyin.</string>
+
+    <!-- ── Genel Bakış ────────────────────────────────────────── -->
+    <string name="overview_title">Genel Bakış</string>
+    <string name="stat_courses_label">Dersler</string>
+    <string name="stat_faculty_label">Öğretim Görevlisi</string>
+
+    <!-- ── Veri / İçe Aktarma ekranı ─────────────────────────── -->
+    <string name="import_data_title">Veri İçe Aktar</string>
+    <string name="import_data_subtitle">Excel ile ders ve hoca bilgilerini yükleyin</string>
+    <string name="how_it_works">Nasıl çalışır</string>
+    <string name="step_download">Şablon\nİndir</string>
+    <string name="step_fill">Veriyi\nGir</string>
+    <string name="step_import">İçe Aktar\n&amp; Önizle</string>
+    <string name="step_save">Firebase\'e\nKaydet</string>
+    <string name="excel_columns_label">EXCEL SÜTUNLARI</string>
+    <string name="btn_template">Şablon</string>
+    <string name="btn_import_xlsx">İçe Aktar .xlsx</string>
+    <string name="importing_excel">Excel dosyası işleniyor</string>
+    <string name="please_wait">Lütfen bekleyin…</string>
+    <string name="preview_verify">%s Doğrula</string>
+    <string name="preview_rows">%d satır</string>
+    <string name="preview_review_msg">Firebase\'e yüklemeden önce tüm girişleri dikkatle inceleyin.</string>
+    <string name="btn_discard">İptal Et</string>
+    <string name="btn_save_count">%1$d %2$s Kaydet</string>
+    <string name="cred_title">Giriş Bilgileri</string>
+    <string name="cred_subtitle">%d hoca eklendi — şifreler sadece bir kez gösterilir!</string>
+    <string name="cred_warning">Bu şifreler veritabanında hash\'li saklanır. Lütfen not alın veya hemen kopyalayın.</string>
+    <string name="copied_all">Tüm şifreler kopyalandı!</string>
+    <string name="copied_one">Kopyalandı: %s</string>
+    <string name="btn_copy_all">Tümünü Kopyala</string>
+    <string name="btn_got_it">Anladım, Devam Et</string>
+    <string name="course_import_title">Ders İçe Aktar</string>
+    <string name="course_import_subtitle">Excel dosyasından ders kataloğunu yükle</string>
+    <string name="lecturer_import_title">Öğretmen İçe Aktar</string>
+    <string name="lecturer_import_subtitle">Excel dosyasından öğretim görevlilerini yükle</string>
+    <string name="tab_courses_name">Dersler</string>
+    <string name="tab_courses_sub">Ders kataloğunu içe aktar</string>
+    <string name="tab_lecturers_name">Öğretmenler</string>
+    <string name="tab_lecturers_sub">Öğretim görevlilerini içe aktar</string>
+    <string name="lecturer_creds_auto">Giriş bilgileri (kullanıcı adı + 6 karakterli şifre) otomatik oluşturulur.</string>
+    <string name="classroom_mgmt_title">Sınıf Yönetimi</string>
+    <string name="classroom_mgmt_subtitle">Manuel ekle veya Excel ile içe aktar</string>
+    <string name="manual_classroom_add_btn">Manuel Sınıf Ekle</string>
+    <string name="classroom_name_ex">Sınıf Adı (Örn. A-101, Lab-2)</string>
+    <string name="enter_text_hint">Metin girin</string>
+    <string name="capacity_ex">Kapasite (1–2000)</string>
+    <string name="enter_number_hint">Sayı girin</string>
+    <string name="btn_save_room">Sınıfı Kaydet</string>
+    <string name="classrooms_excel_title">Sınıflar (Excel)</string>
+    <string name="classrooms_excel_subtitle">Excel dosyasından toplu sınıf ekle</string>
+    <string name="classroom_type_note">Type sütunu: LECTURE, LAB veya COMPUTER_LAB değerlerinden biri olmalı.</string>
+    <string name="registered_classrooms">Kayıtlı Sınıflar (%d)</string>
+    <string name="capacity_bookings">Kapasite: %1$d · %2$d rezervasyon</string>
+    <string name="delete_classroom_title">Sınıfı Sil</string>
+    <string name="delete_classroom_msg">%s sınıfını silmek istiyor musunuz?</string>
+    <string name="classroom_added_toast">Sınıf eklendi!</string>
+    <string name="capacity_range_error">Kapasite 1–2000 arasında olmalı</string>
+
+    <!-- ── Eksik İngilizce karşılıkları ──────────────────────── -->
+    <string name="data_screen_title">Veriler</string>
+    <string name="tab_courses">Dersler</string>
+    <string name="tab_lecturers">Öğretmenler</string>
+    <string name="tab_classrooms">Sınıflar</string>
+    <string name="classroom_manual_add">Manuel Giriş</string>
+    <string name="classroom_excel_import">Excel İçe Aktar</string>
+    <string name="add_classroom_btn">Sınıf Ekle</string>
+    <string name="schedule_calendar_title">Haftalık Program</string>
+    <string name="filter_all_lecturers">Tüm Hocalar</string>
+    <string name="pdf_export_btn">PDF İndir</string>
+    <string name="calendar_pdf_saved">Program PDF olarak kaydedildi</string>
+    <string name="assign_course_to_lecturer">Hocaya Ders Ata</string>
+    <string name="lecturer_availability_map">Müsaitlik Haritası</string>
+    <string name="no_availability_set">Henüz müsaitlik girilmedi</string>
+    <string name="view_calendar_btn">Takvimi Görüntüle</string>
+
+    <!-- ── Haftalık Takvim ────────────────────────────────────── -->
+    <string name="schedule_showing_count">%d ders gösteriliyor</string>
+    <string name="filter_lecturer">Hoca Filtresi</string>
+    <string name="no_courses_to_show">Gösterilecek ders yok</string>
+    <string name="load_demo_or_assign">Demo veriyi yükleyin veya ders atayın.</string>
+    <string name="more_items">+%d daha</string>
+    <string name="calendar_pdf_ok">Takvim PDF olarak kaydedildi</string>
+    <string name="calendar_pdf_err">PDF oluşturulamadı</string>
+    <string name="pdf_time_col">Saat</string>
+
+    <!-- ── Müsaitlik ekranı ───────────────────────────────────── -->
+    <string name="avail_first_time_hint">İlk gönderimde admin onayına gidecek. Sonraki güncellemeler anında uygulanır.</string>
+    <string name="avail_update_hint">Seçili slotları değiştirip \'Haritamı Güncelle\' ile kaydet.</string>
+    <string name="admin_note_label">Admin Notu:</string>
+    <string name="avail_select_slots">Müsait olduğunuz saatleri seçin:</string>
+    <string name="avail_saving">Kaydediliyor…</string>
+    <string name="avail_send_admin_slots">Admin\'e Gönder (%d slot)</string>
+    <string name="avail_send_admin">Admin\'e Gönder</string>
+    <string name="avail_update_map_slots">Haritamı Güncelle (%d slot)</string>
+    <string name="avail_update_map">Haritamı Güncelle</string>
+    <string name="avail_submit_dialog_title">Müsaitlik Gönder</string>
+    <string name="avail_submit_msg1">Müsaitlik haritanız admin onayına gönderilecek.</string>
+    <string name="avail_submit_msg2">Onaylandıktan sonra ders atama sürecinde kullanılacak. Sonraki güncellemeleriniz anında geçerli olur.</string>
+    <string name="avail_slots_count_info">%d slot seçili</string>
+    <string name="avail_yes_send">Evet, Gönder</string>
+    <string name="avail_update_success">Müsaitlik haritanız güncellendi!</string>
+    <string name="avail_update_failed">Güncelleme başarısız, tekrar deneyin.</string>
+    <string name="avail_sent_admin_msg">Müsaitliğiniz admin onayına gönderildi!</string>
+    <string name="avail_map_active">Haritanız aktif (%d slot)</string>
+    <string name="avail_rejected_edit">Reddedildi — lütfen düzenleyin</string>
+    <string name="avail_pending_approval">Admin onayı bekleniyor</string>
+    <string name="classroom_cap_short">(kap: %d)</string>
+
+    <!-- ── Genel ──────────────────────────────────────────────── -->
+    <string name="back">Geri</string>
+    <string name="copy">Kopyala</string>
+
+    <!-- ── Navigasyon (yeni) ──────────────────────────────────── -->
+    <string name="nav_grades">Notlar</string>
+    <string name="nav_attendance">Yoklama</string>
+
+    <!-- ── Hızlı Eylemler ────────────────────────────────────── -->
+    <string name="quick_actions">Hızlı Eylemler</string>
+    <string name="grade_entry_action">Not Gir</string>
+    <string name="attendance_action">Yoklama Al</string>
+    <string name="my_grades_action">Notlarım</string>
+    <string name="my_attendance_action">Yoklamam</string>
+
+    <!-- ── Not Girişi (Öğretim Görevlisi) ───────────────────── -->
+    <string name="grade_entry_title">Not Girişi</string>
+    <string name="grade_entry_subtitle">Not girmek için bir ders seçin</string>
+    <string name="no_assigned_courses">Henüz size atanmış ders yok.</string>
+    <string name="students_label">öğrenci</string>
+    <string name="no_students_in_dept">Bu bölümde kayıtlı öğrenci bulunamadı.</string>
+    <string name="grade_midterm">Vize</string>
+    <string name="grade_assignment">Ödev</string>
+    <string name="grade_lab">Lab</string>
+    <string name="grade_final">Final</string>
+    <string name="grade_preview">Ağırlıklı Ortalama / Harf Notu</string>
+    <string name="grade_save">Notu Kaydet</string>
+
+    <!-- ── Notlarım (Öğrenci) ────────────────────────────────── -->
+    <string name="my_grades_title">Notlarım</string>
+    <string name="no_dept_courses">Bölümünüze ait ders bulunamadı.</string>
+    <string name="grade_not_entered">Girilmedi</string>
+    <string name="grade_midterm_short">Vize: %d</string>
+    <string name="grade_assignment_short">Ödev: %d</string>
+    <string name="grade_lab_short">Lab: %d</string>
+    <string name="grade_final_short">Final: %d</string>
+    <string name="gpa_summary">GPA Özeti</string>
+    <string name="cumulative_gpa">GPA</string>
+    <string name="grade_passed">Geçti</string>
+    <string name="grade_failed">Kaldı</string>
+
+    <!-- ── Admin Not Özeti ────────────────────────────────────── -->
+    <string name="admin_grades_title">Not Özeti</string>
+    <string name="admin_grades_subtitle">Sistem geneli not istatistikleri</string>
+    <string name="avg_gpa">Ort. GPA</string>
+    <string name="total_entered">Kayıt</string>
+    <string name="pass_rate">Geçme Oranı</string>
+    <string name="grade_distribution">Not Dağılımı</string>
+    <string name="course_grade_summary">Derse Göre</string>
+    <string name="n_students">%d öğrenci</string>
+    <string name="panel_grades">Notlar</string>
+
+    <!-- ── Yoklama Girişi (Öğretim Görevlisi) ────────────────── -->
+    <string name="attendance_entry_title">Yoklama Al</string>
+    <string name="attendance_entry_subtitle">Yoklama almak için bir ders seçin</string>
+    <string name="sessions_recorded">%d oturum kaydedildi</string>
+    <string name="attendance_save">Yoklamayı Kaydet</string>
+    <string name="change_date">Değiştir</string>
+    <string name="today">Bugün</string>
+    <string name="present_count">%1$d / %2$d devam ediyor</string>
+    <string name="select_all">Tümü Var</string>
+    <string name="deselect_all">Tümü Yok</string>
+
+    <!-- ── Yoklamam (Öğrenci) ─────────────────────────────────── -->
+    <string name="my_attendance_title">Yoklamam</string>
+    <string name="overall_attendance">Genel Devam Durumu</string>
+    <string name="attended_of">%1$d / %2$d derse katıldı</string>
+    <string name="attendance_warning">Devam %70\'in altında — risk altında!</string>
+    <string name="low_attendance_warning">⚠ %70 altında</string>
+    <string name="no_sessions_yet">Henüz oturum kaydedilmedi</string>
 </resources>

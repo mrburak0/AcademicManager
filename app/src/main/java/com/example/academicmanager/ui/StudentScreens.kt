@@ -38,9 +38,7 @@ import com.example.academicmanager.ui.viewmodels.AdminViewModel
 import com.example.academicmanager.ui.viewmodels.AuthViewModel
 
 // English data keys — used for Firestore data operations, DO NOT localize
-private val STUDENT_WEEK_DAYS    = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-private val STUDENT_WEEK_DAYS_TR = listOf("Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma")
-private fun dayToTurkish(day: String) = STUDENT_WEEK_DAYS_TR.getOrElse(STUDENT_WEEK_DAYS.indexOf(day)) { day }
+private val STUDENT_WEEK_DAYS = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
 private val STUDENT_TIME_SLOTS = listOf(
     "08:00-09:00", "09:00-10:00", "10:00-11:00", "11:00-12:00",
     "13:00-14:00", "14:00-15:00", "15:00-16:00", "16:00-17:00"
@@ -147,6 +145,28 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
             StudentStatCard(stringResource(R.string.stat_lab_sessions), myEntries.count { it.sessionType == SessionType.LAB }.toString(), Icons.Default.Science, Color(0xFFF59E0B), Modifier.weight(1f))
         }
 
+        // ── Quick Actions ─────────────────────────────────────
+        Text(stringResource(R.string.quick_actions), color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            StudentActionCard(
+                label = stringResource(R.string.my_grades_action),
+                icon = Icons.Default.Grade,
+                color = IndigoAccent,
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("my_grades") }
+            )
+            StudentActionCard(
+                label = stringResource(R.string.my_attendance_action),
+                icon = Icons.Default.HowToReg,
+                color = Color(0xFFF59E0B),
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("my_attendance") }
+            )
+        }
+
         // ── Weekly Schedule ──────────────────────────────────
         Text(stringResource(R.string.this_week), color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
 
@@ -196,6 +216,29 @@ private fun StudentStatCard(label: String, value: String, icon: androidx.compose
 }
 
 @Composable
+private fun StudentActionCard(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color, modifier: Modifier, onClick: () -> Unit) {
+    Card(
+        modifier = modifier.clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.10f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.size(40.dp).clip(CircleShape).background(color.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(label, color = color, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
 private fun StudentDaySection(day: String, entries: List<ScheduleEntry>, accentColor: Color, countStr: String) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -234,7 +277,7 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
                         if (isLab) {
                             Spacer(Modifier.width(4.dp))
                             Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
-                                Text("LAB", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.session_lab), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -261,7 +304,7 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
                         ReceiptRow(stringResource(R.string.receipt_course_code), entry.courseCode,    accentColor)
                         ReceiptRow(stringResource(R.string.receipt_lecturer),    entry.lecturerName,  accentColor)
                         ReceiptRow(stringResource(R.string.receipt_classroom),   entry.classroomName, accentColor)
-                        ReceiptRow(stringResource(R.string.receipt_day),         dayToTurkish(entry.dayOfWeek),     accentColor)
+                        ReceiptRow(stringResource(R.string.receipt_day),         weekDaysFull().getOrElse(STUDENT_WEEK_DAYS.indexOf(entry.dayOfWeek)) { entry.dayOfWeek },     accentColor)
                         ReceiptRow(stringResource(R.string.receipt_time),        entry.timeSlot,      accentColor)
                         ReceiptRow(
                             stringResource(R.string.receipt_type),
@@ -421,7 +464,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
                             if (isLab) {
                                 Spacer(Modifier.width(4.dp))
                                 Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
-                                    Text("LAB", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.session_lab), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -444,7 +487,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
                         HorizontalDivider(color = accentColor.copy(alpha = 0.25f))
                         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             ReceiptRow(stringResource(R.string.receipt_lecturer),  entry.lecturerName,  accentColor)
-                            ReceiptRow(stringResource(R.string.receipt_day),       dayToTurkish(entry.dayOfWeek),     accentColor)
+                            ReceiptRow(stringResource(R.string.receipt_day),       weekDaysFull().getOrElse(STUDENT_WEEK_DAYS.indexOf(entry.dayOfWeek)) { entry.dayOfWeek },     accentColor)
                             ReceiptRow(stringResource(R.string.receipt_time),      entry.timeSlot,      accentColor)
                             ReceiptRow(
                                 stringResource(R.string.receipt_type),
