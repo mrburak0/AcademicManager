@@ -558,4 +558,29 @@
     <string name="attendance_warning">Attendance below 70%% — at risk!</string>
     <string name="low_attendance_warning">⚠ Below 70%%</string>
     <string name="no_sessions_yet">No sessions recorded yet</string>
+
+    <!-- ── Exam Schedule ──────────────────────────────────────── -->
+    <string name="nav_exam_schedule">Exams</string>
+    <string name="exam_schedule_admin_title">Exam Schedule</string>
+    <string name="exam_schedule_admin_sub">%d exams scheduled</string>
+    <string name="exam_schedule_student_title">My Exams</string>
+    <string name="add_exam">Add Exam</string>
+    <string name="add_exam_hint">Tap + to add the first exam</string>
+    <string name="no_exams_yet">No exams scheduled yet</string>
+    <string name="no_exams_dept">No exams scheduled for your department</string>
+    <string name="delete_exam_title">Delete Exam?</string>
+    <string name="select_course_exam">Select Course</string>
+    <string name="exam_type_label">Exam Type</string>
+    <string name="exam_date_label">Exam Date</string>
+    <string name="exam_start_time">Start Time</string>
+    <string name="exam_end_time">End Time</string>
+    <string name="exam_classroom">Classroom</string>
+    <string name="exam_lecturer_optional">Lecturer (optional)</string>
+    <string name="exam_notes_optional">Notes (optional)</string>
+    <string name="next_exam_label">Next Exam</string>
+    <string name="upcoming_exams">Upcoming</string>
+    <string name="past_exams">Past Exams (%d)</string>
+    <string name="days_remaining">days left</string>
+    <string name="exam_schedule_action">Exam Schedule</string>
+    <string name="my_exam_schedule_action">My Exams</string>
 </resources>

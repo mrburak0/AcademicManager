@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
@@ -153,6 +154,8 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object AdminGrades          : Screen("admin_grades",          R.string.nav_grades,        Icons.Default.Grade)
     object AttendanceEntry      : Screen("attendance_entry",      R.string.nav_attendance,    Icons.Default.HowToReg)
     object MyAttendance         : Screen("my_attendance",         R.string.nav_attendance,    Icons.Default.HowToReg)
+    object AdminExamSchedule    : Screen("admin_exam_schedule",   R.string.nav_exam_schedule, Icons.AutoMirrored.Filled.EventNote)
+    object StudentExamSchedule  : Screen("student_exam_schedule", R.string.nav_exam_schedule, Icons.AutoMirrored.Filled.EventNote)
 }
 
 @Composable
@@ -174,6 +177,7 @@ fun MainScreen(
     val announcementsViewModel: AnnouncementsViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val gradeViewModel: com.example.academicmanager.ui.viewmodels.GradeViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val attendanceViewModel: com.example.academicmanager.ui.viewmodels.AttendanceViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val examViewModel: com.example.academicmanager.ui.viewmodels.ExamViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val authState by authViewModel.authState.collectAsState()
 
     // Restore session on app startup
@@ -310,6 +314,9 @@ fun MainScreen(
                 composable(Screen.AdminGrades.route)     { AdminGradesOverviewScreen(adminViewModel, gradeViewModel, navController) }
                 composable(Screen.AttendanceEntry.route) { LecturerAttendanceScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
                 composable(Screen.MyAttendance.route)    { StudentAttendanceScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
+                // ── Sınav Takvimi ─────────────────────────────────
+                composable(Screen.AdminExamSchedule.route)   { AdminExamScheduleScreen(adminViewModel, examViewModel, navController) }
+                composable(Screen.StudentExamSchedule.route) { StudentExamScheduleScreen(authViewModel, examViewModel, navController) }
                 // ── Phase 1 geriye dönük uyumluluk ────────────────
                 composable(Screen.Home.route)     { HomeScreen(dao) }
                 composable(Screen.Calendar.route) { CalendarScreen(authViewModel, dao) }

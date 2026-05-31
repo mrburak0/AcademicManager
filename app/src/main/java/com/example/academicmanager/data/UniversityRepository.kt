@@ -61,6 +61,12 @@ interface UniversityRepository {
     suspend fun addAvailability(availability: LecturerAvailability)
     suspend fun updateAvailability(availability: LecturerAvailability)
 
+    // Sınav takvimi
+    fun getExamEntries(): Flow<List<ExamEntry>>
+    fun getExamEntriesByDepartment(department: String): Flow<List<ExamEntry>>
+    suspend fun addExamEntry(entry: ExamEntry)
+    suspend fun deleteExamEntry(id: String)
+
     // Not yönetimi
     fun getGrades(): Flow<List<GradeRecord>>
     fun getGradesByCourse(courseCode: String): Flow<List<GradeRecord>>

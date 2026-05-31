@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
@@ -214,6 +215,13 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                 color = Color(0xFFF59E0B),
                 modifier = Modifier.weight(1f),
                 onClick = { navController.navigate("attendance_entry") }
+            )
+            LecturerActionCard(
+                label = stringResource(R.string.exam_schedule_action),
+                icon = Icons.AutoMirrored.Filled.EventNote,
+                color = Color(0xFFEF4444),
+                modifier = Modifier.weight(1f),
+                onClick = { navController.navigate("student_exam_schedule") }
             )
         }
 

@@ -558,4 +558,29 @@
     <string name="attendance_warning">Devam %70\'in altında — risk altında!</string>
     <string name="low_attendance_warning">⚠ %70 altında</string>
     <string name="no_sessions_yet">Henüz oturum kaydedilmedi</string>
+
+    <!-- ── Sınav Takvimi ──────────────────────────────────────── -->
+    <string name="nav_exam_schedule">Sınavlar</string>
+    <string name="exam_schedule_admin_title">Sınav Takvimi</string>
+    <string name="exam_schedule_admin_sub">%d sınav planlandı</string>
+    <string name="exam_schedule_student_title">Sınavlarım</string>
+    <string name="add_exam">Sınav Ekle</string>
+    <string name="add_exam_hint">İlk sınavı eklemek için + tuşuna basın</string>
+    <string name="no_exams_yet">Henüz sınav planlanmadı</string>
+    <string name="no_exams_dept">Bölümünüz için sınav planlanmadı</string>
+    <string name="delete_exam_title">Sınav Silinsin mi?</string>
+    <string name="select_course_exam">Ders Seçin</string>
+    <string name="exam_type_label">Sınav Türü</string>
+    <string name="exam_date_label">Sınav Tarihi</string>
+    <string name="exam_start_time">Başlangıç Saati</string>
+    <string name="exam_end_time">Bitiş Saati</string>
+    <string name="exam_classroom">Sınıf / Derslik</string>
+    <string name="exam_lecturer_optional">Hoca (isteğe bağlı)</string>
+    <string name="exam_notes_optional">Notlar (isteğe bağlı)</string>
+    <string name="next_exam_label">Sonraki Sınav</string>
+    <string name="upcoming_exams">Yaklaşan Sınavlar</string>
+    <string name="past_exams">Geçmiş Sınavlar (%d)</string>
+    <string name="days_remaining">gün kaldı</string>
+    <string name="exam_schedule_action">Sınav Takvimi</string>
+    <string name="my_exam_schedule_action">Sınavlarım</string>
 </resources>

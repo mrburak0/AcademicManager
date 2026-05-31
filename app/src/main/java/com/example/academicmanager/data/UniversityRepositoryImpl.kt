@@ -281,6 +281,40 @@ class UniversityRepositoryImpl(
         firestore.collection("lecturer_availability").document(availability.id).set(availability).await()
     }
 
+    // ── Sınav Takvimi ─────────────────────────────────────────
+
+    override fun getExamEntries(): Flow<List<ExamEntry>> {
+        return try {
+            firestore.collection("exam_entries")
+                .orderBy("examDate")
+                .snapshots()
+                .map { it.toObjects(ExamEntry::class.java) }
+        } catch (_: Exception) {
+            firestore.collection("exam_entries")
+                .snapshots()
+                .map { it.toObjects(ExamEntry::class.java) }
+        }
+    }
+
+    override fun getExamEntriesByDepartment(department: String): Flow<List<ExamEntry>> {
+        return firestore.collection("exam_entries")
+            .whereEqualTo("department", department)
+            .snapshots()
+            .map { it.toObjects(ExamEntry::class.java) }
+    }
+
+    override suspend fun addExamEntry(entry: ExamEntry) {
+        val docRef = if (entry.id.isEmpty())
+            firestore.collection("exam_entries").document()
+        else
+            firestore.collection("exam_entries").document(entry.id)
+        docRef.set(entry.copy(id = docRef.id)).await()
+    }
+
+    override suspend fun deleteExamEntry(id: String) {
+        firestore.collection("exam_entries").document(id).delete().await()
+    }
+
     // ── Not Yönetimi ──────────────────────────────────────────
 
     override fun getGrades(): Flow<List<GradeRecord>> {

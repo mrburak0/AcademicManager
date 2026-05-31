@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -459,6 +460,17 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     Icon(Icons.Default.Grade, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.panel_grades), fontWeight = FontWeight.SemiBold)
+                }
+                OutlinedButton(
+                    onClick = { navController.navigate("admin_exam_schedule") },
+                    modifier = Modifier.weight(1f),
+                    border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.EventNote, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.exam_schedule_action), fontWeight = FontWeight.SemiBold)
                 }
                 OutlinedButton(
                     onClick = { navController.navigate("announcements") },

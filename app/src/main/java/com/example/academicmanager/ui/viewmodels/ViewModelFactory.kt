@@ -42,6 +42,10 @@ class ViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return AttendanceViewModel(repository) as T
         }
+        if (modelClass.isAssignableFrom(ExamViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ExamViewModel(repository) as T
+        }
         throw IllegalArgumentException("Bilinmeyen ViewModel sınıfı: ${modelClass.name}")
     }
 }
