@@ -91,14 +91,14 @@ fun AnnouncementsScreen(
                             stringResource(R.string.announcements_title),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium,
-                            color = TextPrimary
+                            color = AppColorState.textPrimary
                         )
                         Text(
                             if (sorted.size == 1)
                                 stringResource(R.string.announcements_count_one, sorted.size)
                             else
                                 stringResource(R.string.announcements_count, sorted.size),
-                            color = TextSecondary,
+                            color = AppColorState.textSecondary,
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -108,7 +108,7 @@ fun AnnouncementsScreen(
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Geri",
+                                contentDescription = stringResource(R.string.back),
                                 tint = EmeraldGreen
                             )
                         }
@@ -116,7 +116,7 @@ fun AnnouncementsScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
-                    titleContentColor = TextPrimary
+                    titleContentColor = AppColorState.textPrimary
                 )
             )
         },
@@ -155,11 +155,11 @@ fun AnnouncementsScreen(
                             Icon(
                                 Icons.Default.Notifications,
                                 contentDescription = null,
-                                tint     = TextSecondary.copy(alpha = 0.4f),
+                                tint     = AppColorState.textSecondary.copy(alpha = 0.4f),
                                 modifier = Modifier.size(64.dp)
                             )
                             Spacer(Modifier.height(12.dp))
-                            Text(stringResource(R.string.no_announcements), color = TextSecondary)
+                            Text(stringResource(R.string.no_announcements), color = AppColorState.textSecondary)
                         }
                     }
                 }
@@ -186,7 +186,7 @@ fun AnnouncementsScreen(
                 dialogTitle    = ""; dialogMessage = ""
                 dialogType     = AnnouncementType.INFO
             },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.add_announcement_title), color = EmeraldGreen, fontWeight = FontWeight.Bold) },
             text  = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -194,13 +194,13 @@ fun AnnouncementsScreen(
                         value         = dialogTitle,
                         onValueChange = { dialogTitle = it },
                         label         = { Text(stringResource(R.string.ann_title_field)) },
-                        placeholder   = { Text(stringResource(R.string.ann_title_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder   = { Text(stringResource(R.string.ann_title_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier      = Modifier.fillMaxWidth(),
                         shape         = RoundedCornerShape(12.dp),
                         colors        = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor    = EmeraldGreen, unfocusedBorderColor = Slate800,
-                            focusedLabelColor     = EmeraldGreen, unfocusedLabelColor  = TextSecondary,
-                            focusedTextColor      = TextPrimary,  unfocusedTextColor   = TextPrimary,
+                            focusedBorderColor    = EmeraldGreen, unfocusedBorderColor = AppColorState.surface,
+                            focusedLabelColor     = EmeraldGreen, unfocusedLabelColor  = AppColorState.textSecondary,
+                            focusedTextColor      = AppColorState.textPrimary,  unfocusedTextColor   = AppColorState.textPrimary,
                             cursorColor           = EmeraldGreen,
                             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
@@ -209,14 +209,14 @@ fun AnnouncementsScreen(
                         value         = dialogMessage,
                         onValueChange = { dialogMessage = it },
                         label         = { Text(stringResource(R.string.ann_message_field)) },
-                        placeholder   = { Text(stringResource(R.string.ann_message_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder   = { Text(stringResource(R.string.ann_message_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier      = Modifier.fillMaxWidth().height(120.dp),
                         maxLines      = 5,
                         shape         = RoundedCornerShape(12.dp),
                         colors        = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor    = EmeraldGreen, unfocusedBorderColor = Slate800,
-                            focusedLabelColor     = EmeraldGreen, unfocusedLabelColor  = TextSecondary,
-                            focusedTextColor      = TextPrimary,  unfocusedTextColor   = TextPrimary,
+                            focusedBorderColor    = EmeraldGreen, unfocusedBorderColor = AppColorState.surface,
+                            focusedLabelColor     = EmeraldGreen, unfocusedLabelColor  = AppColorState.textSecondary,
+                            focusedTextColor      = AppColorState.textPrimary,  unfocusedTextColor   = AppColorState.textPrimary,
                             cursorColor           = EmeraldGreen,
                             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
@@ -244,11 +244,11 @@ fun AnnouncementsScreen(
                         ExposedDropdownMenu(
                             expanded        = typeExpanded,
                             onDismissRequest = { typeExpanded = false },
-                            modifier        = Modifier.background(Slate800)
+                            modifier        = Modifier.background(AppColorState.surface)
                         ) {
                             AnnouncementType.all.forEach { t ->
                                 DropdownMenuItem(
-                                    text    = { Text(typeDisplayName(t), color = TextPrimary) },
+                                    text    = { Text(typeDisplayName(t), color = AppColorState.textPrimary) },
                                     onClick = { dialogType = t; typeExpanded = false }
                                 )
                             }
@@ -278,7 +278,7 @@ fun AnnouncementsScreen(
                 TextButton(onClick = {
                     showAddDialog = false
                     dialogTitle   = ""; dialogMessage = ""
-                }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -306,7 +306,7 @@ private fun AnnouncementCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = Slate800),
+        colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape    = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -345,14 +345,14 @@ private fun AnnouncementCard(
                         )
                     }
                     if (dateStr.isNotEmpty()) {
-                        Text(dateStr, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(dateStr, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
 
                 Spacer(Modifier.height(6.dp))
-                Text(announcement.title, color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                Text(announcement.title, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(4.dp))
-                Text(announcement.message, color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(announcement.message, color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
 
                 if (announcement.relatedCourseCode.isNotEmpty()) {
                     Spacer(Modifier.height(4.dp))
@@ -384,9 +384,9 @@ private fun AnnouncementCard(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            containerColor   = Slate800,
+            containerColor   = AppColorState.surface,
             title            = { Text(stringResource(R.string.delete_ann_title), color = ErrorRed) },
-            text             = { Text(stringResource(R.string.delete_ann_msg, announcement.title), color = TextPrimary) },
+            text             = { Text(stringResource(R.string.delete_ann_msg, announcement.title), color = AppColorState.textPrimary) },
             confirmButton    = {
                 Button(
                     onClick = { onDelete(); showDeleteConfirm = false },
@@ -395,7 +395,7 @@ private fun AnnouncementCard(
             },
             dismissButton    = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }
         )

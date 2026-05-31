@@ -115,7 +115,7 @@ fun AcademicLogo(modifier: Modifier = Modifier) {
         Text(
             text = "ACADEMIC",
             style = MaterialTheme.typography.titleMedium,
-            color = TextPrimary,
+            color = AppColorState.textPrimary,
             fontWeight = FontWeight.Black,
             letterSpacing = 4.sp
         )
@@ -160,6 +160,8 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object StudentAssignments   : Screen("student_assignments",   R.string.nav_assignments,         Icons.Default.Assignment)
     object AdminAcademicCal     : Screen("admin_academic_cal",    R.string.nav_academic_calendar,   Icons.Default.DateRange)
     object AcademicCalendar     : Screen("academic_calendar",     R.string.nav_academic_calendar,   Icons.Default.DateRange)
+    object QrSession            : Screen("qr_session",            R.string.nav_attendance,          Icons.Default.QrCode)
+    object QrScan               : Screen("qr_scan",               R.string.nav_attendance,          Icons.Default.QrCodeScanner)
 }
 
 @Composable
@@ -236,12 +238,11 @@ fun MainScreen(
 
     if (authState is AuthState.Authenticated) {
         Scaffold(
-            containerColor = Slate900,
+            containerColor = AppColorState.background,
             bottomBar = {
                 NavigationBar(
-                    containerColor = Slate800,
-                    tonalElevation = 0.dp,
-                    modifier = Modifier.height(72.dp)
+                    containerColor = AppColorState.surface,
+                    tonalElevation = 0.dp
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
@@ -253,14 +254,14 @@ fun MainScreen(
                                     imageVector = screen.icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(22.dp),
-                                    tint = if (selected) EmeraldGreen else TextSecondary.copy(alpha = 0.5f)
+                                    tint = if (selected) EmeraldGreen else AppColorState.textSecondary.copy(alpha = 0.5f)
                                 )
                             },
                             label = {
                                 Text(
                                     stringResource(screen.labelRes),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = if (selected) EmeraldGreen else TextSecondary.copy(alpha = 0.5f),
+                                    color = if (selected) EmeraldGreen else AppColorState.textSecondary.copy(alpha = 0.5f),
                                     fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
                                 )
                             },
@@ -275,7 +276,7 @@ fun MainScreen(
                             colors = NavigationBarItemDefaults.colors(
                                 indicatorColor = EmeraldGreen.copy(alpha = 0.12f),
                                 selectedIconColor = EmeraldGreen,
-                                unselectedIconColor = TextSecondary.copy(alpha = 0.5f)
+                                unselectedIconColor = AppColorState.textSecondary.copy(alpha = 0.5f)
                             )
                         )
                     }
@@ -329,6 +330,9 @@ fun MainScreen(
                 // ── Akademik Takvim ────────────────────────────────
                 composable(Screen.AdminAcademicCal.route)  { AdminAcademicCalendarScreen(academicCalendarViewModel, navController) }
                 composable(Screen.AcademicCalendar.route)  { AcademicCalendarScreen(authViewModel, academicCalendarViewModel, navController) }
+                // ── QR Yoklama ─────────────────────────────────────
+                composable(Screen.QrSession.route) { LecturerQrSessionScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
+                composable(Screen.QrScan.route)    { StudentQrScanScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
                 // ── Phase 1 geriye dönük uyumluluk ────────────────
                 composable(Screen.Home.route)     { HomeScreen(dao) }
                 composable(Screen.Calendar.route) { CalendarScreen(authViewModel, dao) }
@@ -355,13 +359,13 @@ fun ChangePasswordScreen(viewModel: AuthViewModel) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Slate900).padding(32.dp),
+        modifier = Modifier.fillMaxSize().background(AppColorState.background).padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(stringResource(R.string.first_time_title), style = MaterialTheme.typography.headlineSmall, color = EmeraldGreen, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.first_time_subtitle), style = MaterialTheme.typography.bodyMedium, color = TextSecondary, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.first_time_subtitle), style = MaterialTheme.typography.bodyMedium, color = AppColorState.textSecondary, textAlign = TextAlign.Center)
         
         Spacer(Modifier.height(32.dp))
         
@@ -369,22 +373,22 @@ fun ChangePasswordScreen(viewModel: AuthViewModel) {
             value = oldPassword,
             onValueChange = { oldPassword = it },
             label = { Text(stringResource(R.string.old_password)) },
-            placeholder = { Text(stringResource(R.string.old_password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+            placeholder = { Text(stringResource(R.string.old_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
         )
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = newPassword,
             onValueChange = { newPassword = it },
             label = { Text(stringResource(R.string.new_password)) },
-            placeholder = { Text(stringResource(R.string.new_password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+            placeholder = { Text(stringResource(R.string.new_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
         )
         if (newPassword.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
@@ -395,11 +399,11 @@ fun ChangePasswordScreen(viewModel: AuthViewModel) {
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             label = { Text(stringResource(R.string.confirm_password)) },
-            placeholder = { Text(stringResource(R.string.confirm_password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+            placeholder = { Text(stringResource(R.string.confirm_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen, focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
         )
 
         if (authState is AuthState.Error) {
@@ -474,7 +478,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
             // ── Login Card ───────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Slate800),
+                colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                 shape = RoundedCornerShape(28.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
@@ -482,25 +486,25 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                     Text(
                         stringResource(R.string.sign_in),
                         style = MaterialTheme.typography.headlineMedium,
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         stringResource(R.string.sign_in_subtitle),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
 
                     Spacer(Modifier.height(24.dp))
 
                     val loginFieldColors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = Slate700,
-                        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = TextSecondary,
-                        focusedTextColor     = TextPrimary,  unfocusedTextColor    = TextPrimary,
+                        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = AppColorState.surface2,
+                        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = AppColorState.textSecondary,
+                        focusedTextColor     = AppColorState.textPrimary,  unfocusedTextColor    = AppColorState.textPrimary,
                         cursorColor          = EmeraldGreen,
                         focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
                         errorBorderColor     = ErrorRed, errorLabelColor   = ErrorRed,
-                        errorLeadingIconColor = ErrorRed, errorTextColor    = TextPrimary,
+                        errorLeadingIconColor = ErrorRed, errorTextColor    = AppColorState.textPrimary,
                         errorContainerColor  = Color.Transparent, errorSupportingTextColor = ErrorRed
                     )
                     val usernameError = submitted && username.isBlank()
@@ -508,8 +512,8 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         value = username,
                         onValueChange = { username = it; if (submitted && it.isNotBlank()) submitted = false.also { submitted = true } },
                         label = { Text(stringResource(R.string.username)) },
-                        placeholder = { Text(stringResource(R.string.username_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                        leadingIcon = { Icon(Icons.Default.Person, null, tint = if (usernameError) ErrorRed else if (username.isNotBlank()) EmeraldGreen else TextSecondary) },
+                        placeholder = { Text(stringResource(R.string.username_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                        leadingIcon = { Icon(Icons.Default.Person, null, tint = if (usernameError) ErrorRed else if (username.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                         isError = usernameError,
                         supportingText = { if (usernameError) Text("Kullanıcı adı boş bırakılamaz", style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.fillMaxWidth(),
@@ -524,11 +528,11 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         value = password,
                         onValueChange = { password = it },
                         label = { Text(stringResource(R.string.password)) },
-                        placeholder = { Text(stringResource(R.string.password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                        leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (passwordError) ErrorRed else if (password.isNotBlank()) EmeraldGreen else TextSecondary) },
+                        placeholder = { Text(stringResource(R.string.password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                        leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (passwordError) ErrorRed else if (password.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null, tint = TextSecondary)
+                                Icon(if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null, tint = AppColorState.textSecondary)
                             }
                         },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -649,7 +653,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
             // ── Kayıt Ol Linki ────────────────────────────────
             Spacer(Modifier.height(16.dp))
             TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-                Text("Hesabın yok mu? ", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text("Hesabın yok mu? ", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 Text("Kayıt Ol", color = EmeraldGreen, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
             }
 
@@ -732,19 +736,19 @@ private fun CredentialHintRow(role: String, username: String, password: String) 
     ) {
         Text(
             role,
-            color = TextSecondary,
+            color = AppColorState.textSecondary,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.width(76.dp)
         )
         Text(
             username,
-            color = TextPrimary,
+            color = AppColorState.textPrimary,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium
         )
         Text(
             "  /  $password",
-            color = TextSecondary,
+            color = AppColorState.textSecondary,
             style = MaterialTheme.typography.labelSmall
         )
     }
@@ -913,13 +917,13 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
     val strLoadingDepts  = stringResource(R.string.loading_departments)
 
     val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = Slate700,
-        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = TextSecondary,
-        focusedTextColor     = TextPrimary,  unfocusedTextColor    = TextPrimary,
+        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = AppColorState.surface2,
+        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = AppColorState.textSecondary,
+        focusedTextColor     = AppColorState.textPrimary,  unfocusedTextColor    = AppColorState.textPrimary,
         cursorColor          = EmeraldGreen,
         focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
         errorBorderColor     = ErrorRed, errorLabelColor          = ErrorRed,
-        errorLeadingIconColor = ErrorRed, errorTextColor          = TextPrimary,
+        errorLeadingIconColor = ErrorRed, errorTextColor          = AppColorState.textPrimary,
         errorContainerColor  = Color.Transparent, errorSupportingTextColor = ErrorRed
     )
 
@@ -953,20 +957,20 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
             // Geri butonu
             Row(modifier = Modifier.fillMaxWidth()) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = TextSecondary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = AppColorState.textSecondary)
                 }
             }
 
             Text(
                 if (isAdminRole) stringResource(R.string.register_title_admin) else stringResource(R.string.register_title),
                 style = MaterialTheme.typography.headlineMedium,
-                color = if (isAdminRole) Color(0xFFF59E0B) else TextPrimary,
+                color = if (isAdminRole) Color(0xFFF59E0B) else AppColorState.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 if (isAdminRole) stringResource(R.string.register_subtitle_admin)
                 else stringResource(R.string.register_subtitle),
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.bodySmall
             )
 
@@ -993,7 +997,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                         }
                         Text(
                             stringResource(R.string.verify_email_then_wait),
-                            color = TextSecondary, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center
+                            color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(20.dp))
                         Button(
@@ -1008,7 +1012,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                 // ── Kayıt Formu ────────────────────────────────
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1035,8 +1039,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                         OutlinedTextField(
                             value = fullName, onValueChange = { fullName = it },
                             label = { Text(stringResource(R.string.full_name)) },
-                            placeholder = { Text(stringResource(R.string.full_name_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                            leadingIcon = { Icon(Icons.Default.Person, null, tint = if (fullNameError) ErrorRed else if (fullName.isNotBlank()) EmeraldGreen else TextSecondary) },
+                            placeholder = { Text(stringResource(R.string.full_name_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                            leadingIcon = { Icon(Icons.Default.Person, null, tint = if (fullNameError) ErrorRed else if (fullName.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                             isError = fullNameError,
                             supportingText = { if (fullNameError) Text(stringResource(R.string.full_name_required)) },
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors
@@ -1047,8 +1051,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                             OutlinedTextField(
                                 value = email, onValueChange = { email = it },
                                 label = { Text(stringResource(R.string.email_label)) },
-                                placeholder = { Text(stringResource(R.string.email_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                                leadingIcon = { Icon(Icons.Default.Email, null, tint = if (emailError || emailFmtError) ErrorRed else if (email.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                placeholder = { Text(stringResource(R.string.email_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                                leadingIcon = { Icon(Icons.Default.Email, null, tint = if (emailError || emailFmtError) ErrorRed else if (email.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                                 isError = emailError || emailFmtError,
                                 supportingText = {
@@ -1065,8 +1069,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                         OutlinedTextField(
                             value = username, onValueChange = { username = it },
                             label = { Text(stringResource(R.string.username)) },
-                            placeholder = { Text(stringResource(R.string.username_hint_detail), color = TextSecondary.copy(alpha = 0.5f)) },
-                            leadingIcon = { Icon(Icons.Default.AccountCircle, null, tint = if (usernameError) ErrorRed else if (username.isNotBlank()) EmeraldGreen else TextSecondary) },
+                            placeholder = { Text(stringResource(R.string.username_hint_detail), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                            leadingIcon = { Icon(Icons.Default.AccountCircle, null, tint = if (usernameError) ErrorRed else if (username.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                             isError = usernameError,
                             supportingText = { if (usernameError) Text(stringResource(R.string.username_required)) },
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors
@@ -1079,16 +1083,16 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     value = department.ifEmpty { strSelectDept },
                                     onValueChange = {}, readOnly = true,
                                     label = { Text(stringResource(R.string.department)) },
-                                    leadingIcon = { Icon(Icons.Default.School, null, tint = if (deptError) ErrorRed else if (department.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.School, null, tint = if (deptError) ErrorRed else if (department.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = deptExpanded) },
                                     isError = deptError,
                                     supportingText = { if (deptError) Text(strSelectDept) },
                                     modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp), colors = fieldColors
                                 )
-                                ExposedDropdownMenu(expanded = deptExpanded, onDismissRequest = { deptExpanded = false }, modifier = Modifier.background(Slate800).heightIn(max = 300.dp)) {
+                                ExposedDropdownMenu(expanded = deptExpanded, onDismissRequest = { deptExpanded = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 300.dp)) {
                                     DEPARTMENTS.forEach { dept ->
-                                        DropdownMenuItem(text = { Text(dept, color = TextPrimary) }, onClick = { department = dept; deptExpanded = false })
+                                        DropdownMenuItem(text = { Text(dept, color = AppColorState.textPrimary) }, onClick = { department = dept; deptExpanded = false })
                                     }
                                 }
                             }
@@ -1102,16 +1106,16 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     value = selectedCity.ifEmpty { strSelectCity },
                                     onValueChange = {}, readOnly = true,
                                     label = { Text(stringResource(R.string.city_label)) },
-                                    leadingIcon = { Icon(Icons.Default.LocationCity, null, tint = if (cityError) ErrorRed else if (selectedCity.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    leadingIcon = { Icon(Icons.Default.LocationCity, null, tint = if (cityError) ErrorRed else if (selectedCity.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cityExpanded) },
                                     isError = cityError,
                                     supportingText = { if (cityError) Text(strSelectCity) },
                                     modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp), colors = fieldColors
                                 )
-                                ExposedDropdownMenu(expanded = cityExpanded, onDismissRequest = { cityExpanded = false }, modifier = Modifier.background(Slate800).heightIn(max = 280.dp)) {
+                                ExposedDropdownMenu(expanded = cityExpanded, onDismissRequest = { cityExpanded = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 280.dp)) {
                                     UniversityApiViewModel.TURKISH_CITIES.forEach { city ->
-                                        DropdownMenuItem(text = { Text(city, color = TextPrimary) }, onClick = { selectedCity = city; selectedUniversity = ""; department = ""; cityExpanded = false })
+                                        DropdownMenuItem(text = { Text(city, color = AppColorState.textPrimary) }, onClick = { selectedCity = city; selectedUniversity = ""; department = ""; cityExpanded = false })
                                     }
                                 }
                             }
@@ -1126,32 +1130,32 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     value = if (uniDisabled) strFirstCity else if (isLoadingUnis) strLoading else if (selectedUniversity.isBlank() && !showCustomUni) strSelectUni else selectedUniversity,
                                     onValueChange = {}, readOnly = true,
                                     label = { Text(stringResource(R.string.university_label)) },
-                                    leadingIcon = { if (isLoadingUnis) CircularProgressIndicator(modifier = Modifier.size(18.dp), color = EmeraldGreen, strokeWidth = 2.dp) else Icon(Icons.Default.AccountBalance, null, tint = if (uniError) ErrorRed else if (selectedUniversity.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    leadingIcon = { if (isLoadingUnis) CircularProgressIndicator(modifier = Modifier.size(18.dp), color = EmeraldGreen, strokeWidth = 2.dp) else Icon(Icons.Default.AccountBalance, null, tint = if (uniError) ErrorRed else if (selectedUniversity.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     trailingIcon = { if (!uniDisabled) ExposedDropdownMenuDefaults.TrailingIcon(expanded = uniExpanded) },
                                     isError = uniError && !showCustomUni,
                                     supportingText = { if (uniError && !showCustomUni) Text(strSelectUni) },
                                     modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = if (uniError && !showCustomUni) ErrorRed else if (uniDisabled) Slate700 else EmeraldGreen,
-                                        unfocusedBorderColor = if (uniError && !showCustomUni) ErrorRed.copy(alpha = 0.6f) else if (uniDisabled) Slate700.copy(alpha = 0.4f) else Slate700,
-                                        focusedLabelColor = if (uniError && !showCustomUni) ErrorRed else EmeraldGreen, unfocusedLabelColor = TextSecondary,
-                                        focusedTextColor = if (uniDisabled) TextSecondary else TextPrimary, unfocusedTextColor = if (uniDisabled) TextSecondary else TextPrimary,
+                                        focusedBorderColor = if (uniError && !showCustomUni) ErrorRed else if (uniDisabled) AppColorState.surface2 else EmeraldGreen,
+                                        unfocusedBorderColor = if (uniError && !showCustomUni) ErrorRed.copy(alpha = 0.6f) else if (uniDisabled) AppColorState.surface2.copy(alpha = 0.4f) else AppColorState.surface2,
+                                        focusedLabelColor = if (uniError && !showCustomUni) ErrorRed else EmeraldGreen, unfocusedLabelColor = AppColorState.textSecondary,
+                                        focusedTextColor = if (uniDisabled) AppColorState.textSecondary else AppColorState.textPrimary, unfocusedTextColor = if (uniDisabled) AppColorState.textSecondary else AppColorState.textPrimary,
                                         cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
                                         errorBorderColor = ErrorRed, errorLabelColor = ErrorRed, errorLeadingIconColor = ErrorRed,
-                                        errorTextColor = TextPrimary, errorContainerColor = Color.Transparent, errorSupportingTextColor = ErrorRed
+                                        errorTextColor = AppColorState.textPrimary, errorContainerColor = Color.Transparent, errorSupportingTextColor = ErrorRed
                                     )
                                 )
                                 if (!uniDisabled && !isLoadingUnis) {
-                                    ExposedDropdownMenu(expanded = uniExpanded, onDismissRequest = { uniExpanded = false }, modifier = Modifier.background(Slate800).heightIn(max = 280.dp)) {
+                                    ExposedDropdownMenu(expanded = uniExpanded, onDismissRequest = { uniExpanded = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 280.dp)) {
                                         if (filteredUnis.isEmpty()) {
-                                            DropdownMenuItem(text = { Text(stringResource(R.string.no_uni_in_city), color = TextSecondary) }, onClick = { uniExpanded = false })
+                                            DropdownMenuItem(text = { Text(stringResource(R.string.no_uni_in_city), color = AppColorState.textSecondary) }, onClick = { uniExpanded = false })
                                         } else {
                                             filteredUnis.forEach { uni ->
-                                                DropdownMenuItem(text = { Text(uni, color = TextPrimary) }, onClick = { selectedUniversity = uni; showCustomUni = false; customUniversity = ""; department = ""; uniExpanded = false })
+                                                DropdownMenuItem(text = { Text(uni, color = AppColorState.textPrimary) }, onClick = { selectedUniversity = uni; showCustomUni = false; customUniversity = ""; department = ""; uniExpanded = false })
                                             }
                                         }
-                                        HorizontalDivider(color = Slate700)
+                                        HorizontalDivider(color = AppColorState.surface2)
                                         DropdownMenuItem(
                                             text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Edit, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.not_in_list_manual), color = EmeraldGreen) } },
                                             onClick = { showCustomUni = true; selectedUniversity = ""; department = ""; uniExpanded = false }
@@ -1180,27 +1184,27 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     },
                                     onValueChange = {}, readOnly = true,
                                     label = { Text(stringResource(R.string.department)) },
-                                    leadingIcon = { if (isLoadingDepts) CircularProgressIndicator(modifier = Modifier.size(18.dp), color = EmeraldGreen, strokeWidth = 2.dp) else Icon(Icons.Default.School, null, tint = if (department.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    leadingIcon = { if (isLoadingDepts) CircularProgressIndicator(modifier = Modifier.size(18.dp), color = EmeraldGreen, strokeWidth = 2.dp) else Icon(Icons.Default.School, null, tint = if (department.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     trailingIcon = { if (!deptDisabled && !isLoadingDepts) ExposedDropdownMenuDefaults.TrailingIcon(expanded = deptExpanded) },
                                     modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = if (deptDisabled) Slate700 else EmeraldGreen, unfocusedBorderColor = if (deptDisabled) Slate700.copy(alpha = 0.4f) else Slate700,
-                                        focusedLabelColor = EmeraldGreen, unfocusedLabelColor = TextSecondary,
-                                        focusedTextColor = if (deptDisabled) TextSecondary else TextPrimary, unfocusedTextColor = if (deptDisabled) TextSecondary else TextPrimary,
+                                        focusedBorderColor = if (deptDisabled) AppColorState.surface2 else EmeraldGreen, unfocusedBorderColor = if (deptDisabled) AppColorState.surface2.copy(alpha = 0.4f) else AppColorState.surface2,
+                                        focusedLabelColor = EmeraldGreen, unfocusedLabelColor = AppColorState.textSecondary,
+                                        focusedTextColor = if (deptDisabled) AppColorState.textSecondary else AppColorState.textPrimary, unfocusedTextColor = if (deptDisabled) AppColorState.textSecondary else AppColorState.textPrimary,
                                         cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                                     )
                                 )
                                 if (!deptDisabled && !isLoadingDepts) {
-                                    ExposedDropdownMenu(expanded = deptExpanded, onDismissRequest = { deptExpanded = false }, modifier = Modifier.background(Slate800).heightIn(max = 300.dp)) {
+                                    ExposedDropdownMenu(expanded = deptExpanded, onDismissRequest = { deptExpanded = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 300.dp)) {
                                         if (deptList.isEmpty()) {
-                                            DropdownMenuItem(text = { Text(stringResource(R.string.dept_not_found), color = TextSecondary) }, onClick = { deptExpanded = false })
+                                            DropdownMenuItem(text = { Text(stringResource(R.string.dept_not_found), color = AppColorState.textSecondary) }, onClick = { deptExpanded = false })
                                         } else {
                                             deptList.forEach { dept ->
-                                                DropdownMenuItem(text = { Text(dept, color = TextPrimary) }, onClick = { department = dept; showCustomDept = false; customDepartment = ""; deptExpanded = false })
+                                                DropdownMenuItem(text = { Text(dept, color = AppColorState.textPrimary) }, onClick = { department = dept; showCustomDept = false; customDepartment = ""; deptExpanded = false })
                                             }
                                         }
-                                        HorizontalDivider(color = Slate700)
+                                        HorizontalDivider(color = AppColorState.surface2)
                                         DropdownMenuItem(
                                             text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Edit, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.not_in_list_manual), color = EmeraldGreen) } },
                                             onClick = { showCustomDept = true; department = ""; deptExpanded = false }
@@ -1215,8 +1219,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     value = customUniversity,
                                     onValueChange = { customUniversity = it; selectedUniversity = it },
                                     label = { Text(stringResource(R.string.university_manual_label)) },
-                                    placeholder = { Text(stringResource(R.string.university_manual_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                                    leadingIcon = { Icon(Icons.Default.AccountBalance, null, tint = if (uniError) ErrorRed else if (customUniversity.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    placeholder = { Text(stringResource(R.string.university_manual_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                                    leadingIcon = { Icon(Icons.Default.AccountBalance, null, tint = if (uniError) ErrorRed else if (customUniversity.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     isError = uniError && customUniversity.isBlank(),
                                     supportingText = { if (uniError && customUniversity.isBlank()) Text(stringResource(R.string.university_name_required)) },
                                     modifier = Modifier.fillMaxWidth(),
@@ -1231,8 +1235,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                     value = customDepartment,
                                     onValueChange = { customDepartment = it; department = it },
                                     label = { Text(stringResource(R.string.dept_manual_label)) },
-                                    placeholder = { Text(stringResource(R.string.dept_manual_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                                    leadingIcon = { Icon(Icons.Default.School, null, tint = if (deptError) ErrorRed else if (customDepartment.isNotBlank()) EmeraldGreen else TextSecondary) },
+                                    placeholder = { Text(stringResource(R.string.dept_manual_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                                    leadingIcon = { Icon(Icons.Default.School, null, tint = if (deptError) ErrorRed else if (customDepartment.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                                     isError = deptError && customDepartment.isBlank(),
                                     supportingText = { if (deptError && customDepartment.isBlank()) Text(stringResource(R.string.dept_name_required)) },
                                     modifier = Modifier.fillMaxWidth(),
@@ -1246,11 +1250,11 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                         OutlinedTextField(
                             value = password, onValueChange = { password = it },
                             label = { Text(stringResource(R.string.password)) },
-                            placeholder = { Text(stringResource(R.string.new_password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                            leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (passError || passShortError) ErrorRed else if (password.isNotBlank()) EmeraldGreen else TextSecondary) },
+                            placeholder = { Text(stringResource(R.string.new_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                            leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (passError || passShortError) ErrorRed else if (password.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                             trailingIcon = {
                                 IconButton(onClick = { passVisible = !passVisible }) {
-                                    Icon(if (passVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null, tint = TextSecondary)
+                                    Icon(if (passVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff, null, tint = AppColorState.textSecondary)
                                 }
                             },
                             visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -1271,8 +1275,8 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                         OutlinedTextField(
                             value = confirmPass, onValueChange = { confirmPass = it },
                             label = { Text(stringResource(R.string.confirm_password)) },
-                            placeholder = { Text(stringResource(R.string.confirm_password_hint), color = TextSecondary.copy(alpha = 0.5f)) },
-                            leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (confirmError || passMismatch) ErrorRed else if (confirmPass.isNotBlank()) EmeraldGreen else TextSecondary) },
+                            placeholder = { Text(stringResource(R.string.confirm_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                            leadingIcon = { Icon(Icons.Default.Lock, null, tint = if (confirmError || passMismatch) ErrorRed else if (confirmPass.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                             visualTransformation = PasswordVisualTransformation(),
                             isError = confirmError || passMismatch,
                             supportingText = {
@@ -1314,26 +1318,26 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor    = if (isAdminRole) Color(0xFFF59E0B) else EmeraldGreen,
-                                    unfocusedBorderColor  = if (isAdminRole) Color(0xFFF59E0B).copy(alpha = 0.5f) else Slate700,
+                                    unfocusedBorderColor  = if (isAdminRole) Color(0xFFF59E0B).copy(alpha = 0.5f) else AppColorState.surface2,
                                     focusedLabelColor     = if (isAdminRole) Color(0xFFF59E0B) else EmeraldGreen,
-                                    unfocusedLabelColor   = TextSecondary,
-                                    focusedTextColor      = TextPrimary,
-                                    unfocusedTextColor    = TextPrimary,
+                                    unfocusedLabelColor   = AppColorState.textSecondary,
+                                    focusedTextColor      = AppColorState.textPrimary,
+                                    unfocusedTextColor    = AppColorState.textPrimary,
                                     cursorColor           = EmeraldGreen,
                                     focusedContainerColor   = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent
                                 )
                             )
-                            ExposedDropdownMenu(expanded = roleExpanded, onDismissRequest = { roleExpanded = false }, modifier = Modifier.background(Slate800)) {
+                            ExposedDropdownMenu(expanded = roleExpanded, onDismissRequest = { roleExpanded = false }, modifier = Modifier.background(AppColorState.surface)) {
                                 DropdownMenuItem(
-                                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Person, null, tint = EmeraldGreen, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.role_lecturer), color = TextPrimary) } },
+                                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Person, null, tint = EmeraldGreen, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.role_lecturer), color = AppColorState.textPrimary) } },
                                     onClick = { role = UserRole.LECTURER; adminCode = ""; roleExpanded = false }
                                 )
                                 DropdownMenuItem(
-                                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.School, null, tint = Color(0xFF8B5CF6), modifier = Modifier.size(16.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.role_student), color = TextPrimary) } },
+                                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.School, null, tint = Color(0xFF8B5CF6), modifier = Modifier.size(16.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.role_student), color = AppColorState.textPrimary) } },
                                     onClick = { role = UserRole.STUDENT; adminCode = ""; roleExpanded = false }
                                 )
-                                HorizontalDivider(color = Slate700)
+                                HorizontalDivider(color = AppColorState.surface2)
                                 DropdownMenuItem(
                                     text = {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1341,7 +1345,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                             Spacer(Modifier.width(8.dp))
                                             Column {
                                                 Text(stringResource(R.string.role_admin), color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold)
-                                                Text(stringResource(R.string.role_admin_subtitle), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                                                Text(stringResource(R.string.role_admin_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                                             }
                                         }
                                     },
@@ -1378,7 +1382,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                             unfocusedBorderColor = if (adminCodeError) ErrorRed.copy(0.6f) else Color(0xFFF59E0B).copy(alpha = 0.4f),
                                             focusedLabelColor = if (adminCodeError) ErrorRed else Color(0xFFF59E0B),
                                             unfocusedLabelColor = Color(0xFFF59E0B).copy(alpha = 0.6f),
-                                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                                             cursorColor = Color(0xFFF59E0B),
                                             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
                                             errorBorderColor = ErrorRed, errorLabelColor = ErrorRed,
@@ -1461,12 +1465,12 @@ fun HomeScreen(dao: UniversityDao) {
 
 @Composable
 fun StatCard(label: String, count: String, icon: ImageVector, modifier: Modifier = Modifier) {
-    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = Slate800), shape = RoundedCornerShape(24.dp)) {
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = AppColorState.surface), shape = RoundedCornerShape(24.dp)) {
         Column(modifier = Modifier.padding(20.dp)) {
             Icon(icon, contentDescription = null, tint = EmeraldGreen, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(12.dp))
             Text(count, color = EmeraldGreen, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+            Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -1514,7 +1518,7 @@ fun DataScreen(importVM: DataImportViewModel, adminVM: AdminViewModel) {
         // ── Tab bar ──────────────────────────────────────────────
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor   = Slate800,
+            containerColor   = AppColorState.surface,
             contentColor     = EmeraldGreen,
             indicator        = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
@@ -1531,7 +1535,7 @@ fun DataScreen(importVM: DataImportViewModel, adminVM: AdminViewModel) {
                         Text(
                             label,
                             fontWeight = if (selectedTab == i) FontWeight.Bold else FontWeight.Normal,
-                            color      = if (selectedTab == i) EmeraldGreen else TextSecondary
+                            color      = if (selectedTab == i) EmeraldGreen else AppColorState.textSecondary
                         )
                     }
                 )
@@ -1561,7 +1565,7 @@ fun CalendarScreen(authViewModel: AuthViewModel, dao: UniversityDao) {
         Row(modifier = Modifier.fillMaxSize().horizontalScroll(rememberScrollState())) {
             weekDays.forEach { day ->
                 Column(modifier = Modifier.width(220.dp).padding(end = 12.dp)) {
-                    Text(day, style = MaterialTheme.typography.titleMedium, color = TextPrimary, modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(), textAlign = TextAlign.Center)
+                    Text(day, style = MaterialTheme.typography.titleMedium, color = AppColorState.textPrimary, modifier = Modifier.padding(vertical = 12.dp).fillMaxWidth(), textAlign = TextAlign.Center)
                     timeSlots.forEach { slot ->
                         val course = filteredCourses.find { it.dayOfWeek == day && it.timeSlot == slot }
                         ScheduleCard(slot, course)
@@ -1574,16 +1578,16 @@ fun CalendarScreen(authViewModel: AuthViewModel, dao: UniversityDao) {
 
 @Composable
 fun ScheduleCard(slot: String, course: CourseEntity?) {
-    Card(modifier = Modifier.fillMaxWidth().height(120.dp).padding(bottom = 12.dp).then(if (course != null) Modifier.border(1.dp, EmeraldGreen, RoundedCornerShape(16.dp)) else Modifier), colors = CardDefaults.cardColors(containerColor = if (course != null) EmeraldGreen.copy(0.1f) else Slate800), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().height(120.dp).padding(bottom = 12.dp).then(if (course != null) Modifier.border(1.dp, EmeraldGreen, RoundedCornerShape(16.dp)) else Modifier), colors = CardDefaults.cardColors(containerColor = if (course != null) EmeraldGreen.copy(0.1f) else AppColorState.surface), shape = RoundedCornerShape(16.dp)) {
         Column(modifier = Modifier.padding(12.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
-            Text(slot, style = MaterialTheme.typography.labelSmall, color = if (course != null) EmeraldGreen else TextSecondary)
+            Text(slot, style = MaterialTheme.typography.labelSmall, color = if (course != null) EmeraldGreen else AppColorState.textSecondary)
             if (course != null) {
                 Column {
                     Text(course.courseName, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Text(course.courseCode, color = EmeraldGreen, style = MaterialTheme.typography.bodySmall)
                 }
             } else {
-                Text("Empty", color = TextSecondary.copy(alpha = 0.3f))
+                Text("Empty", color = AppColorState.textSecondary.copy(alpha = 0.3f))
             }
         }
     }
@@ -1615,19 +1619,19 @@ fun ProfileScreen(
     fun PasswordDialog() {
         if (!showPasswordDialog) return
         val pf = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = EmeraldGreen, unfocusedBorderColor = Slate700,
-            focusedLabelColor = EmeraldGreen, unfocusedLabelColor = TextSecondary,
-            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+            focusedBorderColor = EmeraldGreen, unfocusedBorderColor = AppColorState.surface2,
+            focusedLabelColor = EmeraldGreen, unfocusedLabelColor = AppColorState.textSecondary,
+            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
             cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
         )
         AlertDialog(
             onDismissRequest = { showPasswordDialog = false; oldPassword = ""; newPassword = ""; confirmPassword = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.update_password_title), color = EmeraldGreen, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(value = oldPassword, onValueChange = { oldPassword = it }, label = { Text(stringResource(R.string.old_password)) }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = pf)
-                    HorizontalDivider(thickness = 1.dp, color = TextSecondary.copy(alpha = 0.1f))
+                    HorizontalDivider(thickness = 1.dp, color = AppColorState.textSecondary.copy(alpha = 0.1f))
                     OutlinedTextField(value = newPassword, onValueChange = { newPassword = it }, label = { Text(stringResource(R.string.new_password)) }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = pf)
                     OutlinedTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = { Text(stringResource(R.string.confirm_password)) }, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = pf)
                 }
@@ -1715,10 +1719,10 @@ fun ProfileScreen(
                     Triple(courses.size, "Ders", Color(0xFF06B6D4)),
                     Triple(pendingRegs.size, "Bekleyen", amberColor)
                 ).forEach { (count, label, color) ->
-                    Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Slate800), border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.25f))) {
+                    Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = AppColorState.surface), border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.25f))) {
                         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("$count", color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-                            Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -1739,7 +1743,7 @@ fun ProfileScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = Slate800),
+                        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                         border = androidx.compose.foundation.BorderStroke(1.dp, amberColor.copy(alpha = 0.25f))
                     ) {
                         Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1758,10 +1762,10 @@ fun ProfileScreen(
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(reg.fullName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
-                                Text("@${reg.username} · ${reg.department}", color = TextSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                Text(reg.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                                Text("@${reg.username} · ${reg.department}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                                 if (reg.email.isNotBlank()) {
-                                    Text(reg.email, color = TextSecondary.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall)
+                                    Text(reg.email, color = AppColorState.textSecondary.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall)
                                 }
                                 Surface(shape = RoundedCornerShape(4.dp), color = when (reg.role) {
                                     UserRole.STUDENT -> adminAccent.copy(alpha = 0.15f)
@@ -1789,31 +1793,31 @@ fun ProfileScreen(
             }
 
             // ── Görünüm Ayarları ──────────────────────────
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Slate800)) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = AppColorState.surface)) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Settings, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Settings, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Sistem Ayarları", color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        Text("Sistem Ayarları", color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
                     }
-                    HorizontalDivider(color = Slate700)
+                    HorizontalDivider(color = AppColorState.surface2)
                     // Tema
-                    Text("Tema", color = TextSecondary, style = MaterialTheme.typography.labelMedium)
+                    Text("Tema", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf(AppSettings.THEME_SYSTEM to "Sistem", AppSettings.THEME_LIGHT to "Açık", AppSettings.THEME_DARK to "Koyu").forEach { (mode, label) ->
                             val sel = currentTheme == mode
-                            OutlinedButton(onClick = { onThemeChange(mode) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else TextSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else Slate700), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
+                            OutlinedButton(onClick = { onThemeChange(mode) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else AppColorState.surface2), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
                                 Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
                             }
                         }
                     }
                     // Dil
-                    Text("Dil", color = TextSecondary, style = MaterialTheme.typography.labelMedium)
+                    Text("Dil", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
                     val currentLang = appSettings?.language ?: AppSettings.LANG_TR
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf(AppSettings.LANG_TR to "Türkçe", AppSettings.LANG_EN to "English").forEach { (code, label) ->
                             val sel = currentLang == code
-                            OutlinedButton(onClick = { appSettings?.language = code; Toast.makeText(context, context.getString(R.string.language_changed), Toast.LENGTH_SHORT).show(); activity?.recreate() }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else TextSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else Slate700), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
+                            OutlinedButton(onClick = { appSettings?.language = code; Toast.makeText(context, context.getString(R.string.language_changed), Toast.LENGTH_SHORT).show(); val i = android.content.Intent(context, com.example.academicmanager.MainActivity::class.java); i.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_NEW_TASK); context.startActivity(i) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else AppColorState.surface2), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
                                 Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
                             }
                         }
@@ -1822,22 +1826,22 @@ fun ProfileScreen(
             }
 
             // ── Hesap Güvenliği ───────────────────────────
-            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Slate800)) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = AppColorState.surface)) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Security, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Security, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Hesap Güvenliği", color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        Text("Hesap Güvenliği", color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
                     }
-                    HorizontalDivider(color = Slate700)
+                    HorizontalDivider(color = AppColorState.surface2)
                     Row(
                         modifier = Modifier.fillMaxWidth().clickable { showPasswordDialog = true }.padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Default.Lock, null, tint = adminAccent, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(12.dp))
-                        Text(stringResource(R.string.change_password_btn), color = TextPrimary, modifier = Modifier.weight(1f))
-                        Icon(Icons.Default.ChevronRight, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        Text(stringResource(R.string.change_password_btn), color = AppColorState.textPrimary, modifier = Modifier.weight(1f))
+                        Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -1890,7 +1894,7 @@ fun ProfileScreen(
             if (user.profilePicturePath != null) {
                 AsyncImage(model = user.profilePicturePath, contentDescription = null, modifier = imageModifier, contentScale = ContentScale.Crop)
             } else {
-                Icon(Icons.Default.AccountCircle, contentDescription = null, modifier = imageModifier, tint = TextSecondary)
+                Icon(Icons.Default.AccountCircle, contentDescription = null, modifier = imageModifier, tint = AppColorState.textSecondary)
             }
             FloatingActionButton(onClick = { imagePickerLauncher.launch("image/*") }, modifier = Modifier.size(40.dp), containerColor = EmeraldGreen, shape = CircleShape) {
                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.White)
@@ -1899,11 +1903,11 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
         Text(stringResource(R.string.full_name_display, user.fullName), style = MaterialTheme.typography.titleLarge)
-        Text(stringResource(R.string.username_display, user.username), color = TextSecondary)
+        Text(stringResource(R.string.username_display, user.username), color = AppColorState.textSecondary)
         Text(stringResource(R.string.role_display, user.role.name), color = EmeraldGreen, fontWeight = FontWeight.Bold)
 
         Spacer(Modifier.height(32.dp))
-        Button(onClick = { showPasswordDialog = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Slate800), shape = RoundedCornerShape(12.dp)) {
+        Button(onClick = { showPasswordDialog = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = AppColorState.surface), shape = RoundedCornerShape(12.dp)) {
             Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
             Text(stringResource(R.string.change_password_btn))
@@ -1917,7 +1921,7 @@ fun ProfileScreen(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             themeOptions.forEach { (mode, label) ->
                 val sel = currentTheme == mode
-                OutlinedButton(onClick = { onThemeChange(mode) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) EmeraldGreen.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) EmeraldGreen else TextSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) EmeraldGreen else Slate700)) {
+                OutlinedButton(onClick = { onThemeChange(mode) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) EmeraldGreen.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) EmeraldGreen else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) EmeraldGreen else AppColorState.surface2)) {
                     Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
                 }
             }
@@ -1927,7 +1931,7 @@ fun ProfileScreen(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(AppSettings.LANG_TR to stringResource(R.string.lang_turkish), AppSettings.LANG_EN to stringResource(R.string.lang_english)).forEach { (code, label) ->
                 val sel = currentLang == code
-                OutlinedButton(onClick = { appSettings?.language = code; Toast.makeText(context, context.getString(R.string.language_changed), Toast.LENGTH_SHORT).show(); activity?.recreate() }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) IndigoAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) IndigoAccent else TextSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) IndigoAccent else Slate700)) {
+                OutlinedButton(onClick = { appSettings?.language = code; Toast.makeText(context, context.getString(R.string.language_changed), Toast.LENGTH_SHORT).show(); val i = android.content.Intent(context, com.example.academicmanager.MainActivity::class.java); i.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_NEW_TASK); context.startActivity(i) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) IndigoAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) IndigoAccent else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) IndigoAccent else AppColorState.surface2)) {
                     Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
                 }
             }

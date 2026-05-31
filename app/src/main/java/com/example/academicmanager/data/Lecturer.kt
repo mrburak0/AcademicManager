@@ -21,5 +21,8 @@ data class Lecturer(
     val profilePicturePath: String? = null,
     val studentYear: String = "",
     val studentId: String = "",
-    val status: String = AccountStatus.APPROVED  // Mevcut kullanıcılar default APPROVED
+    val status: String = AccountStatus.APPROVED,
+    val city: String = "",
+    val university: String = "",
+    val email: String = ""
 )

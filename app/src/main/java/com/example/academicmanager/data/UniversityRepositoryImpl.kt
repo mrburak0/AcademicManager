@@ -472,4 +472,59 @@ class UniversityRepositoryImpl(
     override suspend fun deleteAcademicEvent(id: String) {
         firestore.collection("academic_events").document(id).delete().await()
     }
+
+    // ── Akademik Takvim PDF ──────────────────────────────────
+
+    override suspend fun saveCalendarPdfUrl(url: String) {
+        firestore.collection("settings").document("calendar_pdf")
+            .set(mapOf("url" to url, "updatedAt" to System.currentTimeMillis())).await()
+    }
+
+    override suspend fun getCalendarPdfUrl(): String? {
+        return try {
+            firestore.collection("settings").document("calendar_pdf")
+                .get().await().getString("url")
+        } catch (_: Exception) { null }
+    }
+
+    // ── QR Yoklama Oturumları ─────────────────────────────────
+
+    override fun getActiveSession(courseCode: String): Flow<AttendanceSession?> {
+        return firestore.collection("attendance_sessions")
+            .whereEqualTo("courseCode", courseCode)
+            .whereEqualTo("isActive", true)
+            .snapshots()
+            .map { snap ->
+                snap.toObjects(AttendanceSession::class.java)
+                    .firstOrNull { it.expiresAt > System.currentTimeMillis() }
+            }
+    }
+
+    override suspend fun createSession(session: AttendanceSession): AttendanceSession {
+        val docRef = firestore.collection("attendance_sessions").document()
+        val saved = session.copy(id = docRef.id)
+        docRef.set(saved).await()
+        return saved
+    }
+
+    override suspend fun updateSession(session: AttendanceSession) {
+        firestore.collection("attendance_sessions").document(session.id).set(session).await()
+    }
+
+    override suspend fun getSessionByCode(sessionCode: String): AttendanceSession? {
+        return try {
+            firestore.collection("attendance_sessions")
+                .whereEqualTo("sessionCode", sessionCode)
+                .whereEqualTo("isActive", true)
+                .get().await()
+                .toObjects(AttendanceSession::class.java)
+                .firstOrNull { it.expiresAt > System.currentTimeMillis() }
+        } catch (_: Exception) { null }
+    }
+
+    override suspend fun addStudentToSession(sessionId: String, studentUsername: String) {
+        firestore.collection("attendance_sessions").document(sessionId)
+            .update("presentStudents", com.google.firebase.firestore.FieldValue.arrayUnion(studentUsername))
+            .await()
+    }
 }

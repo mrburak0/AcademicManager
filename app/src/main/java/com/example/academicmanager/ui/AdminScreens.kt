@@ -194,13 +194,13 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     Text(
                         stringResource(R.string.admin_dashboard),
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         stringResource(R.string.admin_dashboard_subtitle),
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
+                        color = AppColorState.textSecondary
                     )
                 }
                 // Duyurular bell ikonu
@@ -516,22 +516,22 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     rejectAvailTarget?.let { avail ->
         AlertDialog(
             onDismissRequest = { rejectAvailTarget = null; rejectAvailNote = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.reject_notification_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text(stringResource(R.string.reject_notification_msg, avail.lecturerName), color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.reject_notification_msg, avail.lecturerName), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
                         value = rejectAvailNote, onValueChange = { rejectAvailNote = it },
                         label = { Text(stringResource(R.string.rejection_reason_label)) },
-                        placeholder = { Text(stringResource(R.string.rejection_reason_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.rejection_reason_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ErrorRed, unfocusedBorderColor = Slate700,
-                            focusedLabelColor = ErrorRed, unfocusedLabelColor = TextSecondary,
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = ErrorRed, unfocusedBorderColor = AppColorState.surface2,
+                            focusedLabelColor = ErrorRed, unfocusedLabelColor = AppColorState.textSecondary,
+                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                             cursorColor = ErrorRed, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
                     )
@@ -544,7 +544,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                 ) { Text(stringResource(R.string.reject)) }
             },
             dismissButton = {
-                TextButton(onClick = { rejectAvailTarget = null; rejectAvailNote = "" }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { rejectAvailTarget = null; rejectAvailNote = "" }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -553,26 +553,26 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     rejectTarget?.let { req ->
         AlertDialog(
             onDismissRequest = { rejectTarget = null; rejectNote = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.reject_notification_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
-                    Text(stringResource(R.string.reject_notification_msg, req.lecturerName), color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.reject_notification_msg, req.lecturerName), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
                         value = rejectNote,
                         onValueChange = { rejectNote = it },
                         label = { Text(stringResource(R.string.rejection_reason_label)) },
-                        placeholder = { Text(stringResource(R.string.rejection_reason_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.rejection_reason_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor    = ErrorRed,
-                            unfocusedBorderColor  = Slate700,
+                            unfocusedBorderColor  = AppColorState.surface2,
                             focusedLabelColor     = ErrorRed,
-                            unfocusedLabelColor   = TextSecondary,
-                            focusedTextColor      = TextPrimary,
-                            unfocusedTextColor    = TextPrimary,
+                            unfocusedLabelColor   = AppColorState.textSecondary,
+                            focusedTextColor      = AppColorState.textPrimary,
+                            unfocusedTextColor    = AppColorState.textPrimary,
                             cursorColor           = ErrorRed,
                             focusedContainerColor   = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent
@@ -587,7 +587,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                 ) { Text(stringResource(R.string.reject)) }
             },
             dismissButton = {
-                TextButton(onClick = { rejectTarget = null; rejectNote = "" }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { rejectTarget = null; rejectNote = "" }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -596,14 +596,14 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     rejectRegTarget?.let { reg ->
         AlertDialog(
             onDismissRequest = { rejectRegTarget = null },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.reject_reg_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
-            text = { Text(stringResource(R.string.reject_reg_msg, reg.fullName, reg.username), color = TextPrimary, style = MaterialTheme.typography.bodySmall) },
+            text = { Text(stringResource(R.string.reject_reg_msg, reg.fullName, reg.username), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall) },
             confirmButton = {
                 Button(onClick = { viewModel.rejectRegistration(reg); rejectRegTarget = null }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.reject_and_delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { rejectRegTarget = null }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { rejectRegTarget = null }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -613,7 +613,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
         val lecturerEntries = scheduleEntries.filter { it.lecturerName == avail.lecturerName }
         AlertDialog(
             onDismissRequest = { viewAvailTarget = null },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             modifier = Modifier.fillMaxWidth(),
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -626,7 +626,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     Spacer(Modifier.width(10.dp))
                     Column {
                         Text(avail.lecturerName, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
-                        Text("${avail.totalSlots} müsait slot", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text("${avail.totalSlots} müsait slot", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             },
@@ -640,7 +640,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     AdminAvailabilityGrid(avail = avail, accentColor = EmeraldGreen)
 
                     if (lecturerEntries.isNotEmpty()) {
-                        HorizontalDivider(color = TextSecondary.copy(alpha = 0.12f))
+                        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.12f))
                         Text("Mevcut Ders Takvimi (${lecturerEntries.size} ders)", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                         lecturerEntries.sortedWith(compareBy({ WEEK_DAYS.indexOf(it.dayOfWeek) }, { it.timeSlot })).forEach { entry ->
                             Row(
@@ -659,19 +659,19 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                                 }
                                 Spacer(Modifier.width(8.dp))
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(entry.courseName, color = TextPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    Text("${entry.timeSlot} · ${entry.classroomName}", color = TextSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+                                    Text(entry.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text("${entry.timeSlot} · ${entry.classroomName}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
                                 }
                             }
                         }
                     } else {
                         Row(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(TextSecondary.copy(alpha = 0.06f)).padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(AppColorState.textSecondary.copy(alpha = 0.06f)).padding(10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.DateRange, null, tint = TextSecondary, modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.DateRange, null, tint = AppColorState.textSecondary, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Henüz ders atanmamış", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Text("Henüz ders atanmamış", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -688,25 +688,25 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     if (showAddStudentDialog) {
         AlertDialog(
             onDismissRequest = { showAddStudentDialog = false; studentFullName = ""; studentUsername = ""; studentPassword = ""; studentDepartment = ""; studentYear = ""; studentId = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.add_student_title), color = Color(0xFF8B5CF6), fontWeight = FontWeight.Bold) },
             text = {
                 val violet = Color(0xFF8B5CF6)
                 val sf = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor    = violet,
-                    unfocusedBorderColor  = Slate700,
+                    unfocusedBorderColor  = AppColorState.surface2,
                     focusedLabelColor     = violet,
-                    unfocusedLabelColor   = TextSecondary,
-                    focusedTextColor      = TextPrimary,
-                    unfocusedTextColor    = TextPrimary,
+                    unfocusedLabelColor   = AppColorState.textSecondary,
+                    focusedTextColor      = AppColorState.textPrimary,
+                    unfocusedTextColor    = AppColorState.textPrimary,
                     cursorColor           = violet,
                     focusedContainerColor   = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedTextField(value = studentFullName, onValueChange = { studentFullName = it.filter { c -> c.isLetter() || c.isWhitespace() || c == '-' } }, label = { Text(stringResource(R.string.student_name_label)) }, placeholder = { Text("Örn. Ali Vural", color = TextSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
-                    OutlinedTextField(value = studentUsername, onValueChange = { studentUsername = it.filter { c -> c.isLetterOrDigit() || c == '_' }.lowercase() }, label = { Text(stringResource(R.string.student_username_label)) }, placeholder = { Text("Örn. ali_vural", color = TextSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
-                    OutlinedTextField(value = studentPassword, onValueChange = { studentPassword = it }, label = { Text(stringResource(R.string.student_password_label)) }, placeholder = { Text(stringResource(R.string.new_password_hint), color = TextSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
+                    OutlinedTextField(value = studentFullName, onValueChange = { studentFullName = it.filter { c -> c.isLetter() || c.isWhitespace() || c == '-' } }, label = { Text(stringResource(R.string.student_name_label)) }, placeholder = { Text("Örn. Ali Vural", color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
+                    OutlinedTextField(value = studentUsername, onValueChange = { studentUsername = it.filter { c -> c.isLetterOrDigit() || c == '_' }.lowercase() }, label = { Text(stringResource(R.string.student_username_label)) }, placeholder = { Text("Örn. ali_vural", color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
+                    OutlinedTextField(value = studentPassword, onValueChange = { studentPassword = it }, label = { Text(stringResource(R.string.student_password_label)) }, placeholder = { Text(stringResource(R.string.new_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
                     if (studentPassword.isNotEmpty()) {
                         PasswordStrengthRow(studentPassword)
                     }
@@ -723,14 +723,14 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                         ExposedDropdownMenu(
                             expanded = deptDropdownExpanded,
                             onDismissRequest = { deptDropdownExpanded = false },
-                            modifier = Modifier.background(Slate800).heightIn(max = 280.dp)
+                            modifier = Modifier.background(AppColorState.surface).heightIn(max = 280.dp)
                         ) {
                             deptOptions.forEach { dept ->
-                                DropdownMenuItem(text = { Text(dept, color = TextPrimary) }, onClick = { studentDepartment = dept; deptDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(dept, color = AppColorState.textPrimary) }, onClick = { studentDepartment = dept; deptDropdownExpanded = false })
                             }
                         }
                     }
-                    OutlinedTextField(value = studentId, onValueChange = { studentId = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.student_id_label)) }, placeholder = { Text(stringResource(R.string.student_id_hint), color = TextSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    OutlinedTextField(value = studentId, onValueChange = { studentId = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.student_id_label)) }, placeholder = { Text(stringResource(R.string.student_id_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     ExposedDropdownMenuBox(expanded = yearDropdownExpanded, onExpandedChange = { yearDropdownExpanded = !yearDropdownExpanded }) {
                         OutlinedTextField(
                             value = studentYear.ifEmpty { stringResource(R.string.class_year_label) }, onValueChange = {}, readOnly = true,
@@ -740,9 +740,9 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                             shape = RoundedCornerShape(10.dp),
                             colors = sf
                         )
-                        ExposedDropdownMenu(expanded = yearDropdownExpanded, onDismissRequest = { yearDropdownExpanded = false }, modifier = Modifier.background(Slate800)) {
+                        ExposedDropdownMenu(expanded = yearDropdownExpanded, onDismissRequest = { yearDropdownExpanded = false }, modifier = Modifier.background(AppColorState.surface)) {
                             yearOptions.forEach { year ->
-                                DropdownMenuItem(text = { Text(year, color = TextPrimary) }, onClick = { studentYear = year; yearDropdownExpanded = false })
+                                DropdownMenuItem(text = { Text(year, color = AppColorState.textPrimary) }, onClick = { studentYear = year; yearDropdownExpanded = false })
                             }
                         }
                     }
@@ -772,7 +772,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
             },
             dismissButton = {
                 TextButton(onClick = { showAddStudentDialog = false; studentFullName = ""; studentUsername = ""; studentPassword = ""; studentDepartment = ""; studentYear = ""; studentId = "" }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }
         )
@@ -795,7 +795,7 @@ private fun QuickSetupCard(isEmpty: Boolean, onSeed: () -> Unit) {
                     Text(stringResource(R.string.db_empty_title), color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.db_empty_desc), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.db_empty_desc), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(12.dp))
                 Button(onClick = onSeed, colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -809,8 +809,8 @@ private fun QuickSetupCard(isEmpty: Boolean, onSeed: () -> Unit) {
             onClick = onSeed,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
-            border = BorderStroke(1.dp, Slate700)
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColorState.textSecondary),
+            border = BorderStroke(1.dp, AppColorState.surface2)
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(6.dp))
@@ -829,7 +829,7 @@ private fun AdminStatCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(
@@ -854,7 +854,7 @@ private fun AdminStatCard(
             )
             Text(
                 title,
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
                 lineHeight = 14.sp
@@ -875,7 +875,7 @@ private fun PanelCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onToggle() },
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -891,7 +891,7 @@ private fun PanelCard(
                         .background(accentColor)
                 )
                 Spacer(Modifier.width(10.dp))
-                Text(title, color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                Text(title, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Badge(containerColor = accentColor.copy(alpha = 0.2f)) {
@@ -901,7 +901,7 @@ private fun PanelCard(
                 Icon(
                     if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = TextSecondary,
+                    tint = AppColorState.textSecondary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -964,7 +964,7 @@ private fun LecturerInfoRow(
             .fillMaxWidth()
             .padding(bottom = 6.dp)
             .clickable { showDetailDialog = true },
-        colors = CardDefaults.cardColors(containerColor = Slate700),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -986,13 +986,13 @@ private fun LecturerInfoRow(
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(lecturer.fullName, color = TextPrimary, fontWeight = FontWeight.Medium)
+                Text(lecturer.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium)
                 Text(
                     buildString {
                         if (lecturer.title.isNotBlank()) append("${lecturer.title} · ")
                         append(lecturer.department)
                     },
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
                 if (lecturer.mustChangePassword) {
@@ -1017,14 +1017,14 @@ private fun LecturerInfoRow(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_lecturer_title), color = ErrorRed) },
-            text = { Text(stringResource(R.string.delete_lecturer_msg, lecturer.fullName), color = TextPrimary) },
+            text = { Text(stringResource(R.string.delete_lecturer_msg, lecturer.fullName), color = AppColorState.textPrimary) },
             confirmButton = {
                 Button(onClick = { onDelete(); showDeleteDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -1033,7 +1033,7 @@ private fun LecturerInfoRow(
     if (showDetailDialog) {
         AlertDialog(
             onDismissRequest = { showDetailDialog = false; assignError = null; selCourse = null; selClassroom = null; selDay = ""; selTime = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             modifier = Modifier.fillMaxWidth(),
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1043,7 +1043,7 @@ private fun LecturerInfoRow(
                     Spacer(Modifier.width(10.dp))
                     Column {
                         Text(lecturer.fullName, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
-                        Text(lecturer.department, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(lecturer.department, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             },
@@ -1069,7 +1069,7 @@ private fun LecturerInfoRow(
                     }
 
                     if (onAssignCourse != null) {
-                        HorizontalDivider(color = TextSecondary.copy(alpha = 0.12f))
+                        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.12f))
                         Text("Ders Ata", color = IndigoAccent, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
 
                         // Hata mesajı
@@ -1085,9 +1085,9 @@ private fun LecturerInfoRow(
                         }
 
                         val fieldColors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = Slate700,
-                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = TextSecondary,
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = AppColorState.surface2,
+                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = AppColorState.textSecondary,
+                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
 
@@ -1102,9 +1102,9 @@ private fun LecturerInfoRow(
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
-                            ExposedDropdownMenu(expanded = courseExp, onDismissRequest = { courseExp = false }, modifier = Modifier.background(Slate800).heightIn(max = 200.dp)) {
+                            ExposedDropdownMenu(expanded = courseExp, onDismissRequest = { courseExp = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 200.dp)) {
                                 unassignedCourses.forEach { c ->
-                                    DropdownMenuItem(text = { Text("${c.courseCode} – ${c.courseName}", color = TextPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selCourse = c; courseExp = false })
+                                    DropdownMenuItem(text = { Text("${c.courseCode} – ${c.courseName}", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selCourse = c; courseExp = false })
                                 }
                             }
                         }
@@ -1120,9 +1120,9 @@ private fun LecturerInfoRow(
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
-                            ExposedDropdownMenu(expanded = dayExp, onDismissRequest = { dayExp = false }, modifier = Modifier.background(Slate800)) {
+                            ExposedDropdownMenu(expanded = dayExp, onDismissRequest = { dayExp = false }, modifier = Modifier.background(AppColorState.surface)) {
                                 availDays.forEach { day ->
-                                    DropdownMenuItem(text = { Text(dayLocalizedName(day, weekDaysFull()), color = TextPrimary) }, onClick = { selDay = day; selTime = ""; dayExp = false })
+                                    DropdownMenuItem(text = { Text(dayLocalizedName(day, weekDaysFull()), color = AppColorState.textPrimary) }, onClick = { selDay = day; selTime = ""; dayExp = false })
                                 }
                             }
                         }
@@ -1139,9 +1139,9 @@ private fun LecturerInfoRow(
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors,
                                 enabled = selDay.isNotEmpty()
                             )
-                            ExposedDropdownMenu(expanded = timeExp, onDismissRequest = { timeExp = false }, modifier = Modifier.background(Slate800)) {
+                            ExposedDropdownMenu(expanded = timeExp, onDismissRequest = { timeExp = false }, modifier = Modifier.background(AppColorState.surface)) {
                                 availTimesForDay.forEach { t ->
-                                    DropdownMenuItem(text = { Text(t, color = TextPrimary) }, onClick = { selTime = t; timeExp = false })
+                                    DropdownMenuItem(text = { Text(t, color = AppColorState.textPrimary) }, onClick = { selTime = t; timeExp = false })
                                 }
                             }
                         }
@@ -1157,9 +1157,9 @@ private fun LecturerInfoRow(
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
-                            ExposedDropdownMenu(expanded = clsExp, onDismissRequest = { clsExp = false }, modifier = Modifier.background(Slate800).heightIn(max = 200.dp)) {
+                            ExposedDropdownMenu(expanded = clsExp, onDismissRequest = { clsExp = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 200.dp)) {
                                 classrooms.forEach { cls ->
-                                    DropdownMenuItem(text = { Text("${cls.name} · ${cls.capacity} kişi · ${ClassroomType.displayName(cls.classroomType)}", color = TextPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selClassroom = cls; clsExp = false })
+                                    DropdownMenuItem(text = { Text("${cls.name} · ${cls.capacity} kişi · ${ClassroomType.displayName(cls.classroomType)}", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selClassroom = cls; clsExp = false })
                                 }
                             }
                         }
@@ -1175,9 +1175,9 @@ private fun LecturerInfoRow(
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
-                            ExposedDropdownMenu(expanded = sessExp, onDismissRequest = { sessExp = false }, modifier = Modifier.background(Slate800)) {
-                                DropdownMenuItem(text = { Text("Teorik", color = TextPrimary) }, onClick = { selSession = SessionType.LECTURE; sessExp = false })
-                                DropdownMenuItem(text = { Text("Lab", color = TextPrimary) }, onClick = { selSession = SessionType.LAB; sessExp = false })
+                            ExposedDropdownMenu(expanded = sessExp, onDismissRequest = { sessExp = false }, modifier = Modifier.background(AppColorState.surface)) {
+                                DropdownMenuItem(text = { Text("Teorik", color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LECTURE; sessExp = false })
+                                DropdownMenuItem(text = { Text("Lab", color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LAB; sessExp = false })
                             }
                         }
                     }
@@ -1196,7 +1196,7 @@ private fun LecturerInfoRow(
                             },
                             enabled = canAssign,
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent, disabledContainerColor = Slate700),
+                            colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent, disabledContainerColor = AppColorState.surface2),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(14.dp))
@@ -1205,7 +1205,7 @@ private fun LecturerInfoRow(
                         }
                     }
                     TextButton(onClick = { showDetailDialog = false; assignError = null }) {
-                        Text(stringResource(R.string.close), color = TextSecondary)
+                        Text(stringResource(R.string.close), color = AppColorState.textSecondary)
                     }
                 }
             },
@@ -1216,28 +1216,28 @@ private fun LecturerInfoRow(
     if (showResetPwdDialog && onResetPassword != null) {
         AlertDialog(
             onDismissRequest = { showResetPwdDialog = false; newPwd = "" },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text("Şifre Sıfırla", color = IndigoAccent, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("${lecturer.fullName} (@${lecturer.username}) için yeni şifre belirleyin.", color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                    Text("${lecturer.fullName} (@${lecturer.username}) için yeni şifre belirleyin.", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newPwd,
                         onValueChange = { newPwd = it },
                         label = { Text("Yeni Şifre") },
-                        placeholder = { Text("En az 6 karakter", color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text("En az 6 karakter", color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = Slate700,
-                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = TextSecondary,
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = IndigoAccent, unfocusedBorderColor = AppColorState.surface2,
+                            focusedLabelColor = IndigoAccent, unfocusedLabelColor = AppColorState.textSecondary,
+                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                             cursorColor = IndigoAccent, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
                     )
                     if (newPwd.isNotEmpty()) PasswordStrengthRow(newPwd)
-                    Text("Hoca bir sonraki girişte şifresini değiştirmek zorunda kalacak.", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text("Hoca bir sonraki girişte şifresini değiştirmek zorunda kalacak.", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
             },
             confirmButton = {
@@ -1260,7 +1260,7 @@ private fun LecturerInfoRow(
                 ) { Text("Sıfırla") }
             },
             dismissButton = {
-                TextButton(onClick = { showResetPwdDialog = false; newPwd = "" }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { showResetPwdDialog = false; newPwd = "" }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -1274,7 +1274,7 @@ private fun CourseInfoRow(course: Course, onDelete: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Slate700),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -1297,7 +1297,7 @@ private fun CourseInfoRow(course: Course, onDelete: () -> Unit = {}) {
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(course.courseName, color = TextPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(course.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(course.courseCode, color = IndigoAccent, style = MaterialTheme.typography.bodySmall)
             }
             IconButton(onClick = { showDeleteDialog = true }, modifier = Modifier.size(32.dp)) {
@@ -1309,14 +1309,14 @@ private fun CourseInfoRow(course: Course, onDelete: () -> Unit = {}) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_course_title), color = ErrorRed) },
-            text = { Text(stringResource(R.string.delete_course_msg, course.courseName), color = TextPrimary) },
+            text = { Text(stringResource(R.string.delete_course_msg, course.courseName), color = AppColorState.textPrimary) },
             confirmButton = {
                 Button(onClick = { onDelete(); showDeleteDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -1330,7 +1330,7 @@ private fun StudentInfoRow(student: Lecturer, onDelete: () -> Unit = {}) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Slate700),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -1352,13 +1352,13 @@ private fun StudentInfoRow(student: Lecturer, onDelete: () -> Unit = {}) {
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(student.fullName, color = TextPrimary, fontWeight = FontWeight.Medium)
+                Text(student.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium)
                 Text(
                     buildString {
                         if (student.studentYear.isNotBlank()) append("${student.studentYear} · ")
                         if (student.studentId.isNotBlank()) append(student.studentId)
                     },
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
                 if (student.mustChangePassword) {
@@ -1378,14 +1378,14 @@ private fun StudentInfoRow(student: Lecturer, onDelete: () -> Unit = {}) {
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_student_title), color = ErrorRed) },
-            text = { Text(stringResource(R.string.delete_student_msg, student.fullName), color = TextPrimary) },
+            text = { Text(stringResource(R.string.delete_student_msg, student.fullName), color = AppColorState.textPrimary) },
             confirmButton = {
                 Button(onClick = { onDelete(); showDeleteDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -1409,19 +1409,19 @@ private fun PendingRequestCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.EventAvailable, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text(request.lecturerName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                Text(request.lecturerName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Schedule, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                Icon(Icons.Default.Schedule, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("${request.proposedDay} · ${request.proposedTimeSlot}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text("${request.proposedDay} · ${request.proposedTimeSlot}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
             if (request.proposedClassroom.isNotBlank()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.MeetingRoom, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                    Icon(Icons.Default.MeetingRoom, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Tercih: ${request.proposedClassroom}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text("Tercih: ${request.proposedClassroom}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
             }
             if (request.courseName.isNotBlank()) {
@@ -1433,7 +1433,7 @@ private fun PendingRequestCard(
             }
             if (request.lecturerNote.isNotBlank()) {
                 Spacer(Modifier.height(2.dp))
-                Text("\"${request.lecturerNote}\"", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text("\"${request.lecturerNote}\"", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1492,8 +1492,8 @@ private fun PendingRegistrationCard(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(lecturer.fullName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
-                    Text("@${lecturer.username} · ${lecturer.department}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(lecturer.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                    Text("@${lecturer.username} · ${lecturer.department}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
                 Box(modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(roleColor.copy(alpha = 0.15f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
                     Text(lecturer.role.name, color = roleColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -1522,7 +1522,7 @@ private fun ScheduleEntryInfoRow(entry: ScheduleEntry) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Slate700),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface2),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -1530,13 +1530,13 @@ private fun ScheduleEntryInfoRow(entry: ScheduleEntry) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(entry.courseName, color = TextPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${entry.lecturerName} · ${entry.classroomName}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(entry.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text("${entry.lecturerName} · ${entry.classroomName}", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
             }
             Spacer(Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
                 Text(dayLocalizedShort(entry.dayOfWeek, weekDaysShort()), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
-                Text(entry.timeSlot, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(entry.timeSlot, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
         }
     }
@@ -1587,10 +1587,10 @@ private fun PendingAvailabilityCard(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(avail.lecturerName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                    Text(avail.lecturerName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
                     Text(
                         stringResource(R.string.admin_avail_slots_count, avail.totalSlots),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -1714,7 +1714,7 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
                 title = {
                     Column {
                         Text(stringResource(R.string.admin_avail_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                        Text(stringResource(R.string.admin_avail_subtitle), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.admin_avail_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 },
                 navigationIcon = {
@@ -1722,7 +1722,7 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = EmeraldGreen)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = TextPrimary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = AppColorState.textPrimary)
             )
         }
     ) { innerPadding ->
@@ -1743,23 +1743,23 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
                     value        = selectedLecturerName,
                     onValueChange = {},
                     readOnly     = true,
-                    label        = { Text(stringResource(R.string.admin_avail_select_lecturer), color = TextSecondary) },
+                    label        = { Text(stringResource(R.string.admin_avail_select_lecturer), color = AppColorState.textSecondary) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = lecturerDropdown) },
                     modifier     = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                     shape        = RoundedCornerShape(12.dp),
                     colors       = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor    = EmeraldGreen,
-                        unfocusedBorderColor  = Slate700,
+                        unfocusedBorderColor  = AppColorState.surface2,
                         focusedLabelColor     = EmeraldGreen,
-                        unfocusedLabelColor   = TextSecondary,
-                        focusedTextColor      = TextPrimary,
-                        unfocusedTextColor    = TextPrimary
+                        unfocusedLabelColor   = AppColorState.textSecondary,
+                        focusedTextColor      = AppColorState.textPrimary,
+                        unfocusedTextColor    = AppColorState.textPrimary
                     )
                 )
                 ExposedDropdownMenu(
                     expanded         = lecturerDropdown,
                     onDismissRequest = { lecturerDropdown = false },
-                    modifier         = Modifier.background(Slate800)
+                    modifier         = Modifier.background(AppColorState.surface)
                 ) {
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.admin_avail_all_lecturers), color = EmeraldGreen, fontWeight = FontWeight.SemiBold) },
@@ -1767,7 +1767,7 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
                     )
                     lecturers.forEach { lect ->
                         DropdownMenuItem(
-                            text    = { Text(lect.fullName, color = TextPrimary) },
+                            text    = { Text(lect.fullName, color = AppColorState.textPrimary) },
                             onClick = { selectedUsername = lect.username; lecturerDropdown = false }
                         )
                     }
@@ -1778,13 +1778,13 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
             if (displayMap.isEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors   = CardDefaults.cardColors(containerColor = Slate800),
+                    colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape    = RoundedCornerShape(16.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Icon(Icons.Default.EventBusy, contentDescription = null, tint = TextSecondary, modifier = Modifier.size(36.dp))
-                            Text(stringResource(R.string.admin_avail_no_data), color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                            Icon(Icons.Default.EventBusy, contentDescription = null, tint = AppColorState.textSecondary, modifier = Modifier.size(36.dp))
+                            Text(stringResource(R.string.admin_avail_no_data), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
@@ -1812,18 +1812,18 @@ private fun AdminAvailabilityDetailCard(avail: LecturerAvailability) {
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = Slate800),
+        colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape    = RoundedCornerShape(16.dp),
         border   = BorderStroke(1.dp, statusColor.copy(alpha = 0.3f))
     ) {
         Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(avail.lecturerName, color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                    Text(avail.lecturerName, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
                     Text(
                         java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.getDefault())
                             .format(java.util.Date(avail.timestamp)),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
@@ -1836,7 +1836,7 @@ private fun AdminAvailabilityDetailCard(avail: LecturerAvailability) {
             // Read-only grid
             AdminAvailabilityGrid(avail = avail, accentColor = statusColor)
             if (avail.adminNote.isNotBlank()) {
-                Text("Not: \"${avail.adminNote}\"", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text("Not: \"${avail.adminNote}\"", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
         }
     }
@@ -1846,22 +1846,22 @@ private fun AdminAvailabilityDetailCard(avail: LecturerAvailability) {
 private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = Slate800),
+        colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape    = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
                 stringResource(R.string.admin_avail_all_maps),
-                color      = TextPrimary,
+                color      = AppColorState.textPrimary,
                 fontWeight = FontWeight.Bold,
                 style      = MaterialTheme.typography.titleSmall
             )
             Text(
                 "${availabilities.size} hoca müsaitlik haritası",
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.labelSmall
             )
-            HorizontalDivider(color = TextSecondary.copy(alpha = 0.1f))
+            HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.1f))
 
             // Column headers
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -1879,7 +1879,7 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
             // Grid rows
             AVAIL_SLOTS.forEach { slot ->
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(slot.take(5), color = TextSecondary.copy(alpha = 0.55f), style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, modifier = Modifier.width(60.dp))
+                    Text(slot.take(5), color = AppColorState.textSecondary.copy(alpha = 0.55f), style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, modifier = Modifier.width(60.dp))
                     AVAIL_DAYS_EN.forEachIndexed { dayIdx, day ->
                         val lecturersAvailable = availabilities.filter { slot in it.slotsForDay(day) }
                         val count = lecturersAvailable.size
@@ -1893,7 +1893,7 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
                                 .clip(RoundedCornerShape(5.dp))
                                 .background(
                                     if (count > 0) AVAIL_DAY_COLORS[dayIdx].copy(alpha = alpha)
-                                    else Slate700
+                                    else AppColorState.surface2
                                 )
                                 .border(1.dp, if (count > 0) AVAIL_DAY_COLORS[dayIdx].copy(alpha = 0.3f) else Color.Transparent, RoundedCornerShape(5.dp)),
                             contentAlignment = Alignment.Center
@@ -1914,9 +1914,9 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
 
             // Legend
             Spacer(Modifier.height(4.dp))
-            HorizontalDivider(color = TextSecondary.copy(alpha = 0.1f))
+            HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.1f))
             Spacer(Modifier.height(2.dp))
-            Text("Sayı = o saatte müsait hoca adedi", color = TextSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+            Text("Sayı = o saatte müsait hoca adedi", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
         }
     }
 }
@@ -1947,10 +1947,10 @@ private fun AdminAvailabilityGrid(
         Spacer(Modifier.height(4.dp))
         AVAIL_SLOTS.forEachIndexed { _, slot ->
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(slot.take(5), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, modifier = Modifier.width(54.dp))
+                Text(slot.take(5), color = AppColorState.textSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall, fontSize = 9.sp, modifier = Modifier.width(54.dp))
                 AVAIL_DAYS_EN.forEachIndexed { dayIdx, day ->
                     val selected = slot in avail.slotsForDay(day)
-                    val unavailColor = if (showUnavailableRed) ErrorRed.copy(alpha = 0.18f) else Slate700
+                    val unavailColor = if (showUnavailableRed) ErrorRed.copy(alpha = 0.18f) else AppColorState.surface2
                     val unavailBorder = if (showUnavailableRed) ErrorRed.copy(alpha = 0.25f) else Color.Transparent
                     Box(
                         modifier = Modifier
@@ -2023,7 +2023,7 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                         Text(
                             stringResource(R.string.classrooms_title),
                             style = MaterialTheme.typography.headlineSmall,
-                            color = TextPrimary,
+                            color = AppColorState.textPrimary,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
@@ -2031,7 +2031,7 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                                 stringResource(R.string.classrooms_subtitle_one, classrooms.size)
                             else
                                 stringResource(R.string.classrooms_subtitle, classrooms.size),
-                            color = TextSecondary,
+                            color = AppColorState.textSecondary,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -2051,18 +2051,18 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                             Icon(
                                 Icons.Default.Home,
                                 contentDescription = null,
-                                tint = TextSecondary.copy(alpha = 0.4f),
+                                tint = AppColorState.textSecondary.copy(alpha = 0.4f),
                                 modifier = Modifier.size(64.dp)
                             )
                             Spacer(Modifier.height(12.dp))
                             Text(
                                 stringResource(R.string.no_classrooms),
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
                                 stringResource(R.string.tap_plus_add),
-                                color = TextSecondary.copy(alpha = 0.6f),
+                                color = AppColorState.textSecondary.copy(alpha = 0.6f),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -2089,7 +2089,7 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                 showAddDialog = false
                 name = ""; capacityText = ""
             },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = {
                 Text(stringResource(R.string.add_classroom_title), color = EmeraldGreen, fontWeight = FontWeight.Bold)
             },
@@ -2099,20 +2099,20 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                         value = name,
                         onValueChange = { name = it },
                         label = { Text(stringResource(R.string.classroom_name_label)) },
-                        placeholder = { Text(stringResource(R.string.classroom_name_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.classroom_name_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = Slate700, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = TextSecondary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = AppColorState.surface2, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = AppColorState.textSecondary, focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
                     )
                     OutlinedTextField(
                         value = capacityText,
                         onValueChange = { capacityText = it.filter { c -> c.isDigit() } },
                         label = { Text(stringResource(R.string.capacity_label)) },
-                        placeholder = { Text(stringResource(R.string.capacity_hint), color = TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.capacity_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = Slate700, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = TextSecondary, focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = AppColorState.surface2, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = AppColorState.textSecondary, focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
                     )
                     ExposedDropdownMenuBox(
                         expanded = typeExpanded,
@@ -2136,11 +2136,11 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                         ExposedDropdownMenu(
                             expanded = typeExpanded,
                             onDismissRequest = { typeExpanded = false },
-                            modifier = Modifier.background(Slate800)
+                            modifier = Modifier.background(AppColorState.surface)
                         ) {
                             ClassroomType.all.forEach { t ->
                                 DropdownMenuItem(
-                                    text    = { Text(ClassroomType.displayName(t), color = TextPrimary) },
+                                    text    = { Text(ClassroomType.displayName(t), color = AppColorState.textPrimary) },
                                     onClick = { selectedType = t; typeExpanded = false }
                                 )
                             }
@@ -2173,7 +2173,7 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false; name = ""; capacityText = ""; selectedType = ClassroomType.LECTURE }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }
         )
@@ -2193,7 +2193,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -2217,7 +2217,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
             Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(classroom.name, color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                    Text(classroom.name, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold)
                     Spacer(Modifier.width(8.dp))
                     Box(
                         modifier = Modifier
@@ -2235,7 +2235,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
                 }
                 Text(
                     stringResource(R.string.capacity_display, classroom.capacity),
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(Modifier.height(6.dp))
@@ -2246,7 +2246,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp)),
                     color = occupancyColor,
-                    trackColor = Slate700
+                    trackColor = AppColorState.surface2
                 )
             }
             Spacer(Modifier.width(8.dp))
@@ -2259,7 +2259,7 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
                 )
                 Text(
                     stringResource(R.string.bookings_label),
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.labelSmall
                 )
                 Spacer(Modifier.height(4.dp))
@@ -2273,14 +2273,14 @@ private fun ClassroomCard(classroom: Classroom, bookingCount: Int, onDelete: () 
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_course_title), color = ErrorRed) },
-            text = { Text(stringResource(R.string.delete_course_msg, classroom.name), color = TextPrimary) },
+            text = { Text(stringResource(R.string.delete_course_msg, classroom.name), color = AppColorState.textPrimary) },
             confirmButton = {
                 Button(onClick = { onDelete(); showDeleteDialog = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.delete)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -2354,12 +2354,12 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
                 Text(
                     stringResource(R.string.course_assignment_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     stringResource(R.string.course_assignment_subtitle),
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -2466,7 +2466,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = EmeraldGreen,
-                disabledContainerColor = Slate700
+                disabledContainerColor = AppColorState.surface2
             )
         ) {
             Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -2478,12 +2478,12 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
         if (scheduleEntries.isNotEmpty()) {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
-                color = TextSecondary.copy(alpha = 0.1f)
+                color = AppColorState.textSecondary.copy(alpha = 0.1f)
             )
             Text(
                 stringResource(R.string.current_schedule, scheduleEntries.size),
                 style = MaterialTheme.typography.titleSmall,
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(Modifier.height(4.dp))
@@ -2503,7 +2503,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
 private fun SectionLabel(text: String) {
     Text(
         text,
-        color = TextSecondary,
+        color = AppColorState.textSecondary,
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
@@ -2534,23 +2534,23 @@ private fun DropdownSelector(
                 .fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedBorderColor = if (selected.isEmpty()) Slate700 else EmeraldGreen.copy(alpha = 0.5f),
+                unfocusedBorderColor = if (selected.isEmpty()) AppColorState.surface2 else EmeraldGreen.copy(alpha = 0.5f),
                 focusedBorderColor = EmeraldGreen,
-                unfocusedTextColor = if (selected.isEmpty()) TextSecondary else TextPrimary,
-                focusedTextColor = TextPrimary
+                unfocusedTextColor = if (selected.isEmpty()) AppColorState.textSecondary else AppColorState.textPrimary,
+                focusedTextColor = AppColorState.textPrimary
             )
         )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(Slate800)
+            modifier = Modifier.background(AppColorState.surface)
         ) {
             options.forEachIndexed { index, option ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             option,
-                            color = TextPrimary,
+                            color = AppColorState.textPrimary,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -2601,10 +2601,10 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                 title = {
                     Column {
                         Text("Otomatik Ders Atama", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                        Text("Müsaitlik haritasına göre dersler otomatik atanır", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text("Müsaitlik haritasına göre dersler otomatik atanır", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = TextPrimary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = AppColorState.textPrimary)
             )
         }
     ) { innerPadding ->
@@ -2629,8 +2629,8 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                         Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(color = accentColor, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
-                                Text("Hesaplanıyor...", color = TextSecondary, fontWeight = FontWeight.SemiBold)
-                                Text("Müsaitlikler ve sınıflar kontrol ediliyor", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                                Text("Hesaplanıyor...", color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
+                                Text("Müsaitlikler ve sınıflar kontrol ediliyor", color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -2662,16 +2662,16 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                             OutlinedButton(
                                 onClick = { viewModel.selectAllProposals(false) },
                                 modifier = Modifier.weight(1f),
-                                border = BorderStroke(1.dp, TextSecondary.copy(alpha = 0.3f)),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                                border = BorderStroke(1.dp, AppColorState.textSecondary.copy(alpha = 0.3f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColorState.textSecondary),
                                 shape = RoundedCornerShape(10.dp),
                                 contentPadding = PaddingValues(vertical = 6.dp)
                             ) { Text("Tümünü Kaldır", style = MaterialTheme.typography.labelSmall) }
                             OutlinedButton(
                                 onClick = { viewModel.runAutoAssign() },
                                 modifier = Modifier.weight(1f),
-                                border = BorderStroke(1.dp, TextSecondary.copy(alpha = 0.3f)),
-                                colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                                border = BorderStroke(1.dp, AppColorState.textSecondary.copy(alpha = 0.3f)),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColorState.textSecondary),
                                 shape = RoundedCornerShape(10.dp),
                                 contentPadding = PaddingValues(vertical = 6.dp)
                             ) {
@@ -2685,12 +2685,12 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                     // Proposals
                     if (s.proposals.isEmpty()) {
                         item {
-                            Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Slate800), shape = RoundedCornerShape(14.dp)) {
+                            Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = AppColorState.surface), shape = RoundedCornerShape(14.dp)) {
                                 Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(Icons.Default.SearchOff, null, tint = TextSecondary, modifier = Modifier.size(36.dp))
+                                    Icon(Icons.Default.SearchOff, null, tint = AppColorState.textSecondary, modifier = Modifier.size(36.dp))
                                     Spacer(Modifier.height(8.dp))
-                                    Text("Atanacak ders bulunamadı", color = TextSecondary)
-                                    Text("Hocaların müsaitlik haritası girilmiş olmalı", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                                    Text("Atanacak ders bulunamadı", color = AppColorState.textSecondary)
+                                    Text("Hocaların müsaitlik haritası girilmiş olmalı", color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -2737,7 +2737,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                                     }
                                     Spacer(Modifier.width(10.dp))
                                     Column(Modifier.weight(1f)) {
-                                        Text(course.courseName, color = TextPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(course.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text("Uygun hoca/saat/sınıf bulunamadı", color = ErrorRed, style = MaterialTheme.typography.labelSmall)
                                     }
                                 }
@@ -2773,7 +2773,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = accentColor,
-                                disabledContainerColor = Slate700
+                                disabledContainerColor = AppColorState.surface2
                             )
                         ) {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
@@ -2794,7 +2794,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                         Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(color = EmeraldGreen, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
-                                Text("Firebase'e kaydediliyor...", color = TextSecondary, fontWeight = FontWeight.SemiBold)
+                                Text("Firebase'e kaydediliyor...", color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -2852,7 +2852,7 @@ private fun AutoAssignIdleSection(
                             contentAlignment = Alignment.Center
                         ) { Text("${i+1}", color = accentColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                         Spacer(Modifier.width(10.dp))
-                        Text(text, color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                        Text(text, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -2892,7 +2892,7 @@ private fun AutoAssignIdleSection(
             enabled = !hasIssues,
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = accentColor, disabledContainerColor = Slate700)
+            colors = ButtonDefaults.buttonColors(containerColor = accentColor, disabledContainerColor = AppColorState.surface2)
         ) {
             Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
@@ -2909,7 +2909,7 @@ private fun RequirementRow(label: String, met: Boolean) {
             null, tint = if (met) EmeraldGreen else ErrorRed, modifier = Modifier.size(14.dp)
         )
         Spacer(Modifier.width(8.dp))
-        Text(label, color = if (met) TextPrimary else ErrorRed, style = MaterialTheme.typography.bodySmall)
+        Text(label, color = if (met) AppColorState.textPrimary else ErrorRed, style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -2930,7 +2930,7 @@ private fun AutoAssignProposalCard(
     onToggle: () -> Unit
 ) {
     val isLab = proposal.entry.sessionType == SessionType.LAB
-    val cardColor  = if (proposal.included) (if (isLab) Color(0xFFF59E0B) else accentColor) else TextSecondary
+    val cardColor  = if (proposal.included) (if (isLab) Color(0xFFF59E0B) else accentColor) else AppColorState.textSecondary
     val bgAlpha    = if (proposal.included) 0.08f else 0.04f
 
     Card(
@@ -2958,7 +2958,7 @@ private fun AutoAssignProposalCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         proposal.entry.courseName,
-                        color = if (proposal.included) TextPrimary else TextSecondary,
+                        color = if (proposal.included) AppColorState.textPrimary else AppColorState.textSecondary,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -2972,7 +2972,7 @@ private fun AutoAssignProposalCard(
                     }
                 }
                 Text(proposal.entry.lecturerName, color = cardColor, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
-                Text("${proposal.entry.classroomName} · ${proposal.entry.timeSlot}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text("${proposal.entry.classroomName} · ${proposal.entry.timeSlot}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
             // Toggle switch
             Switch(
@@ -2981,7 +2981,7 @@ private fun AutoAssignProposalCard(
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
                     checkedTrackColor = cardColor,
-                    uncheckedTrackColor = Slate700
+                    uncheckedTrackColor = AppColorState.surface2
                 )
             )
         }
@@ -2996,7 +2996,7 @@ private fun ScheduleEntryCard(entry: ScheduleEntry, onDelete: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(14.dp)
     ) {
         Row(
@@ -3021,14 +3021,14 @@ private fun ScheduleEntryCard(entry: ScheduleEntry, onDelete: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     entry.courseName,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     "${entry.lecturerName} · ${entry.classroomName}",
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -3056,12 +3056,12 @@ private fun ScheduleEntryCard(entry: ScheduleEntry, onDelete: () -> Unit) {
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.remove_assignment_title), color = ErrorRed) },
             text = {
                 Text(
                     stringResource(R.string.remove_assignment_msg, entry.courseName, entry.dayOfWeek, entry.timeSlot),
-                    color = TextPrimary
+                    color = AppColorState.textPrimary
                 )
             },
             confirmButton = {
@@ -3072,7 +3072,7 @@ private fun ScheduleEntryCard(entry: ScheduleEntry, onDelete: () -> Unit) {
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }
         )

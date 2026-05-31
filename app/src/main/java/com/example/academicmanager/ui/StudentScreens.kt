@@ -119,14 +119,14 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
                 }
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.welcome_student), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
-                    Text(user.fullName, color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.welcome_student), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(user.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     if (user.department.isNotBlank()) {
                         Spacer(Modifier.height(2.dp))
                         Text(user.department, color = IndigoAccent, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
                     }
                     if (user.studentYear.isNotBlank()) {
-                        Text(user.studentYear, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(user.studentYear, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 // Duyurular bell ikonu
@@ -147,7 +147,7 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
         }
 
         // ── Quick Actions ─────────────────────────────────────
-        Text(stringResource(R.string.quick_actions), color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.quick_actions), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StudentActionCard(
@@ -163,6 +163,13 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
                     color = Color(0xFFF59E0B),
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("my_attendance") }
+                )
+                StudentActionCard(
+                    label = "QR Yoklama",
+                    icon = Icons.Default.QrCodeScanner,
+                    color = Color(0xFF8B5CF6),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("qr_scan") }
                 )
                 StudentActionCard(
                     label = stringResource(R.string.my_exam_schedule_action),
@@ -191,21 +198,21 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
         }
 
         // ── Weekly Schedule ──────────────────────────────────
-        Text(stringResource(R.string.this_week), color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.this_week), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
 
         if (myEntries.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors   = CardDefaults.cardColors(containerColor = Slate800),
+                colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
                 shape    = RoundedCornerShape(16.dp)
             ) {
                 Column(
                     modifier             = Modifier.fillMaxWidth().padding(32.dp),
                     horizontalAlignment  = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Default.EventBusy, contentDescription = null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
+                    Icon(Icons.Default.EventBusy, contentDescription = null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
                     Spacer(Modifier.height(12.dp))
-                    Text(stringResource(R.string.no_dept_schedule), color = TextSecondary, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.no_dept_schedule), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                 }
             }
         } else {
@@ -228,12 +235,12 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
 
 @Composable
 private fun StudentStatCard(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color, modifier: Modifier) {
-    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = Slate800), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = AppColorState.surface), shape = RoundedCornerShape(16.dp)) {
         Column(modifier = Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
             Spacer(Modifier.height(6.dp))
             Text(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-            Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, lineHeight = 13.sp)
+            Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, lineHeight = 13.sp)
         }
     }
 }
@@ -269,7 +276,7 @@ private fun StudentDaySection(day: String, entries: List<ScheduleEntry>, accentC
             Spacer(Modifier.width(8.dp))
             Text(day, color = accentColor, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
             Spacer(Modifier.width(8.dp))
-            Text(countStr, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+            Text(countStr, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
         }
         entries.sortedBy { it.timeSlot }.forEach { entry -> StudentCourseCard(entry, accentColor) }
     }
@@ -285,7 +292,7 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
             .fillMaxWidth()
             .animateContentSize()
             .clickable { expanded = !expanded },
-        colors = CardDefaults.cardColors(containerColor = if (expanded) accentColor.copy(alpha = 0.12f) else Slate800),
+        colors = CardDefaults.cardColors(containerColor = if (expanded) accentColor.copy(alpha = 0.12f) else AppColorState.surface),
         shape  = RoundedCornerShape(14.dp),
         border = if (expanded) BorderStroke(1.dp, accentColor.copy(alpha = 0.4f)) else null
     ) {
@@ -296,7 +303,7 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
                 Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(entry.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                        Text(entry.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                         if (isLab) {
                             Spacer(Modifier.width(4.dp))
                             Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
@@ -307,8 +314,8 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
                     Text(entry.courseCode, color = accentColor, style = MaterialTheme.typography.bodySmall)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(entry.timeSlot, color = TextPrimary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
-                    Text(entry.classroomName, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(entry.timeSlot, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
+                    Text(entry.classroomName, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
                 Spacer(Modifier.width(8.dp))
                 Icon(
@@ -352,8 +359,8 @@ private fun StudentCourseCard(entry: ScheduleEntry, accentColor: Color) {
 @Composable
 private fun ReceiptRow(label: String, value: String, accentColor: Color) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
-        Text(value, color = TextPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium, textAlign = TextAlign.End, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false).padding(start = 8.dp))
+        Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+        Text(value, color = AppColorState.textPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium, textAlign = TextAlign.End, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false).padding(start = 8.dp))
     }
 }
 
@@ -393,8 +400,8 @@ fun StudentCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVie
 
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         Spacer(Modifier.height(16.dp))
-        Text(stringResource(R.string.student_schedule_title), style = MaterialTheme.typography.headlineSmall, color = TextPrimary, fontWeight = FontWeight.Bold)
-        Text("${user.department} · ${stringResource(R.string.courses_this_day, myEntries.size)}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.student_schedule_title), style = MaterialTheme.typography.headlineSmall, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
+        Text("${user.department} · ${stringResource(R.string.courses_this_day, myEntries.size)}", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(20.dp))
 
         // ── Day Selector Tabs ─────────────────────────────────
@@ -408,13 +415,13 @@ fun StudentCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVie
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(when { isSelected -> tabColor; isToday -> tabColor.copy(alpha = 0.10f); else -> Slate800 })
+                        .background(when { isSelected -> tabColor; isToday -> tabColor.copy(alpha = 0.10f); else -> AppColorState.surface })
                         .then(if (isToday && !isSelected) Modifier.border(1.dp, tabColor.copy(alpha = 0.45f), RoundedCornerShape(14.dp)) else Modifier)
                         .clickable { selectedDay = idx }
                         .padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(displayDaysShort[idx], color = if (isSelected) Color.White else if (isToday) tabColor else TextSecondary, style = MaterialTheme.typography.labelMedium, fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal)
+                    Text(displayDaysShort[idx], color = if (isSelected) Color.White else if (isToday) tabColor else AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium, fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal)
                     Spacer(Modifier.height(4.dp))
                     if (count > 0) {
                         Box(modifier = Modifier.size(18.dp).clip(CircleShape).background(if (isSelected) Color.White.copy(alpha = 0.25f) else tabColor.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
@@ -434,7 +441,7 @@ fun StudentCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVie
             Text(
                 if (dayEntries.isEmpty()) stringResource(R.string.no_session_student)
                 else stringResource(R.string.courses_this_day, dayEntries.size),
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -461,7 +468,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
     ) {
         Text(
             timeSlot.take(5),
-            color      = if (entry != null) accentColor else TextSecondary.copy(alpha = 0.40f),
+            color      = if (entry != null) accentColor else AppColorState.textSecondary.copy(alpha = 0.40f),
             style      = MaterialTheme.typography.labelSmall,
             fontWeight = if (entry != null) FontWeight.Bold else FontWeight.Normal,
             modifier   = Modifier.width(54.dp).padding(top = 7.dp),
@@ -469,8 +476,8 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
         )
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(20.dp)) {
             Spacer(Modifier.height(8.dp))
-            Box(modifier = Modifier.size(if (entry != null) 11.dp else 6.dp).clip(CircleShape).background(if (entry != null) accentColor else TextSecondary.copy(alpha = 0.18f)))
-            Box(modifier = Modifier.width(if (entry != null) 2.dp else 1.dp).height(if (entry != null && expanded) 120.dp else if (entry != null) 68.dp else 26.dp).background(if (entry != null) accentColor.copy(alpha = 0.22f) else TextSecondary.copy(alpha = 0.07f)))
+            Box(modifier = Modifier.size(if (entry != null) 11.dp else 6.dp).clip(CircleShape).background(if (entry != null) accentColor else AppColorState.textSecondary.copy(alpha = 0.18f)))
+            Box(modifier = Modifier.width(if (entry != null) 2.dp else 1.dp).height(if (entry != null && expanded) 120.dp else if (entry != null) 68.dp else 26.dp).background(if (entry != null) accentColor.copy(alpha = 0.22f) else AppColorState.textSecondary.copy(alpha = 0.07f)))
         }
         Spacer(Modifier.width(12.dp))
         if (entry != null) {
@@ -483,7 +490,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
                 Row(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(entry.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                            Text(entry.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                             if (isLab) {
                                 Spacer(Modifier.width(4.dp))
                                 Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)) {
@@ -497,7 +504,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
                                 Text(entry.courseCode, color = accentColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                             }
                             Spacer(Modifier.width(8.dp))
-                            Text(entry.classroomName, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Text(entry.classroomName, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     Icon(
@@ -528,7 +535,7 @@ private fun StudentTimelineRow(timeSlot: String, entry: ScheduleEntry?, accentCo
             }
         } else {
             Box(modifier = Modifier.fillMaxWidth().height(26.dp), contentAlignment = Alignment.CenterStart) {
-                HorizontalDivider(color = TextSecondary.copy(alpha = 0.05f), thickness = 1.dp)
+                HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.05f), thickness = 1.dp)
             }
         }
     }

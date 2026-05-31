@@ -112,7 +112,7 @@ private fun GradeCourseListScreen(
     onCourseSelected: (ScheduleEntry) -> Unit,
     onBack: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         // ── Gradient Header ──────────────────────────────────
         Box(
             modifier = Modifier
@@ -126,19 +126,19 @@ private fun GradeCourseListScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
                         stringResource(R.string.grade_entry_title),
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         stringResource(R.string.grade_entry_subtitle),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -151,18 +151,18 @@ private fun GradeCourseListScreen(
                 Spacer(Modifier.width(8.dp))
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
         if (myCourseEntries.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Box(
-                        modifier = Modifier.size(80.dp).clip(CircleShape).background(Slate800),
+                        modifier = Modifier.size(80.dp).clip(CircleShape).background(AppColorState.surface),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.AutoStories, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(40.dp))
+                        Icon(Icons.Default.AutoStories, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(40.dp))
                     }
-                    Text(stringResource(R.string.no_assigned_courses), color = TextSecondary, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.no_assigned_courses), color = AppColorState.textSecondary, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         } else {
@@ -192,7 +192,7 @@ private fun GradeCourseCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(18.dp)
     ) {
         Row(
@@ -203,7 +203,7 @@ private fun GradeCourseCard(
             Box(modifier = Modifier.size(52.dp), contentAlignment = Alignment.Center) {
                 Canvas(modifier = Modifier.size(52.dp)) {
                     drawArc(
-                        color = Slate700,
+                        color = AppColorState.surface2,
                         startAngle = -90f, sweepAngle = 360f, useCenter = false,
                         style = Stroke(width = 5.dp.toPx(), cap = StrokeCap.Round)
                     )
@@ -219,7 +219,7 @@ private fun GradeCourseCard(
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(entry.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(entry.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(2.dp))
                 Text(entry.courseCode, color = EmeraldGreen, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(6.dp))
@@ -250,7 +250,7 @@ private fun GradeCourseCard(
                     }
                 }
             }
-            Icon(Icons.Default.ChevronRight, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -271,13 +271,13 @@ private fun GradeEntryForCourse(
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        containerColor = Slate900,
+        containerColor = AppColorState.background,
         snackbarHost = {
             SnackbarHost(snackbarHostState) { data ->
                 Snackbar(
                     snackbarData = data,
                     containerColor = EmeraldGreen,
-                    contentColor = Slate900,
+                    contentColor = AppColorState.background,
                     shape = RoundedCornerShape(12.dp)
                 )
             }
@@ -292,11 +292,11 @@ private fun GradeEntryForCourse(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                         }
                         Spacer(Modifier.width(4.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(entry.courseName, color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(entry.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(entry.courseCode, color = EmeraldGreen, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                                 if (hasLab) {
@@ -306,10 +306,10 @@ private fun GradeEntryForCourse(
                                 }
                             }
                         }
-                        Surface(shape = RoundedCornerShape(10.dp), color = Slate700) {
+                        Surface(shape = RoundedCornerShape(10.dp), color = AppColorState.surface2) {
                             Text(
                                 "${existingGrades.size}/${students.size}",
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold
@@ -318,15 +318,15 @@ private fun GradeEntryForCourse(
                         Spacer(Modifier.width(8.dp))
                     }
                 }
-                HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+                HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
             }
         }
     ) { padding ->
         if (students.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(Icons.Default.PeopleOutline, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(56.dp))
-                    Text(stringResource(R.string.no_students_in_dept), color = TextSecondary, textAlign = TextAlign.Center)
+                    Icon(Icons.Default.PeopleOutline, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(56.dp))
+                    Text(stringResource(R.string.no_students_in_dept), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                 }
             }
         } else {
@@ -393,15 +393,15 @@ private fun StudentGradeEntryCard(
         if (m >= 0 && f >= 0 && a >= 0) GradeRecord.calculateAverage(m, f, a, l, hasLab) else -1f
     }
     val previewLetter = if (previewAvg >= 0) GradeRecord.calculateLetterGrade(previewAvg) else ""
-    val letterColor   = if (previewLetter.isNotEmpty()) Color(GradeRecord.letterColor(previewLetter)) else TextSecondary
+    val letterColor   = if (previewLetter.isNotEmpty()) Color(GradeRecord.letterColor(previewLetter)) else AppColorState.textSecondary
 
     val hasExisting = existing != null && existing.letterGrade.isNotEmpty()
-    val existingColor = if (hasExisting) Color(GradeRecord.letterColor(existing!!.letterGrade)) else TextSecondary
+    val existingColor = if (hasExisting) Color(GradeRecord.letterColor(existing!!.letterGrade)) else AppColorState.textSecondary
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isExpanded) Slate800 else Slate800
+            containerColor = if (isExpanded) AppColorState.surface else AppColorState.surface
         ),
         shape = RoundedCornerShape(16.dp),
         border = if (isExpanded) CardDefaults.outlinedCardBorder().copy(width = 0.dp) else null
@@ -433,9 +433,9 @@ private fun StudentGradeEntryCard(
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(student.fullName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                    Text(student.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
                     if (student.studentId.isNotBlank()) {
-                        Text(student.studentId, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(student.studentId, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
                 // Existing grade badge
@@ -457,19 +457,19 @@ private fun StudentGradeEntryCard(
                 Icon(
                     if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     null,
-                    tint = if (isExpanded) EmeraldGreen else TextSecondary.copy(alpha = 0.5f),
+                    tint = if (isExpanded) EmeraldGreen else AppColorState.textSecondary.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp)
                 )
             }
 
             AnimatedVisibility(visible = isExpanded, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
                 Column(modifier = Modifier.padding(top = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    HorizontalDivider(color = Slate700.copy(alpha = 0.6f))
+                    HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.6f))
                     Spacer(Modifier.height(2.dp))
 
                     // Weights info row
                     Row(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Slate700.copy(alpha = 0.5f)).padding(10.dp),
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(AppColorState.surface2.copy(alpha = 0.5f)).padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         if (hasLab) {
@@ -506,8 +506,8 @@ private fun StudentGradeEntryCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text("Ağırlıklı Ortalama", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
-                                Text("%.1f / 100".format(previewAvg), color = TextPrimary, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                Text("Ağırlıklı Ortalama", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                                Text("%.1f / 100".format(previewAvg), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(previewLetter, color = letterColor, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.displaySmall.copy(fontSize = 28.sp))
@@ -528,9 +528,9 @@ private fun StudentGradeEntryCard(
                         colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Default.Save, null, modifier = Modifier.size(18.dp), tint = Slate900)
+                        Icon(Icons.Default.Save, null, modifier = Modifier.size(18.dp), tint = AppColorState.background)
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.grade_save), fontWeight = FontWeight.Bold, color = Slate900)
+                        Text(stringResource(R.string.grade_save), fontWeight = FontWeight.Bold, color = AppColorState.background)
                     }
                 }
             }
@@ -542,7 +542,7 @@ private fun StudentGradeEntryCard(
 private fun WeightChip(label: String, weight: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(weight, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
-        Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+        Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -554,14 +554,14 @@ private fun GradeInputField(
         value = value,
         onValueChange = { if (it.length <= 5) onValueChange(it) },
         label = { Text(label, style = MaterialTheme.typography.labelSmall) },
-        placeholder = { Text("0-100", color = TextSecondary.copy(alpha = 0.35f), style = MaterialTheme.typography.labelSmall) },
+        placeholder = { Text("0-100", color = AppColorState.textSecondary.copy(alpha = 0.35f), style = MaterialTheme.typography.labelSmall) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         modifier = modifier,
         shape = RoundedCornerShape(10.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = EmeraldGreen, unfocusedBorderColor = Slate700,
-            focusedLabelColor = EmeraldGreen, focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary, cursorColor = EmeraldGreen,
+            focusedBorderColor = EmeraldGreen, unfocusedBorderColor = AppColorState.surface2,
+            focusedLabelColor = EmeraldGreen, focusedTextColor = AppColorState.textPrimary,
+            unfocusedTextColor = AppColorState.textPrimary, cursorColor = EmeraldGreen,
             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
         ),
         singleLine = true
@@ -590,7 +590,7 @@ fun StudentGradesScreen(
     val failedCount = myGrades.count { it.gpa in 0f..1.99f }
     val pendingCount = deptCourses.size - myGrades.size.coerceAtMost(deptCourses.size)
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         // ── Header ───────────────────────────────────────────
         Box(
             modifier = Modifier
@@ -600,16 +600,16 @@ fun StudentGradesScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.my_grades_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.my_grades_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(user.department, color = IndigoAccent, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                 }
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -619,7 +619,7 @@ fun StudentGradesScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Column(
@@ -635,10 +635,10 @@ fun StudentGradesScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             GpaStatItem(passedCount.toString(), stringResource(R.string.grade_passed), EmeraldGreen)
-                            Box(modifier = Modifier.width(1.dp).height(36.dp).background(Slate700))
+                            Box(modifier = Modifier.width(1.dp).height(36.dp).background(AppColorState.surface2))
                             GpaStatItem(failedCount.toString(), stringResource(R.string.grade_failed), ErrorRed)
-                            Box(modifier = Modifier.width(1.dp).height(36.dp).background(Slate700))
-                            GpaStatItem(pendingCount.toString(), "Bekleniyor", TextSecondary)
+                            Box(modifier = Modifier.width(1.dp).height(36.dp).background(AppColorState.surface2))
+                            GpaStatItem(pendingCount.toString(), "Bekleniyor", AppColorState.textSecondary)
                         }
                     }
                 }
@@ -647,7 +647,7 @@ fun StudentGradesScreen(
             item {
                 Text(
                     "Ders Notları",
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
@@ -657,7 +657,7 @@ fun StudentGradesScreen(
             if (deptCourses.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.no_dept_courses), color = TextSecondary, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.no_dept_courses), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -677,12 +677,12 @@ private fun GpaCircle(gpa: Float) {
         gpa >= 3.0f -> EmeraldGreen
         gpa >= 2.0f -> IndigoAccent
         gpa > 0f    -> Color(0xFFF59E0B)
-        else        -> Slate700
+        else        -> AppColorState.surface2
     }
     Box(modifier = Modifier.size(120.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(120.dp)) {
             drawArc(
-                color = Slate700,
+                color = AppColorState.surface2,
                 startAngle = 135f, sweepAngle = 270f, useCenter = false,
                 style = Stroke(width = 10.dp.toPx(), cap = StrokeCap.Round),
                 size = Size(size.width - 10.dp.toPx(), size.height - 10.dp.toPx()),
@@ -705,7 +705,7 @@ private fun GpaCircle(gpa: Float) {
                 fontWeight = FontWeight.ExtraBold,
                 style = MaterialTheme.typography.headlineMedium
             )
-            Text("/ 4.00 GPA", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+            Text("/ 4.00 GPA", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -714,18 +714,18 @@ private fun GpaCircle(gpa: Float) {
 private fun GpaStatItem(value: String, label: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, color = color, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge)
-        Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+        Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
     }
 }
 
 @Composable
 private fun StudentGradeCard(course: Course, grade: GradeRecord?) {
     val hasGrade = grade != null && grade.letterGrade.isNotEmpty()
-    val gradeColor = if (hasGrade) Color(GradeRecord.letterColor(grade!!.letterGrade)) else TextSecondary
+    val gradeColor = if (hasGrade) Color(GradeRecord.letterColor(grade!!.letterGrade)) else AppColorState.textSecondary
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -745,8 +745,8 @@ private fun StudentGradeCard(course: Course, grade: GradeRecord?) {
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(course.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(course.courseCode, color = if (hasGrade) gradeColor.copy(alpha = 0.7f) else TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(course.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(course.courseCode, color = if (hasGrade) gradeColor.copy(alpha = 0.7f) else AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 if (hasGrade && grade!!.midterm >= 0) {
                     Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -771,10 +771,10 @@ private fun StudentGradeCard(course: Course, grade: GradeRecord?) {
                     Text("%.1f".format(grade.gpa), color = gradeColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Medium)
                 }
             } else {
-                Surface(shape = RoundedCornerShape(10.dp), color = Slate700) {
+                Surface(shape = RoundedCornerShape(10.dp), color = AppColorState.surface2) {
                     Text(
                         stringResource(R.string.grade_not_entered),
-                        color = TextSecondary.copy(alpha = 0.6f),
+                        color = AppColorState.textSecondary.copy(alpha = 0.6f),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.labelSmall
                     )
@@ -786,8 +786,8 @@ private fun StudentGradeCard(course: Course, grade: GradeRecord?) {
 
 @Composable
 private fun MiniTag(text: String) {
-    Surface(shape = RoundedCornerShape(6.dp), color = Slate700) {
-        Text(text, color = TextSecondary, modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
+    Surface(shape = RoundedCornerShape(6.dp), color = AppColorState.surface2) {
+        Text(text, color = AppColorState.textSecondary, modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -819,7 +819,7 @@ fun AdminGradesOverviewScreen(
         Triple(course, cg.size, avg)
     }.sortedByDescending { it.third }
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         Box(
             modifier = Modifier.fillMaxWidth()
                 .background(Brush.verticalGradient(listOf(EmeraldGreen.copy(alpha = 0.14f), Color.Transparent)))
@@ -827,16 +827,16 @@ fun AdminGradesOverviewScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.admin_grades_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.admin_grades_subtitle), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.admin_grades_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.admin_grades_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -855,14 +855,14 @@ fun AdminGradesOverviewScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.BarChart, null, tint = IndigoAccent, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.grade_distribution), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.grade_distribution), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
                         }
                         Spacer(Modifier.height(16.dp))
                         val maxCount = gradeDistribution.maxOfOrNull { it.second }.takeIf { it != null && it > 0 } ?: 1
@@ -878,9 +878,9 @@ fun AdminGradesOverviewScreen(
             if (courseSummaries.isNotEmpty()) {
                 item {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.School, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.School, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.course_grade_summary), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.course_grade_summary), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                     }
                 }
                 items(courseSummaries) { (course, count, avgGpaC) ->
@@ -891,7 +891,7 @@ fun AdminGradesOverviewScreen(
                     }
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Slate800),
+                        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                         shape = RoundedCornerShape(14.dp)
                     ) {
                         Row(
@@ -906,10 +906,10 @@ fun AdminGradesOverviewScreen(
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(course.courseName, color = TextPrimary, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(course.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 Text(course.courseCode, color = color.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall)
                             }
-                            Text(stringResource(R.string.n_students, count), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.n_students, count), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -943,7 +943,7 @@ private fun GradeDistributionBar(letter: String, count: Int, maxCount: Int, colo
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(letter, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(28.dp))
         Box(
-            modifier = Modifier.weight(1f).height(16.dp).clip(RoundedCornerShape(8.dp)).background(Slate700)
+            modifier = Modifier.weight(1f).height(16.dp).clip(RoundedCornerShape(8.dp)).background(AppColorState.surface2)
         ) {
             Box(
                 modifier = Modifier.fillMaxHeight().fillMaxWidth(animPct)
@@ -954,7 +954,7 @@ private fun GradeDistributionBar(letter: String, count: Int, maxCount: Int, colo
         Spacer(Modifier.width(8.dp))
         Text(
             count.toString(),
-            color = if (count > 0) color else TextSecondary.copy(alpha = 0.4f),
+            color = if (count > 0) color else AppColorState.textSecondary.copy(alpha = 0.4f),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.width(22.dp),

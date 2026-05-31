@@ -96,4 +96,15 @@ interface UniversityRepository {
     fun getAcademicEvents(): Flow<List<AcademicEvent>>
     suspend fun addAcademicEvent(event: AcademicEvent)
     suspend fun deleteAcademicEvent(id: String)
+
+    // Akademik takvim PDF
+    suspend fun saveCalendarPdfUrl(url: String)
+    suspend fun getCalendarPdfUrl(): String?
+
+    // QR Yoklama oturumları
+    fun getActiveSession(courseCode: String): Flow<AttendanceSession?>
+    suspend fun createSession(session: AttendanceSession): AttendanceSession
+    suspend fun updateSession(session: AttendanceSession)
+    suspend fun getSessionByCode(sessionCode: String): AttendanceSession?
+    suspend fun addStudentToSession(sessionId: String, studentUsername: String)
 }

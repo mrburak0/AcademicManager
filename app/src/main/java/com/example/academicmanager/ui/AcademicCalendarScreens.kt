@@ -1,5 +1,10 @@
 package com.example.academicmanager.ui
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,6 +39,7 @@ import com.example.academicmanager.data.*
 import com.example.academicmanager.ui.theme.*
 import com.example.academicmanager.ui.viewmodels.AcademicCalendarViewModel
 import com.example.academicmanager.ui.viewmodels.AuthViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -49,12 +56,31 @@ fun AdminAcademicCalendarScreen(
     calendarViewModel: AcademicCalendarViewModel,
     navController: NavController
 ) {
-    val events by calendarViewModel.events.collectAsState()
-    val snackbar = remember { SnackbarHostState() }
+    val events   by calendarViewModel.events.collectAsState()
+    val snackbar  = remember { SnackbarHostState() }
+    val context   = LocalContext.current
+    val scope     = rememberCoroutineScope()
 
     var showAdd      by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<AcademicEvent?>(null) }
     var filterType   by remember { mutableStateOf<String?>(null) }
+    var pdfUploading by remember { mutableStateOf(false) }
+
+    // PDF yükle sonucu dinle
+    LaunchedEffect(Unit) {
+        calendarViewModel.pdfResult.collect { (ok, _) ->
+            pdfUploading = false
+            val msg = if (ok) "PDF başarıyla yüklendi" else "PDF yüklenemedi"
+            snackbar.showSnackbar(msg)
+        }
+    }
+
+    // PDF dosya seçici
+    val pdfPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { calendarViewModel.uploadCalendarPdf(it, context); pdfUploading = true }
+    }
 
     val today = LocalDate.now()
     val fmt   = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -73,21 +99,34 @@ fun AdminAcademicCalendarScreen(
     }
 
     Scaffold(
-        containerColor = Slate900,
+        containerColor = AppColorState.background,
         snackbarHost = {
             SnackbarHost(snackbar) { data ->
                 Snackbar(data, containerColor = CalendarBlue, contentColor = Color.White, shape = RoundedCornerShape(12.dp))
             }
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAdd = true },
-                containerColor = CalendarBlue,
-                contentColor   = Color.White,
-                shape          = RoundedCornerShape(16.dp),
-                icon  = { Icon(Icons.Default.Add, null) },
-                text  = { Text(stringResource(R.string.add_event), fontWeight = FontWeight.Bold) }
-            )
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // PDF Yükle butonu
+                SmallFloatingActionButton(
+                    onClick = { if (!pdfUploading) pdfPickerLauncher.launch("application/pdf") },
+                    containerColor = AppColorState.surface2,
+                    contentColor   = AppColorState.textPrimary,
+                    shape          = RoundedCornerShape(12.dp)
+                ) {
+                    if (pdfUploading) CircularProgressIndicator(Modifier.size(18.dp), color = EmeraldGreen, strokeWidth = 2.dp)
+                    else Icon(Icons.Default.UploadFile, contentDescription = "PDF Yükle")
+                }
+                // Etkinlik ekle butonu
+                ExtendedFloatingActionButton(
+                    onClick = { showAdd = true },
+                    containerColor = CalendarBlue,
+                    contentColor   = Color.White,
+                    shape          = RoundedCornerShape(16.dp),
+                    icon  = { Icon(Icons.Default.Add, null) },
+                    text  = { Text(stringResource(R.string.add_event), fontWeight = FontWeight.Bold) }
+                )
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -99,12 +138,12 @@ fun AdminAcademicCalendarScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                     }
                     Spacer(Modifier.width(4.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.academic_calendar_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.academic_calendar_sub, events.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.academic_calendar_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.academic_calendar_sub, events.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                     }
                     if (ongoing.isNotEmpty()) {
                         Surface(shape = RoundedCornerShape(8.dp), color = EmeraldGreen.copy(alpha = 0.15f)) {
@@ -127,7 +166,7 @@ fun AdminAcademicCalendarScreen(
                     CalendarFilterChip(label = EventType.displayName(type), selected = filterType == type, color = Color(EventType.color(type))) { filterType = if (filterType == type) null else type }
                 }
             }
-            HorizontalDivider(color = Slate700.copy(alpha = 0.4f))
+            HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.4f))
 
             if (filtered.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -137,10 +176,10 @@ fun AdminAcademicCalendarScreen(
                                 .background(Brush.radialGradient(listOf(CalendarBlue.copy(alpha = 0.15f), Color.Transparent))),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.CalendarMonth, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(46.dp))
+                            Icon(Icons.Default.CalendarMonth, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(46.dp))
                         }
-                        Text(stringResource(R.string.no_events_yet), color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
-                        Text(stringResource(R.string.add_event_hint), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.no_events_yet), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.add_event_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -175,7 +214,7 @@ fun AdminAcademicCalendarScreen(
                     // Past
                     if (past.isNotEmpty()) {
                         item {
-                            CalendarSectionHeader(stringResource(R.string.past_events_cal), TextSecondary, past.size, alpha = 0.5f)
+                            CalendarSectionHeader(stringResource(R.string.past_events_cal), AppColorState.textSecondary, past.size, alpha = 0.5f)
                         }
                         items(past.reversed(), key = { "past_${it.id}" }) { event ->
                             AdminEventCard(event = event, isOngoing = false, isPast = true, onDelete = { deleteTarget = event })
@@ -200,9 +239,9 @@ fun AdminAcademicCalendarScreen(
     deleteTarget?.let { event ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            containerColor   = Slate800,
+            containerColor   = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_event_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
-            text  = { Text(event.title, color = TextPrimary, style = MaterialTheme.typography.bodyMedium) },
+            text  = { Text(event.title, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
                 Button(onClick = { calendarViewModel.deleteEvent(event.id); deleteTarget = null },
                     colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) {
@@ -210,7 +249,7 @@ fun AdminAcademicCalendarScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -221,10 +260,10 @@ private fun CalendarFilterChip(label: String, selected: Boolean, color: Color, o
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = if (selected) color.copy(alpha = 0.18f) else Slate800,
-        border = BorderStroke(1.dp, if (selected) color else Slate700)
+        color = if (selected) color.copy(alpha = 0.18f) else AppColorState.surface,
+        border = BorderStroke(1.dp, if (selected) color else AppColorState.surface2)
     ) {
-        Text(label, color = if (selected) color else TextSecondary, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
+        Text(label, color = if (selected) color else AppColorState.textSecondary, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
     }
 }
 
@@ -233,7 +272,7 @@ private fun CalendarSectionHeader(title: String, color: Color, count: Int, alpha
     Row(modifier = Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(color.copy(alpha = alpha)))
         Spacer(Modifier.width(10.dp))
-        Text(title, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
+        Text(title, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
         Spacer(Modifier.width(8.dp))
         Surface(shape = CircleShape, color = color.copy(alpha = alpha * 0.15f)) {
             Text(count.toString(), color = color.copy(alpha = alpha), modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -264,7 +303,7 @@ private fun AdminEventCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = if (isPast) Slate800.copy(alpha = 0.6f) else Slate800),
+        colors   = CardDefaults.cardColors(containerColor = if (isPast) AppColorState.surface.copy(alpha = 0.6f) else AppColorState.surface),
         shape    = RoundedCornerShape(16.dp),
         border   = BorderStroke(1.dp, typeColor.copy(alpha = if (isPast) 0.1f else 0.28f))
     ) {
@@ -293,15 +332,15 @@ private fun AdminEventCard(
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(event.title, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(event.title, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(5.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Icon(Icons.Default.CalendarMonth, null, tint = TextSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
-                    Text(dateDisplay, color = TextSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
+                    Icon(Icons.Default.CalendarMonth, null, tint = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
+                    Text(dateDisplay, color = AppColorState.textSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
                 }
                 if (event.description.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
-                    Text(event.description, color = TextSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(event.description, color = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -328,7 +367,7 @@ private fun AddAcademicEventDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = Slate800,
+        containerColor   = AppColorState.surface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -336,7 +375,7 @@ private fun AddAcademicEventDialog(
                     Icon(Icons.Default.Event, null, tint = CalendarBlue, modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.add_event), color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.add_event), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
             }
         },
         text = {
@@ -345,7 +384,7 @@ private fun AddAcademicEventDialog(
                 CalendarTextField(stringResource(R.string.event_title_field), title, { title = it }, Modifier.fillMaxWidth())
 
                 // Event type chips
-                Text(stringResource(R.string.event_type_label_cal), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.event_type_label_cal), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     EventType.all.chunked(3).forEach { row ->
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -355,12 +394,12 @@ private fun AddAcademicEventDialog(
                                 Surface(
                                     modifier = Modifier.weight(1f).clickable { eventType = type },
                                     shape = RoundedCornerShape(10.dp),
-                                    color = if (sel) tc.copy(alpha = 0.18f) else Slate700.copy(alpha = 0.5f),
+                                    color = if (sel) tc.copy(alpha = 0.18f) else AppColorState.surface2.copy(alpha = 0.5f),
                                     border = if (sel) BorderStroke(1.dp, tc) else BorderStroke(1.dp, Color.Transparent)
                                 ) {
                                     Text(
                                         EventType.displayName(type),
-                                        color = if (sel) tc else TextSecondary,
+                                        color = if (sel) tc else AppColorState.textSecondary,
                                         fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
                                         style = MaterialTheme.typography.labelSmall,
                                         modifier = Modifier.padding(vertical = 7.dp),
@@ -373,7 +412,7 @@ private fun AddAcademicEventDialog(
                 }
 
                 // Start date navigator
-                Text(stringResource(R.string.event_start_date), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.event_start_date), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 DateNavigator(startDate, fmt) { startDate = it; if (hasEndDate && parsedEnd.isBefore(parsedStart)) endDate = startDate }
 
                 // End date toggle
@@ -382,13 +421,13 @@ private fun AddAcademicEventDialog(
                         checked = hasEndDate,
                         onCheckedChange = { hasEndDate = it; if (it && endDate.isBlank()) endDate = LocalDate.parse(startDate, fmt).plusDays(1).format(fmt) else if (!it) endDate = "" },
                         modifier = Modifier.size(36.dp),
-                        colors = SwitchDefaults.colors(checkedThumbColor = CalendarBlue, checkedTrackColor = CalendarBlue.copy(alpha = 0.3f), uncheckedThumbColor = TextSecondary, uncheckedTrackColor = Slate700)
+                        colors = SwitchDefaults.colors(checkedThumbColor = CalendarBlue, checkedTrackColor = CalendarBlue.copy(alpha = 0.3f), uncheckedThumbColor = AppColorState.textSecondary, uncheckedTrackColor = AppColorState.surface2)
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.event_has_end_date), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.event_has_end_date), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 }
                 if (hasEndDate) {
-                    Text(stringResource(R.string.event_end_date), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.event_end_date), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     DateNavigator(endDate.ifBlank { startDate }, fmt) { endDate = it }
                 }
 
@@ -411,7 +450,7 @@ private fun AddAcademicEventDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
         }
     )
 }
@@ -420,15 +459,15 @@ private fun AddAcademicEventDialog(
 private fun DateNavigator(date: String, fmt: DateTimeFormatter, onDateChange: (String) -> Unit) {
     val parsed = remember(date) { try { LocalDate.parse(date, fmt) } catch (_: Exception) { LocalDate.now() } }
     Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Slate700.copy(alpha = 0.6f)),
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(AppColorState.surface2.copy(alpha = 0.6f)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = { onDateChange(parsed.minusDays(1).format(fmt)) }, modifier = Modifier.size(36.dp)) {
-            Icon(Icons.Default.ChevronLeft, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.ChevronLeft, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
         }
-        Text(date, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+        Text(date, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
         IconButton(onClick = { onDateChange(parsed.plusDays(1).format(fmt)) }, modifier = Modifier.size(36.dp)) {
-            Icon(Icons.Default.ChevronRight, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -441,9 +480,9 @@ private fun CalendarTextField(label: String, value: String, onValueChange: (Stri
         modifier = modifier, shape = RoundedCornerShape(10.dp), maxLines = maxLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = CalendarBlue, unfocusedBorderColor = Slate700,
-            focusedLabelColor = CalendarBlue, focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary, cursorColor = CalendarBlue,
+            focusedBorderColor = CalendarBlue, unfocusedBorderColor = AppColorState.surface2,
+            focusedLabelColor = CalendarBlue, focusedTextColor = AppColorState.textPrimary,
+            unfocusedTextColor = AppColorState.textPrimary, cursorColor = CalendarBlue,
             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
         )
     )
@@ -459,14 +498,22 @@ fun AcademicCalendarScreen(
     calendarViewModel: AcademicCalendarViewModel,
     navController: NavController
 ) {
-    val events by calendarViewModel.events.collectAsState()
-    val user   = authViewModel.currentUser
+    val events   by calendarViewModel.events.collectAsState()
+    val user      = authViewModel.currentUser
+    val context   = LocalContext.current
 
     val today = LocalDate.now()
     val fmt   = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    var filterType by remember { mutableStateOf<String?>(null) }
-    var showPast   by remember { mutableStateOf(false) }
+    var filterType  by remember { mutableStateOf<String?>(null) }
+    var showPast    by remember { mutableStateOf(false) }
+    var pdfUrl      by remember { mutableStateOf<String?>(null) }
+    var pdfLoading  by remember { mutableStateOf(false) }
+
+    // PDF URL'ini yükle
+    LaunchedEffect(Unit) {
+        calendarViewModel.getCalendarPdfUrl { url -> pdfUrl = url }
+    }
 
     val filtered = events.filter { filterType == null || it.eventType == filterType }
         .sortedWith(compareBy({ it.startDate }, { it.title }))
@@ -491,7 +538,7 @@ fun AcademicCalendarScreen(
     val nextEvent   = upcoming.firstOrNull()
     val daysToNext  = nextEvent?.let { try { ChronoUnit.DAYS.between(today, LocalDate.parse(it.startDate, fmt)) } catch (_: Exception) { null } }
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         // Header
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -500,11 +547,11 @@ fun AcademicCalendarScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.academic_calendar_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.academic_calendar_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(user?.department ?: stringResource(R.string.all_departments), color = CalendarBlue.copy(alpha = 0.8f), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                 }
                 if (ongoing.isNotEmpty()) {
@@ -512,7 +559,25 @@ fun AcademicCalendarScreen(
                         Text("${ongoing.size} aktif", color = EmeraldGreen, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                     }
                 }
-                Spacer(Modifier.width(8.dp))
+                // PDF görüntüle butonu
+                pdfUrl?.let { url ->
+                    Spacer(Modifier.width(4.dp))
+                    IconButton(
+                        onClick = {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            } catch (_: Exception) {
+                                Toast.makeText(context, "PDF açılamadı", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF Görüntüle", tint = CalendarBlue, modifier = Modifier.size(24.dp))
+                    }
+                }
+                Spacer(Modifier.width(4.dp))
             }
         }
 
@@ -528,7 +593,7 @@ fun AcademicCalendarScreen(
                 }
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.4f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.4f))
 
         if (events.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -538,9 +603,9 @@ fun AcademicCalendarScreen(
                             .background(Brush.radialGradient(listOf(CalendarBlue.copy(alpha = 0.15f), Color.Transparent))),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.CalendarMonth, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
+                        Icon(Icons.Default.CalendarMonth, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
                     }
-                    Text(stringResource(R.string.no_events_yet), color = TextSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.no_events_yet), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
                 }
             }
         } else {
@@ -570,7 +635,7 @@ fun AcademicCalendarScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Schedule, null, tint = CalendarBlue, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.upcoming_events_cal), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(R.string.upcoming_events_cal), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                             Spacer(Modifier.width(8.dp))
                             Surface(shape = CircleShape, color = CalendarBlue.copy(alpha = 0.15f)) {
                                 Text(upcoming.size.toString(), color = CalendarBlue, modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -590,15 +655,15 @@ fun AcademicCalendarScreen(
                         Spacer(Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                                .background(Slate800.copy(alpha = 0.5f))
+                                .background(AppColorState.surface.copy(alpha = 0.5f))
                                 .clickable { showPast = !showPast }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.History, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.History, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.past_events_cal, past.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = TextSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.past_events_cal, past.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = AppColorState.textSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
                         }
                         Spacer(Modifier.height(8.dp))
                     }
@@ -634,7 +699,7 @@ private fun OngoingEventsBanner(ongoing: List<AcademicEvent>) {
                 val typeColor = Color(EventType.color(ev.eventType))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(typeColor))
-                    Text(ev.title, color = TextPrimary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(ev.title, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Surface(shape = RoundedCornerShape(6.dp), color = typeColor.copy(alpha = 0.15f)) {
                         Text(EventType.displayName(ev.eventType), color = typeColor, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
                     }
@@ -648,7 +713,7 @@ private fun OngoingEventsBanner(ongoing: List<AcademicEvent>) {
 private fun NextEventHeroCard(event: AcademicEvent, daysToNext: Long) {
     val typeColor  = Color(EventType.color(event.eventType))
     val isToday    = daysToNext == 0L
-    val gradBrush  = Brush.linearGradient(listOf(typeColor.copy(alpha = 0.25f), typeColor.copy(alpha = 0.08f), Slate800))
+    val gradBrush  = Brush.linearGradient(listOf(typeColor.copy(alpha = 0.25f), typeColor.copy(alpha = 0.08f), AppColorState.surface))
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -671,7 +736,7 @@ private fun NextEventHeroCard(event: AcademicEvent, daysToNext: Long) {
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                Text(event.title, color = TextPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(event.title, color = AppColorState.textPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(14.dp))
                 Row(verticalAlignment = Alignment.Bottom) {
                     Column(Modifier.weight(1f)) {
@@ -683,12 +748,12 @@ private fun NextEventHeroCard(event: AcademicEvent, daysToNext: Long) {
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Icon(Icons.Default.CalendarMonth, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
-                            Text(dateDisplay, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Icon(Icons.Default.CalendarMonth, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
+                            Text(dateDisplay, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                         if (event.description.isNotBlank()) {
                             Spacer(Modifier.height(4.dp))
-                            Text(event.description, color = TextSecondary.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(event.description, color = AppColorState.textSecondary.copy(alpha = 0.8f), style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                         }
                     }
                     Surface(
@@ -737,7 +802,7 @@ private fun StudentEventCard(
         Spacer(Modifier.width(8.dp))
         Card(
             modifier = Modifier.weight(1f),
-            colors   = CardDefaults.cardColors(containerColor = if (isPast) Slate800.copy(alpha = 0.5f) else Slate800),
+            colors   = CardDefaults.cardColors(containerColor = if (isPast) AppColorState.surface.copy(alpha = 0.5f) else AppColorState.surface),
             shape    = RoundedCornerShape(16.dp),
             border   = if (!isPast) BorderStroke(1.dp, typeColor.copy(alpha = 0.2f)) else null
         ) {
@@ -756,15 +821,15 @@ private fun StudentEventCard(
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text(event.title, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(event.title, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Icon(Icons.Default.CalendarMonth, null, tint = TextSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
-                        Text(dateDisplay, color = TextSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
+                        Icon(Icons.Default.CalendarMonth, null, tint = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
+                        Text(dateDisplay, color = AppColorState.textSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
                     }
                     if (event.description.isNotBlank()) {
                         Spacer(Modifier.height(3.dp))
-                        Text(event.description, color = TextSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(event.description, color = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }

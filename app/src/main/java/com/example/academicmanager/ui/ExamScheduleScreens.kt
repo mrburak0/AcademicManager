@@ -68,10 +68,10 @@ fun AdminExamScheduleScreen(
         .groupBy { it.examDate }
 
     Scaffold(
-        containerColor = Slate900,
+        containerColor = AppColorState.background,
         snackbarHost = {
             SnackbarHost(snackbar) { data ->
-                Snackbar(data, containerColor = EmeraldGreen, contentColor = Slate900, shape = RoundedCornerShape(12.dp))
+                Snackbar(data, containerColor = EmeraldGreen, contentColor = AppColorState.background, shape = RoundedCornerShape(12.dp))
             }
         },
         floatingActionButton = {
@@ -100,12 +100,12 @@ fun AdminExamScheduleScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                     }
                     Spacer(Modifier.width(4.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.exam_schedule_admin_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.exam_schedule_admin_sub, allExams.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.exam_schedule_admin_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.exam_schedule_admin_sub, allExams.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                     }
                     // Type legend
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -124,7 +124,7 @@ fun AdminExamScheduleScreen(
                     Spacer(Modifier.width(8.dp))
                 }
             }
-            HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+            HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
             if (allExams.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -134,10 +134,10 @@ fun AdminExamScheduleScreen(
                                 .background(Brush.radialGradient(listOf(Color(0xFFEF4444).copy(alpha = 0.18f), Color.Transparent))),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.EventBusy, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(44.dp))
+                            Icon(Icons.Default.EventBusy, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(44.dp))
                         }
-                        Text(stringResource(R.string.no_exams_yet), color = TextSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-                        Text(stringResource(R.string.add_exam_hint), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.no_exams_yet), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.add_exam_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -181,16 +181,16 @@ fun AdminExamScheduleScreen(
     deleteTarget?.let { exam ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_exam_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
-            text  = { Text("${exam.courseName} — ${ExamType.displayName(exam.examType)} (${exam.examDate})", color = TextPrimary, style = MaterialTheme.typography.bodyMedium) },
+            text  = { Text("${exam.courseName} — ${ExamType.displayName(exam.examType)} (${exam.examDate})", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
                 Button(onClick = { examViewModel.deleteExam(exam.id); deleteTarget = null }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) {
                     Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -211,12 +211,12 @@ private fun AdminDateHeader(date: String, isToday: Boolean, isPast: Boolean) {
     ) {
         Box(
             modifier = Modifier.size(6.dp).clip(CircleShape)
-                .background(if (isToday) Color(0xFFEF4444) else if (isPast) TextSecondary.copy(alpha = 0.3f) else Color(0xFFEF4444).copy(alpha = 0.6f))
+                .background(if (isToday) Color(0xFFEF4444) else if (isPast) AppColorState.textSecondary.copy(alpha = 0.3f) else Color(0xFFEF4444).copy(alpha = 0.6f))
         )
         Spacer(Modifier.width(10.dp))
         Text(
             display,
-            color = if (isToday) Color(0xFFEF4444) else if (isPast) TextSecondary.copy(alpha = 0.5f) else TextPrimary,
+            color = if (isToday) Color(0xFFEF4444) else if (isPast) AppColorState.textSecondary.copy(alpha = 0.5f) else AppColorState.textPrimary,
             fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.SemiBold,
             style = MaterialTheme.typography.labelLarge
         )
@@ -236,7 +236,7 @@ private fun AdminExamCard(exam: ExamEntry, isPast: Boolean, onDelete: () -> Unit
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = Slate800.copy(alpha = if (isPast) 0.6f else 1f)),
+        colors   = CardDefaults.cardColors(containerColor = AppColorState.surface.copy(alpha = if (isPast) 0.6f else 1f)),
         shape    = RoundedCornerShape(16.dp),
         border   = BorderStroke(1.dp, typeColor.copy(alpha = if (isPast) 0.12f else 0.3f))
     ) {
@@ -266,7 +266,7 @@ private fun AdminExamCard(exam: ExamEntry, isPast: Boolean, onDelete: () -> Unit
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                Text(exam.courseName, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(exam.courseName, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     ExamDetailChip(Icons.Default.AccessTime, "${exam.startTime}–${exam.endTime}", alpha)
@@ -277,7 +277,7 @@ private fun AdminExamCard(exam: ExamEntry, isPast: Boolean, onDelete: () -> Unit
                 }
                 if (exam.notes.isNotBlank()) {
                     Spacer(Modifier.height(4.dp))
-                    Text(exam.notes, color = TextSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(exam.notes, color = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }
@@ -287,8 +287,8 @@ private fun AdminExamCard(exam: ExamEntry, isPast: Boolean, onDelete: () -> Unit
 @Composable
 private fun ExamDetailChip(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, alpha: Float) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        Icon(icon, null, tint = TextSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
-        Text(text, color = TextSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
+        Icon(icon, null, tint = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
+        Text(text, color = AppColorState.textSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -316,7 +316,7 @@ private fun AddExamDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = Slate800,
+        containerColor   = AppColorState.surface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -324,7 +324,7 @@ private fun AddExamDialog(
                     Icon(Icons.Default.EditCalendar, null, tint = Color(0xFFEF4444), modifier = Modifier.size(18.dp))
                 }
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.add_exam), color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.add_exam), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
             }
         },
         text = {
@@ -334,22 +334,22 @@ private fun AddExamDialog(
                     onClick = { showCourse = !showCourse },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
-                    border = BorderStroke(1.dp, if (courseName.isNotBlank()) EmeraldGreen.copy(alpha = 0.5f) else Slate700)
+                    border = BorderStroke(1.dp, if (courseName.isNotBlank()) EmeraldGreen.copy(alpha = 0.5f) else AppColorState.surface2)
                 ) {
-                    Icon(Icons.Default.School, null, modifier = Modifier.size(14.dp), tint = if (courseName.isNotBlank()) EmeraldGreen else TextSecondary)
+                    Icon(Icons.Default.School, null, modifier = Modifier.size(14.dp), tint = if (courseName.isNotBlank()) EmeraldGreen else AppColorState.textSecondary)
                     Spacer(Modifier.width(6.dp))
                     Text(
                         if (courseName.isNotBlank()) courseName else stringResource(R.string.select_course_exam),
-                        color = if (courseName.isNotBlank()) EmeraldGreen else TextSecondary,
+                        color = if (courseName.isNotBlank()) EmeraldGreen else AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
-                    Icon(if (showCourse) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                    Icon(if (showCourse) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                 }
                 AnimatedVisibility(visible = showCourse, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-                    Card(colors = CardDefaults.cardColors(containerColor = Slate700), shape = RoundedCornerShape(12.dp)) {
+                    Card(colors = CardDefaults.cardColors(containerColor = AppColorState.surface2), shape = RoundedCornerShape(12.dp)) {
                         Column {
                             courses.take(10).forEach { c ->
                                 Row(
@@ -359,18 +359,18 @@ private fun AddExamDialog(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(Modifier.weight(1f)) {
-                                        Text(c.courseName, color = TextPrimary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(c.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(c.courseCode, color = EmeraldGreen, style = MaterialTheme.typography.labelSmall)
                                     }
                                 }
-                                if (c != courses.take(10).last()) HorizontalDivider(color = Slate800.copy(alpha = 0.5f), modifier = Modifier.padding(horizontal = 8.dp))
+                                if (c != courses.take(10).last()) HorizontalDivider(color = AppColorState.surface.copy(alpha = 0.5f), modifier = Modifier.padding(horizontal = 8.dp))
                             }
                         }
                     }
                 }
 
                 // Exam type chips
-                Text(stringResource(R.string.exam_type_label), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.exam_type_label), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ExamType.all.forEach { t ->
                         val tc = Color(ExamType.color(t))
@@ -378,12 +378,12 @@ private fun AddExamDialog(
                         Surface(
                             modifier = Modifier.weight(1f).clickable { examType = t },
                             shape = RoundedCornerShape(10.dp),
-                            color = if (sel) tc.copy(alpha = 0.18f) else Slate700.copy(alpha = 0.5f),
+                            color = if (sel) tc.copy(alpha = 0.18f) else AppColorState.surface2.copy(alpha = 0.5f),
                             border = if (sel) BorderStroke(1.dp, tc) else BorderStroke(1.dp, Color.Transparent)
                         ) {
                             Text(
                                 ExamType.displayName(t),
-                                color = if (sel) tc else TextSecondary,
+                                color = if (sel) tc else AppColorState.textSecondary,
                                 fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
                                 style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.padding(vertical = 8.dp),
@@ -394,17 +394,17 @@ private fun AddExamDialog(
                 }
 
                 // Date navigator
-                Text(stringResource(R.string.exam_date_label), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.exam_date_label), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 Row(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Slate700.copy(alpha = 0.6f)),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(AppColorState.surface2.copy(alpha = 0.6f)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { examDate = parsed.minusDays(1).format(fmt) }, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.ChevronLeft, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.ChevronLeft, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                     }
-                    Text(examDate, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                    Text(examDate, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
                     IconButton(onClick = { examDate = parsed.plusDays(1).format(fmt) }, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.ChevronRight, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                     }
                 }
 
@@ -439,7 +439,7 @@ private fun AddExamDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
         }
     )
 }
@@ -452,9 +452,9 @@ private fun ExamTextField(label: String, value: String, onValueChange: (String) 
         modifier = modifier, shape = RoundedCornerShape(10.dp), singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFFEF4444), unfocusedBorderColor = Slate700,
-            focusedLabelColor = Color(0xFFEF4444), focusedTextColor = TextPrimary,
-            unfocusedTextColor = TextPrimary, cursorColor = Color(0xFFEF4444),
+            focusedBorderColor = Color(0xFFEF4444), unfocusedBorderColor = AppColorState.surface2,
+            focusedLabelColor = Color(0xFFEF4444), focusedTextColor = AppColorState.textPrimary,
+            unfocusedTextColor = AppColorState.textPrimary, cursorColor = Color(0xFFEF4444),
             focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
         )
     )
@@ -488,7 +488,7 @@ fun StudentExamScheduleScreen(
 
     var showPast by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         // ── Hero Header ───────────────────────────────────────
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -502,16 +502,16 @@ fun StudentExamScheduleScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.exam_schedule_student_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.exam_schedule_student_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(user.department, color = Color(0xFFEF4444).copy(alpha = 0.8f), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                 }
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.4f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.4f))
 
         if (exams.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -521,9 +521,9 @@ fun StudentExamScheduleScreen(
                             .background(Brush.radialGradient(listOf(Color(0xFFEF4444).copy(alpha = 0.15f), Color.Transparent))),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.EventAvailable, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
+                        Icon(Icons.Default.EventAvailable, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
                     }
-                    Text(stringResource(R.string.no_exams_dept), color = TextSecondary, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.no_exams_dept), color = AppColorState.textSecondary, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         } else {
@@ -545,7 +545,7 @@ fun StudentExamScheduleScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Schedule, null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.upcoming_exams), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(R.string.upcoming_exams), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                             Spacer(Modifier.width(8.dp))
                             Surface(shape = CircleShape, color = Color(0xFFEF4444).copy(alpha = 0.15f)) {
                                 Text(upcoming.size.toString(), color = Color(0xFFEF4444), modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -567,15 +567,15 @@ fun StudentExamScheduleScreen(
                         Spacer(Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                                .background(Slate800.copy(alpha = 0.5f))
+                                .background(AppColorState.surface.copy(alpha = 0.5f))
                                 .clickable { showPast = !showPast }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.History, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.History, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.past_exams, past.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = TextSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.past_exams, past.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = AppColorState.textSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
                         }
                         Spacer(Modifier.height(8.dp))
                     }
@@ -602,7 +602,7 @@ private fun NextExamHeroCard(exam: ExamEntry, daysToNext: Long) {
         colors = listOf(
             typeColor.copy(alpha = 0.30f),
             typeColor.copy(alpha = 0.10f),
-            Slate800
+            AppColorState.surface
         )
     )
 
@@ -630,7 +630,7 @@ private fun NextExamHeroCard(exam: ExamEntry, daysToNext: Long) {
                 Spacer(Modifier.height(14.dp))
 
                 // Course name
-                Text(exam.courseName, color = TextPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(exam.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 if (exam.courseCode.isNotBlank()) {
                     Text(exam.courseCode, color = typeColor.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
                 }
@@ -668,12 +668,12 @@ private fun NextExamHeroCard(exam: ExamEntry, daysToNext: Long) {
                 if (exam.notes.isNotBlank()) {
                     Spacer(Modifier.height(10.dp))
                     Row(
-                        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(Slate900.copy(alpha = 0.3f)).padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(AppColorState.background.copy(alpha = 0.3f)).padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Info, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
+                        Icon(Icons.Default.Info, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(exam.notes, color = TextSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(exam.notes, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -684,8 +684,8 @@ private fun NextExamHeroCard(exam: ExamEntry, daysToNext: Long) {
 @Composable
 private fun HeroDetail(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Icon(icon, null, tint = TextSecondary, modifier = Modifier.size(12.dp))
-        Text(text, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+        Icon(icon, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
+        Text(text, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -718,7 +718,7 @@ private fun StudentExamTimelineCard(
                 contentAlignment = Alignment.Center
             ) {
                 if (isNext) {
-                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(Slate900))
+                    Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(AppColorState.background))
                 }
             }
         }
@@ -727,7 +727,7 @@ private fun StudentExamTimelineCard(
         Card(
             modifier = Modifier.weight(1f),
             colors   = CardDefaults.cardColors(
-                containerColor = if (isPast) Slate800.copy(alpha = 0.5f) else Slate800
+                containerColor = if (isPast) AppColorState.surface.copy(alpha = 0.5f) else AppColorState.surface
             ),
             shape  = RoundedCornerShape(16.dp),
             border = if (!isPast) BorderStroke(1.dp, typeColor.copy(alpha = 0.2f)) else null
@@ -752,11 +752,11 @@ private fun StudentExamTimelineCard(
                                 )
                             }
                         } else if (isPast) {
-                            Icon(Icons.Default.CheckCircle, null, tint = TextSecondary.copy(alpha = 0.3f), modifier = Modifier.size(14.dp))
+                            Icon(Icons.Default.CheckCircle, null, tint = AppColorState.textSecondary.copy(alpha = 0.3f), modifier = Modifier.size(14.dp))
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text(exam.courseName, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(exam.courseName, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Spacer(Modifier.height(5.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         ExamDetailChip(Icons.Default.CalendarMonth, dateDisplay, alpha)
@@ -765,7 +765,7 @@ private fun StudentExamTimelineCard(
                     }
                     if (exam.notes.isNotBlank()) {
                         Spacer(Modifier.height(4.dp))
-                        Text(exam.notes, color = TextSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(exam.notes, color = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }

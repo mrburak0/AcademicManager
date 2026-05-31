@@ -112,7 +112,7 @@ private fun AttendanceCourseListScreen(
     onCourseSelected: (ScheduleEntry) -> Unit,
     onBack: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         Box(
             modifier = Modifier.fillMaxWidth()
                 .background(Brush.verticalGradient(listOf(AttendanceAmber.copy(alpha = 0.15f), Color.Transparent)))
@@ -120,12 +120,12 @@ private fun AttendanceCourseListScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.attendance_entry_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.attendance_entry_subtitle), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.attendance_entry_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.attendance_entry_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 }
                 Box(
                     modifier = Modifier.size(40.dp).clip(CircleShape).background(AttendanceAmber.copy(alpha = 0.15f)),
@@ -136,15 +136,15 @@ private fun AttendanceCourseListScreen(
                 Spacer(Modifier.width(8.dp))
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
         if (myCourseEntries.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(Slate800), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.EventBusy, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(40.dp))
+                    Box(modifier = Modifier.size(80.dp).clip(CircleShape).background(AppColorState.surface), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.EventBusy, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(40.dp))
                     }
-                    Text(stringResource(R.string.no_assigned_courses), color = TextSecondary, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.no_assigned_courses), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                 }
             }
         } else {
@@ -171,7 +171,7 @@ private fun AttendanceCourseCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick(entry) },
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(18.dp)
     ) {
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -184,23 +184,23 @@ private fun AttendanceCourseCard(
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(entry.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(entry.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(2.dp))
                 Text(entry.courseCode, color = AttendanceAmber, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Surface(shape = RoundedCornerShape(20.dp), color = Slate700) {
+                    Surface(shape = RoundedCornerShape(20.dp), color = AppColorState.surface2) {
                         Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Icon(Icons.AutoMirrored.Filled.EventNote, null, tint = TextSecondary, modifier = Modifier.size(10.dp))
-                            Text(stringResource(R.string.sessions_recorded, sessionCount), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                            Icon(Icons.AutoMirrored.Filled.EventNote, null, tint = AppColorState.textSecondary, modifier = Modifier.size(10.dp))
+                            Text(stringResource(R.string.sessions_recorded, sessionCount), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                     if (lastDate != null) {
-                        Text("Son: $lastDate", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.labelSmall)
+                        Text("Son: $lastDate", color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
-            Icon(Icons.Default.ChevronRight, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -233,10 +233,10 @@ private fun AttendanceSessionEntryScreen(
     val pct = if (totalCount > 0) presentCount.toFloat() / totalCount else 0f
 
     Scaffold(
-        containerColor = Slate900,
+        containerColor = AppColorState.background,
         snackbarHost = {
             SnackbarHost(snackbarHostState) { data ->
-                Snackbar(snackbarData = data, containerColor = AttendanceAmber, contentColor = Slate900, shape = RoundedCornerShape(12.dp))
+                Snackbar(snackbarData = data, containerColor = AttendanceAmber, contentColor = AppColorState.background, shape = RoundedCornerShape(12.dp))
             }
         },
         topBar = {
@@ -247,16 +247,16 @@ private fun AttendanceSessionEntryScreen(
                         .padding(horizontal = 8.dp, vertical = 8.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary) }
+                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary) }
                         Spacer(Modifier.width(4.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(entry.courseName, color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(entry.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(entry.courseCode, color = AttendanceAmber, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                         }
                         // Mini attendance ring in header
                         Box(modifier = Modifier.size(42.dp), contentAlignment = Alignment.Center) {
                             Canvas(modifier = Modifier.size(42.dp)) {
-                                drawArc(Slate700, -90f, 360f, false, style = Stroke(4.dp.toPx(), cap = StrokeCap.Round))
+                                drawArc(AppColorState.surface2, -90f, 360f, false, style = Stroke(4.dp.toPx(), cap = StrokeCap.Round))
                                 if (pct > 0f) drawArc(AttendanceAmber, -90f, 360f * pct, false, style = Stroke(4.dp.toPx(), cap = StrokeCap.Round))
                             }
                             Text("${(pct * 100).toInt()}%", color = AttendanceAmber, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -264,16 +264,16 @@ private fun AttendanceSessionEntryScreen(
                         Spacer(Modifier.width(8.dp))
                     }
                 }
-                HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+                HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
             }
         },
         bottomBar = {
-            Column(modifier = Modifier.background(Slate900).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.background(AppColorState.background).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Attendance summary bar
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Slate800)
+                        .background(AppColorState.surface)
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -318,9 +318,9 @@ private fun AttendanceSessionEntryScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = AttendanceAmber),
                     shape = RoundedCornerShape(14.dp)
                 ) {
-                    Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(20.dp), tint = Slate900)
+                    Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(20.dp), tint = AppColorState.background)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.attendance_save), fontWeight = FontWeight.Bold, color = Slate900, style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.attendance_save), fontWeight = FontWeight.Bold, color = AppColorState.background, style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -337,21 +337,21 @@ private fun AttendanceSessionEntryScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // Date row
-                        Text("Oturum Tarihi", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text("Oturum Tarihi", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         DateNavigator(
                             selectedDate = selectedDate,
                             formatter = formatter,
                             today = today,
                             onDateChange = { selectedDate = it }
                         )
-                        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+                        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
                         // Session type
-                        Text("Oturum Tipi", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text("Oturum Tipi", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf(
                                 SessionType.LECTURE to "Teorik",
@@ -361,7 +361,7 @@ private fun AttendanceSessionEntryScreen(
                                 Surface(
                                     modifier = Modifier.clickable { selectedSessionType = type }.weight(1f),
                                     shape = RoundedCornerShape(10.dp),
-                                    color = if (selected) AttendanceAmber.copy(alpha = 0.18f) else Slate700.copy(alpha = 0.6f),
+                                    color = if (selected) AttendanceAmber.copy(alpha = 0.18f) else AppColorState.surface2.copy(alpha = 0.6f),
                                     border = if (selected) BorderStroke(1.dp, AttendanceAmber) else BorderStroke(1.dp, Color.Transparent)
                                 ) {
                                     Row(
@@ -372,13 +372,13 @@ private fun AttendanceSessionEntryScreen(
                                         Icon(
                                             if (type == SessionType.LECTURE) Icons.AutoMirrored.Filled.MenuBook else Icons.Default.Science,
                                             null,
-                                            tint = if (selected) AttendanceAmber else TextSecondary,
+                                            tint = if (selected) AttendanceAmber else AppColorState.textSecondary,
                                             modifier = Modifier.size(14.dp)
                                         )
                                         Spacer(Modifier.width(6.dp))
                                         Text(
                                             label,
-                                            color = if (selected) AttendanceAmber else TextSecondary,
+                                            color = if (selected) AttendanceAmber else AppColorState.textSecondary,
                                             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
                                             style = MaterialTheme.typography.bodySmall
                                         )
@@ -413,9 +413,9 @@ private fun AttendanceSessionEntryScreen(
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.PeopleOutline, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
+                            Icon(Icons.Default.PeopleOutline, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
                             Spacer(Modifier.height(12.dp))
-                            Text(stringResource(R.string.no_students_in_dept), color = TextSecondary, textAlign = TextAlign.Center)
+                            Text(stringResource(R.string.no_students_in_dept), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                         }
                     }
                 }
@@ -452,7 +452,7 @@ private fun DateNavigator(
     Row(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Slate700.copy(alpha = 0.6f))
+            .background(AppColorState.surface2.copy(alpha = 0.6f))
             .padding(horizontal = 4.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -460,7 +460,7 @@ private fun DateNavigator(
             onClick = { onDateChange(parsed.minusDays(1).format(formatter)) },
             modifier = Modifier.size(36.dp)
         ) {
-            Icon(Icons.Default.ChevronLeft, null, tint = TextSecondary, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ChevronLeft, null, tint = AppColorState.textSecondary, modifier = Modifier.size(20.dp))
         }
         Column(
             modifier = Modifier.weight(1f),
@@ -468,7 +468,7 @@ private fun DateNavigator(
         ) {
             Text(
                 selectedDate,
-                color = TextPrimary,
+                color = AppColorState.textPrimary,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -491,7 +491,7 @@ private fun DateNavigator(
             onClick = { onDateChange(parsed.plusDays(1).format(formatter)) },
             modifier = Modifier.size(36.dp)
         ) {
-            Icon(Icons.Default.ChevronRight, null, tint = TextSecondary, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -499,12 +499,12 @@ private fun DateNavigator(
 @Composable
 private fun AttendanceStudentRow(student: Lecturer, isPresent: Boolean, onToggle: () -> Unit) {
     val accentColor by animateColorAsState(
-        targetValue = if (isPresent) EmeraldGreen else Slate700,
+        targetValue = if (isPresent) EmeraldGreen else AppColorState.surface2,
         animationSpec = tween(200),
         label = "acc"
     )
     val bgColor by animateColorAsState(
-        targetValue = if (isPresent) EmeraldGreen.copy(alpha = 0.07f) else Slate800,
+        targetValue = if (isPresent) EmeraldGreen.copy(alpha = 0.07f) else AppColorState.surface,
         animationSpec = tween(200),
         label = "bg"
     )
@@ -527,16 +527,16 @@ private fun AttendanceStudentRow(student: Lecturer, isPresent: Boolean, onToggle
             ) {
                 Text(
                     student.fullName.firstOrNull()?.uppercase() ?: "?",
-                    color = if (isPresent) EmeraldGreen else TextSecondary,
+                    color = if (isPresent) EmeraldGreen else AppColorState.textSecondary,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(student.fullName, color = TextPrimary, fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium)
+                Text(student.fullName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium)
                 if (student.studentId.isNotBlank()) {
-                    Text(student.studentId, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(student.studentId, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
             }
             AnimatedContent(
@@ -547,7 +547,7 @@ private fun AttendanceStudentRow(student: Lecturer, isPresent: Boolean, onToggle
                 Icon(
                     if (present) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                     null,
-                    tint = if (present) EmeraldGreen else TextSecondary.copy(alpha = 0.35f),
+                    tint = if (present) EmeraldGreen else AppColorState.textSecondary.copy(alpha = 0.35f),
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -583,7 +583,7 @@ fun StudentAttendanceScreen(
     val totalAttended = attendanceMap.values.sumOf { it.first }
     val overallPct = if (totalSessions > 0) totalAttended.toFloat() / totalSessions * 100 else 0f
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         Box(
             modifier = Modifier.fillMaxWidth()
                 .background(Brush.verticalGradient(listOf(AttendanceAmber.copy(alpha = 0.16f), Color.Transparent)))
@@ -591,16 +591,16 @@ fun StudentAttendanceScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.my_attendance_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.my_attendance_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(user.department, color = AttendanceAmber, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                 }
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
@@ -610,7 +610,7 @@ fun StudentAttendanceScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Column(
@@ -622,7 +622,7 @@ fun StudentAttendanceScreen(
                         if (totalSessions > 0) {
                             Text(
                                 stringResource(R.string.attended_of, totalAttended, totalSessions),
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 style = MaterialTheme.typography.bodySmall
                             )
                             if (overallPct < 70f) {
@@ -639,20 +639,20 @@ fun StudentAttendanceScreen(
                                 }
                             }
                         } else {
-                            Text("Henüz oturum kaydedilmedi", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                            Text("Henüz oturum kaydedilmedi", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
             }
 
             item {
-                Text("Derse Göre Devam", color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
+                Text("Derse Göre Devam", color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
             }
 
             if (deptCourses.isEmpty()) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.no_dept_courses), color = TextSecondary, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.no_dept_courses), color = AppColorState.textSecondary, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -672,12 +672,12 @@ private fun AttendanceCircle(pct: Float) {
         pct >= 0.70f -> EmeraldGreen
         pct >= 0.50f -> AttendanceAmber
         pct >  0f    -> ErrorRed
-        else         -> Slate700
+        else         -> AppColorState.surface2
     }
     Box(modifier = Modifier.size(130.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(130.dp)) {
             drawArc(
-                color = Slate700, startAngle = 135f, sweepAngle = 270f, useCenter = false,
+                color = AppColorState.surface2, startAngle = 135f, sweepAngle = 270f, useCenter = false,
                 style = Stroke(12.dp.toPx(), cap = StrokeCap.Round),
                 size = Size(size.width - 12.dp.toPx(), size.height - 12.dp.toPx()),
                 topLeft = Offset(6.dp.toPx(), 6.dp.toPx())
@@ -699,7 +699,7 @@ private fun AttendanceCircle(pct: Float) {
                 fontWeight = FontWeight.ExtraBold,
                 style = MaterialTheme.typography.headlineMedium
             )
-            Text(stringResource(R.string.overall_attendance), color = TextSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.overall_attendance), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center)
         }
     }
 }
@@ -707,7 +707,7 @@ private fun AttendanceCircle(pct: Float) {
 @Composable
 private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: Int, pct: Float) {
     val color = when {
-        total == 0 -> TextSecondary
+        total == 0 -> AppColorState.textSecondary
         pct >= 70f -> EmeraldGreen
         pct >= 50f -> AttendanceAmber
         else       -> ErrorRed
@@ -720,7 +720,7 @@ private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: In
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -734,7 +734,7 @@ private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: In
                 }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(course.courseName, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(course.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(course.courseCode, color = color.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall)
                 }
                 Column(horizontalAlignment = Alignment.End) {
@@ -745,7 +745,7 @@ private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: In
                         style = MaterialTheme.typography.titleLarge
                     )
                     if (total > 0) {
-                        Text("$attended/$total", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text("$attended/$total", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -753,7 +753,7 @@ private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: In
             if (total > 0) {
                 Spacer(Modifier.height(10.dp))
                 Box(
-                    modifier = Modifier.fillMaxWidth().height(7.dp).clip(RoundedCornerShape(4.dp)).background(Slate700)
+                    modifier = Modifier.fillMaxWidth().height(7.dp).clip(RoundedCornerShape(4.dp)).background(AppColorState.surface2)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxHeight().fillMaxWidth(animPct)
@@ -773,7 +773,7 @@ private fun StudentAttendanceCourseCard(course: Course, attended: Int, total: In
                 }
             } else {
                 Spacer(Modifier.height(6.dp))
-                Text(stringResource(R.string.no_sessions_yet), color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.no_sessions_yet), color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.labelSmall)
             }
         }
     }

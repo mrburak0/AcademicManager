@@ -476,6 +476,25 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
                     ScheduleEntry(id = "EE101_Wed_1500_LAB",       courseCode = "EE101",   courseName = "Devre Analizi Lab",  lecturerName = "Mehmet Demir", classroomName = "Lab-1",  dayOfWeek = "Wednesday", timeSlot = "15:00-16:00", sessionType = SessionType.LAB)
                 ).forEach { repository.addScheduleEntry(it) }
 
+                // 7. Sınav Takvimi demo verileri
+                listOf(
+                    com.example.academicmanager.data.ExamEntry(id = "exam_cs101_midterm", courseCode = "CS101", courseName = "Programlamaya Giriş", department = "Computer Science", lecturerName = "Ahmet Yılmaz", examDate = "2026-06-10", startTime = "09:00", endTime = "11:00", classroom = "A-101", examType = "MIDTERM", notes = "Kitap kapalı, hesap makinesi yok"),
+                    com.example.academicmanager.data.ExamEntry(id = "exam_math101_midterm", courseCode = "MATH101", courseName = "Matematik I", department = "Mathematics", lecturerName = "Ayşe Kaya", examDate = "2026-06-12", startTime = "13:00", endTime = "15:00", classroom = "B-202", examType = "MIDTERM", notes = "Formül kağıdı getirilebilir"),
+                    com.example.academicmanager.data.ExamEntry(id = "exam_ee101_midterm", courseCode = "EE101", courseName = "Devre Analizi", department = "Electrical Engineering", lecturerName = "Mehmet Demir", examDate = "2026-06-14", startTime = "10:00", endTime = "12:00", classroom = "D-104", examType = "MIDTERM", notes = ""),
+                    com.example.academicmanager.data.ExamEntry(id = "exam_cs101_final", courseCode = "CS101", courseName = "Programlamaya Giriş", department = "Computer Science", lecturerName = "Ahmet Yılmaz", examDate = "2026-07-08", startTime = "09:00", endTime = "12:00", classroom = "A-101", examType = "FINAL", notes = ""),
+                    com.example.academicmanager.data.ExamEntry(id = "exam_math101_final", courseCode = "MATH101", courseName = "Matematik I", department = "Mathematics", lecturerName = "Ayşe Kaya", examDate = "2026-07-10", startTime = "13:00", endTime = "16:00", classroom = "B-202", examType = "FINAL", notes = "Tüm konular"),
+                    com.example.academicmanager.data.ExamEntry(id = "exam_ee101_makeup", courseCode = "EE101", courseName = "Devre Analizi", department = "Electrical Engineering", lecturerName = "Mehmet Demir", examDate = "2026-07-22", startTime = "10:00", endTime = "12:00", classroom = "C-303", examType = "MAKEUP", notes = "Bütünleme")
+                ).forEach { repository.addExamEntry(it) }
+
+                // 8. Ödev demo verileri
+                val now = System.currentTimeMillis()
+                listOf(
+                    com.example.academicmanager.data.AssignmentEntry(courseCode = "CS101", courseName = "Programlamaya Giriş", department = "Computer Science", lecturerUsername = "ahmet_yilmaz", lecturerName = "Ahmet Yılmaz", title = "Ödev 1: Temel Algoritmalar", description = "Sıralama ve arama algoritmalarını Python ile kodlayın. Bubble sort, selection sort ve binary search implement edin.", dueDate = "2026-06-15", dueTime = "23:59", maxPoints = 100, timestamp = now),
+                    com.example.academicmanager.data.AssignmentEntry(courseCode = "CS101", courseName = "Programlamaya Giriş", department = "Computer Science", lecturerUsername = "ahmet_yilmaz", lecturerName = "Ahmet Yılmaz", title = "Ödev 2: Veri Yapıları", description = "Stack ve Queue veri yapılarını sıfırdan implement edin ve test edin.", dueDate = "2026-06-28", dueTime = "23:59", maxPoints = 100, timestamp = now),
+                    com.example.academicmanager.data.AssignmentEntry(courseCode = "MATH101", courseName = "Matematik I", department = "Mathematics", lecturerUsername = "ayse_kaya", lecturerName = "Ayşe Kaya", title = "Problem Seti 1", description = "Sayfa 45-60 arası tüm alıştırmalar. Türev ve integral işlemleri.", dueDate = "2026-06-18", dueTime = "18:00", maxPoints = 50, timestamp = now),
+                    com.example.academicmanager.data.AssignmentEntry(courseCode = "EE101", courseName = "Devre Analizi", department = "Electrical Engineering", lecturerUsername = "mehmet_demir", lecturerName = "Mehmet Demir", title = "Lab Raporu 1: RC Devreleri", description = "RC devresi deneyi raporu. Ölçüm grafikleri ve hesaplamalar dahil edilmeli.", dueDate = "2026-06-20", dueTime = "17:00", maxPoints = 80, timestamp = now)
+                ).forEach { repository.addAssignment(it) }
+
                 // ── Atanmamış bırakılan dersler (Yapay Zeka demo için) ──
                 // CS201, CS301, CS401, SW101, SW201, MATH201, EE201
                 // Zeynep Arslan ve Ali Çelik de atanmamış hoca olarak görünür

@@ -74,7 +74,7 @@ fun LecturerAssignmentScreen(
     val sorted = assignments.sortedWith(compareBy({ it.dueDate }, { it.title }))
 
     Scaffold(
-        containerColor = Slate900,
+        containerColor = AppColorState.background,
         snackbarHost = {
             SnackbarHost(snackbar) { data ->
                 Snackbar(data, containerColor = AssignmentPurple, contentColor = Color.White, shape = RoundedCornerShape(12.dp))
@@ -100,12 +100,12 @@ fun LecturerAssignmentScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                     }
                     Spacer(Modifier.width(4.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.assignments_lecturer_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.assignments_lecturer_sub, assignments.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.assignments_lecturer_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.assignments_lecturer_sub, assignments.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                     }
                     // Stats chips
                     val overdue  = sorted.count { try { LocalDate.parse(it.dueDate, fmt).isBefore(today) } catch (_: Exception) { false } }
@@ -116,7 +116,7 @@ fun LecturerAssignmentScreen(
                     Spacer(Modifier.width(8.dp))
                 }
             }
-            HorizontalDivider(color = Slate700.copy(alpha = 0.5f))
+            HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f))
 
             if (sorted.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -126,10 +126,10 @@ fun LecturerAssignmentScreen(
                                 .background(Brush.radialGradient(listOf(AssignmentPurple.copy(alpha = 0.15f), Color.Transparent))),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.Assignment, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(46.dp))
+                            Icon(Icons.Default.Assignment, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(46.dp))
                         }
-                        Text(stringResource(R.string.no_assignments_yet), color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
-                        Text(stringResource(R.string.add_assignment_hint), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.no_assignments_yet), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.add_assignment_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -170,9 +170,9 @@ fun LecturerAssignmentScreen(
     deleteTarget?.let { a ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            containerColor   = Slate800,
+            containerColor   = AppColorState.surface,
             title = { Text(stringResource(R.string.delete_assignment_title), color = ErrorRed, fontWeight = FontWeight.Bold) },
-            text  = { Text(a.title, color = TextPrimary, style = MaterialTheme.typography.bodyMedium) },
+            text  = { Text(a.title, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodyMedium) },
             confirmButton = {
                 Button(onClick = { assignmentViewModel.deleteAssignment(a.id); deleteTarget = null },
                     colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) {
@@ -180,7 +180,7 @@ fun LecturerAssignmentScreen(
                 }
             },
             dismissButton = {
-                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+                TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
             }
         )
     }
@@ -210,7 +210,7 @@ private fun LecturerAssignmentCard(
     val daysLeft = try { ChronoUnit.DAYS.between(today, LocalDate.parse(assignment.dueDate, fmt)) } catch (_: Exception) { null }
     val alpha    = if (isPast) 0.5f else 1f
     val barColor = when {
-        isPast           -> TextSecondary.copy(alpha = 0.4f)
+        isPast           -> AppColorState.textSecondary.copy(alpha = 0.4f)
         daysLeft != null && daysLeft <= 2 -> Color(0xFFEF4444)
         daysLeft != null && daysLeft <= 5 -> Color(0xFFF59E0B)
         else             -> AssignmentPurple
@@ -218,7 +218,7 @@ private fun LecturerAssignmentCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors   = CardDefaults.cardColors(containerColor = Slate800),
+        colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape    = RoundedCornerShape(16.dp),
         border   = BorderStroke(1.dp, barColor.copy(alpha = if (isPast) 0.1f else 0.25f))
     ) {
@@ -229,7 +229,7 @@ private fun LecturerAssignmentCard(
             Column(modifier = Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(assignment.title, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(assignment.title, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Spacer(Modifier.height(2.dp))
                         Text(assignment.courseName, color = barColor.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
                     }
@@ -252,8 +252,8 @@ private fun LecturerAssignmentCard(
                             Text(if (daysLeft == 0L) "Bugün!" else "${daysLeft}g kaldı", color = barColor, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                         }
                     } else if (isPast) {
-                        Surface(shape = RoundedCornerShape(6.dp), color = TextSecondary.copy(alpha = 0.08f)) {
-                            Text("Süresi doldu", color = TextSecondary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
+                        Surface(shape = RoundedCornerShape(6.dp), color = AppColorState.textSecondary.copy(alpha = 0.08f)) {
+                            Text("Süresi doldu", color = AppColorState.textSecondary, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -261,19 +261,19 @@ private fun LecturerAssignmentCard(
                 // Expanded: submission list
                 AnimatedVisibility(visible = isExpanded, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
                     Column(modifier = Modifier.padding(top = 10.dp)) {
-                        HorizontalDivider(color = Slate700.copy(alpha = 0.5f), modifier = Modifier.padding(bottom = 8.dp))
+                        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.5f), modifier = Modifier.padding(bottom = 8.dp))
                         if (assignment.description.isNotBlank()) {
-                            Text(assignment.description, color = TextSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 8.dp))
+                            Text(assignment.description, color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(bottom = 8.dp))
                         }
-                        Text("Teslim Edenler (${submissions.size})", color = TextSecondary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+                        Text("Teslim Edenler (${submissions.size})", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
                         Spacer(Modifier.height(4.dp))
                         if (submissions.isEmpty()) {
-                            Text(stringResource(R.string.no_submissions_yet), color = TextSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(vertical = 4.dp))
+                            Text(stringResource(R.string.no_submissions_yet), color = AppColorState.textSecondary.copy(alpha = 0.5f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(vertical = 4.dp))
                         } else {
                             submissions.forEach { sub ->
                                 Row(modifier = Modifier.padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Icon(Icons.Default.CheckCircle, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
-                                    Text(sub.studentName.ifBlank { sub.studentUsername }, color = TextPrimary, style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                                    Text(sub.studentName.ifBlank { sub.studentUsername }, color = AppColorState.textPrimary, style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
                                     if (sub.isLate) {
                                         Surface(shape = RoundedCornerShape(4.dp), color = Color(0xFFF59E0B).copy(alpha = 0.15f)) {
                                             Text("Geç", color = Color(0xFFF59E0B), modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp), style = MaterialTheme.typography.labelSmall)
@@ -281,7 +281,7 @@ private fun LecturerAssignmentCard(
                                     }
                                 }
                                 if (sub.note.isNotBlank()) {
-                                    Text("  ↳ ${sub.note}", color = TextSecondary.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 22.dp))
+                                    Text("  ↳ ${sub.note}", color = AppColorState.textSecondary.copy(alpha = 0.7f), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 22.dp))
                                 }
                             }
                         }
@@ -314,7 +314,7 @@ private fun AddAssignmentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = Slate800,
+        containerColor   = AppColorState.surface,
         shape = RoundedCornerShape(24.dp),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -322,7 +322,7 @@ private fun AddAssignmentDialog(
                     Icon(Icons.Default.Assignment, null, tint = AssignmentPurple, modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.add_assignment), color = TextPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.add_assignment), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
             }
         },
         text = {
@@ -335,15 +335,15 @@ private fun AddAssignmentDialog(
                     onClick = { showCourse = !showCourse },
                     modifier = Modifier.fillMaxWidth(),
                     shape  = RoundedCornerShape(10.dp),
-                    border = BorderStroke(1.dp, if (courseName.isNotBlank()) AssignmentPurple.copy(alpha = 0.5f) else Slate700)
+                    border = BorderStroke(1.dp, if (courseName.isNotBlank()) AssignmentPurple.copy(alpha = 0.5f) else AppColorState.surface2)
                 ) {
-                    Icon(Icons.Default.School, null, modifier = Modifier.size(14.dp), tint = if (courseName.isNotBlank()) AssignmentPurple else TextSecondary)
+                    Icon(Icons.Default.School, null, modifier = Modifier.size(14.dp), tint = if (courseName.isNotBlank()) AssignmentPurple else AppColorState.textSecondary)
                     Spacer(Modifier.width(6.dp))
-                    Text(courseName.ifBlank { stringResource(R.string.select_course_assignment) }, color = if (courseName.isNotBlank()) AssignmentPurple else TextSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Icon(if (showCourse) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                    Text(courseName.ifBlank { stringResource(R.string.select_course_assignment) }, color = if (courseName.isNotBlank()) AssignmentPurple else AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Icon(if (showCourse) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                 }
                 AnimatedVisibility(visible = showCourse, enter = expandVertically() + fadeIn(), exit = shrinkVertically() + fadeOut()) {
-                    Card(colors = CardDefaults.cardColors(containerColor = Slate700), shape = RoundedCornerShape(12.dp)) {
+                    Card(colors = CardDefaults.cardColors(containerColor = AppColorState.surface2), shape = RoundedCornerShape(12.dp)) {
                         Column {
                             courses.take(12).forEach { c ->
                                 Row(
@@ -353,11 +353,11 @@ private fun AddAssignmentDialog(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(Modifier.weight(1f)) {
-                                        Text(c.courseName, color = TextPrimary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(c.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(c.courseCode, color = AssignmentPurple, style = MaterialTheme.typography.labelSmall)
                                     }
                                 }
-                                if (c != courses.take(12).last()) HorizontalDivider(color = Slate800.copy(alpha = 0.5f), modifier = Modifier.padding(horizontal = 8.dp))
+                                if (c != courses.take(12).last()) HorizontalDivider(color = AppColorState.surface.copy(alpha = 0.5f), modifier = Modifier.padding(horizontal = 8.dp))
                             }
                         }
                     }
@@ -372,17 +372,17 @@ private fun AddAssignmentDialog(
                 )
 
                 // Due date navigator
-                Text(stringResource(R.string.assignment_due_date), color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.assignment_due_date), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 Row(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Slate700.copy(alpha = 0.6f)),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(AppColorState.surface2.copy(alpha = 0.6f)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = { dueDate = parsed.minusDays(1).format(fmt) }, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.ChevronLeft, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.ChevronLeft, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                     }
-                    Text(dueDate, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                    Text(dueDate, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
                     IconButton(onClick = { dueDate = parsed.plusDays(1).format(fmt) }, modifier = Modifier.size(36.dp)) {
-                        Icon(Icons.Default.ChevronRight, null, tint = TextSecondary, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.ChevronRight, null, tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                     }
                 }
 
@@ -413,16 +413,16 @@ private fun AddAssignmentDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
         }
     )
 }
 
 @Composable
 private fun assignmentFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = AssignmentPurple, unfocusedBorderColor = Slate700,
-    focusedLabelColor = AssignmentPurple, focusedTextColor = TextPrimary,
-    unfocusedTextColor = TextPrimary, cursorColor = AssignmentPurple,
+    focusedBorderColor = AssignmentPurple, unfocusedBorderColor = AppColorState.surface2,
+    focusedLabelColor = AssignmentPurple, focusedTextColor = AppColorState.textPrimary,
+    unfocusedTextColor = AppColorState.textPrimary, cursorColor = AssignmentPurple,
     focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
 )
 
@@ -440,8 +440,8 @@ private fun AssignmentField(label: String, value: String, onValueChange: (String
 @Composable
 private fun AssignmentInfoChip(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, alpha: Float) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        Icon(icon, null, tint = TextSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
-        Text(text, color = TextSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
+        Icon(icon, null, tint = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), modifier = Modifier.size(11.dp))
+        Text(text, color = AppColorState.textSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -475,7 +475,7 @@ fun StudentAssignmentScreen(
     var showPast     by remember { mutableStateOf(false) }
     var submitTarget by remember { mutableStateOf<AssignmentEntry?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().background(Slate900)) {
+    Column(modifier = Modifier.fillMaxSize().background(AppColorState.background)) {
         // Header
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -484,11 +484,11 @@ fun StudentAssignmentScreen(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = AppColorState.textPrimary)
                 }
                 Spacer(Modifier.width(4.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.assignments_student_title), color = TextPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.assignments_student_title), color = AppColorState.textPrimary, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(user.department, color = AssignmentPurple.copy(alpha = 0.8f), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium)
                 }
                 // Submitted count
@@ -501,7 +501,7 @@ fun StudentAssignmentScreen(
                 Spacer(Modifier.width(8.dp))
             }
         }
-        HorizontalDivider(color = Slate700.copy(alpha = 0.4f))
+        HorizontalDivider(color = AppColorState.surface2.copy(alpha = 0.4f))
 
         if (assignments.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -511,9 +511,9 @@ fun StudentAssignmentScreen(
                             .background(Brush.radialGradient(listOf(AssignmentPurple.copy(alpha = 0.15f), Color.Transparent))),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.AssignmentTurnedIn, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
+                        Icon(Icons.Default.AssignmentTurnedIn, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(50.dp))
                     }
-                    Text(stringResource(R.string.no_assignments_dept), color = TextSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.no_assignments_dept), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
                 }
             }
         } else {
@@ -535,7 +535,7 @@ fun StudentAssignmentScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Pending, null, tint = AssignmentPurple, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text(stringResource(R.string.upcoming_assignments), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                            Text(stringResource(R.string.upcoming_assignments), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                             Spacer(Modifier.width(8.dp))
                             Surface(shape = CircleShape, color = AssignmentPurple.copy(alpha = 0.15f)) {
                                 Text(upcoming.size.toString(), color = AssignmentPurple, modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -563,15 +563,15 @@ fun StudentAssignmentScreen(
                         Spacer(Modifier.height(6.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-                                .background(Slate800.copy(alpha = 0.5f))
+                                .background(AppColorState.surface.copy(alpha = 0.5f))
                                 .clickable { showPast = !showPast }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.History, null, tint = TextSecondary, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.History, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.past_assignments, past.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = TextSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.past_assignments, past.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                            Icon(if (showPast) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = AppColorState.textSecondary.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
                         }
                         Spacer(Modifier.height(8.dp))
                     }
@@ -615,7 +615,7 @@ fun StudentAssignmentScreen(
 private fun NextAssignmentHeroCard(assignment: AssignmentEntry, daysToNext: Long, isSubmitted: Boolean) {
     val isToday  = daysToNext == 0L
     val gradientBrush = Brush.linearGradient(
-        colors = listOf(AssignmentPurple.copy(alpha = if (isSubmitted) 0.12f else 0.28f), AssignmentBlue.copy(alpha = 0.08f), Slate800)
+        colors = listOf(AssignmentPurple.copy(alpha = if (isSubmitted) 0.12f else 0.28f), AssignmentBlue.copy(alpha = 0.08f), AppColorState.surface)
     )
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -634,7 +634,7 @@ private fun NextAssignmentHeroCard(assignment: AssignmentEntry, daysToNext: Long
                     }
                 }
                 Spacer(Modifier.height(12.dp))
-                Text(assignment.title, color = TextPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(assignment.title, color = AppColorState.textPrimary, fontWeight = FontWeight.ExtraBold, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(assignment.courseName, color = AssignmentPurple.copy(alpha = 0.7f), style = MaterialTheme.typography.labelMedium)
                 Spacer(Modifier.height(14.dp))
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -695,14 +695,14 @@ private fun StudentAssignmentCard(
         // Timeline dot
         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(28.dp)) {
             Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(statusColor.copy(alpha = alpha)), contentAlignment = Alignment.Center) {
-                if (isSubmitted) Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(Slate900))
+                if (isSubmitted) Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(AppColorState.background))
             }
         }
         Spacer(Modifier.width(8.dp))
 
         Card(
             modifier = Modifier.weight(1f),
-            colors   = CardDefaults.cardColors(containerColor = if (isOverdue) Slate800.copy(alpha = 0.6f) else Slate800),
+            colors   = CardDefaults.cardColors(containerColor = if (isOverdue) AppColorState.surface.copy(alpha = 0.6f) else AppColorState.surface),
             shape    = RoundedCornerShape(16.dp),
             border   = if (!isPast || isSubmitted) BorderStroke(1.dp, statusColor.copy(alpha = 0.22f)) else null
         ) {
@@ -734,8 +734,8 @@ private fun StudentAssignmentCard(
                         }
                     }
                     Spacer(Modifier.height(4.dp))
-                    Text(assignment.title, color = TextPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(assignment.courseName, color = TextSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
+                    Text(assignment.title, color = AppColorState.textPrimary.copy(alpha = alpha), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(assignment.courseName, color = AppColorState.textSecondary.copy(alpha = alpha * 0.8f), style = MaterialTheme.typography.labelSmall)
                     Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         AssignmentInfoChip(Icons.Default.CalendarMonth, dateDisplay, alpha)
@@ -755,7 +755,7 @@ private fun StudentAssignmentCard(
                     }
                     if (assignment.description.isNotBlank()) {
                         Spacer(Modifier.height(4.dp))
-                        Text(assignment.description, color = TextSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(assignment.description, color = AppColorState.textSecondary.copy(alpha = alpha * 0.7f), style = MaterialTheme.typography.labelSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -776,7 +776,7 @@ private fun SubmitAssignmentDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor   = Slate800,
+        containerColor   = AppColorState.surface,
         shape = RoundedCornerShape(20.dp),
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -785,15 +785,15 @@ private fun SubmitAssignmentDialog(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text(stringResource(R.string.submit_assignment), color = TextPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.submit_assignment), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
                     if (isLate) Text("Geç teslim", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
                 }
             }
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(assignment.title, color = TextPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
-                Text("${assignment.courseName} · Son teslim: ${assignment.dueDate} ${assignment.dueTime}", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(assignment.title, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                Text("${assignment.courseName} · Son teslim: ${assignment.dueDate} ${assignment.dueTime}", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 OutlinedTextField(
                     value = note, onValueChange = { note = it },
                     label = { Text(stringResource(R.string.submission_note), style = MaterialTheme.typography.labelSmall) },
@@ -814,7 +814,7 @@ private fun SubmitAssignmentDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = TextSecondary) }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
         }
     )
 }

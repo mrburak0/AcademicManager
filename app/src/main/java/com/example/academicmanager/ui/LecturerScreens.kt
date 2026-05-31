@@ -142,7 +142,7 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                             if (user.title.isNotBlank()) append("${user.title} ")
                             append(user.fullName)
                         },
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -194,7 +194,7 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
         // ── Quick Actions ─────────────────────────────────────
         Text(
             stringResource(R.string.quick_actions),
-            color = TextPrimary,
+            color = AppColorState.textPrimary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -213,6 +213,13 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                     color = Color(0xFFF59E0B),
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("attendance_entry") }
+                )
+                LecturerActionCard(
+                    label = "QR Yoklama",
+                    icon = Icons.Default.QrCode,
+                    color = Color(0xFF8B5CF6),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("qr_session") }
                 )
                 LecturerActionCard(
                     label = stringResource(R.string.exam_schedule_action),
@@ -243,7 +250,7 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
         // ── Weekly Schedule ──────────────────────────────────
         Text(
             stringResource(R.string.this_week),
-            color = TextPrimary,
+            color = AppColorState.textPrimary,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -251,7 +258,7 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
         if (myEntries.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Slate800),
+                colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
@@ -263,19 +270,19 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                     Icon(
                         Icons.Default.DateRange,
                         contentDescription = null,
-                        tint = TextSecondary.copy(alpha = 0.4f),
+                        tint = AppColorState.textSecondary.copy(alpha = 0.4f),
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(Modifier.height(12.dp))
                     Text(
                         stringResource(R.string.no_courses_assigned),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
                         stringResource(R.string.contact_admin),
-                        color = TextSecondary.copy(alpha = 0.6f),
+                        color = AppColorState.textSecondary.copy(alpha = 0.6f),
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center
                     )
@@ -313,7 +320,7 @@ private fun LecturerStatCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -323,7 +330,7 @@ private fun LecturerStatCard(
             Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
             Spacer(Modifier.height(6.dp))
             Text(value, color = color, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-            Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, lineHeight = 13.sp)
+            Text(label, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, lineHeight = 13.sp)
         }
     }
 }
@@ -371,7 +378,7 @@ private fun DaySection(day: String, entries: List<ScheduleEntry>, accentColor: C
             Spacer(Modifier.width(8.dp))
             Text(
                 entriesCountStr,
-                color = TextSecondary,
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.labelSmall
             )
         }
@@ -385,7 +392,7 @@ private fun DaySection(day: String, entries: List<ScheduleEntry>, accentColor: C
 private fun LecturerCourseCard(entry: ScheduleEntry, accentColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(14.dp)
     ) {
         Row(
@@ -403,7 +410,7 @@ private fun LecturerCourseCard(entry: ScheduleEntry, accentColor: Color) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     entry.courseName,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -417,13 +424,13 @@ private fun LecturerCourseCard(entry: ScheduleEntry, accentColor: Color) {
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     entry.timeSlot,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     entry.classroomName,
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -509,8 +516,8 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(stringResource(R.string.my_schedule), style = MaterialTheme.typography.headlineSmall, color = TextPrimary, fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.sessions_per_week, myEntries.size), color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.my_schedule), style = MaterialTheme.typography.headlineSmall, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.sessions_per_week, myEntries.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                 }
                 OutlinedButton(
                     onClick = {
@@ -550,7 +557,7 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                                 when {
                                     isSelected -> tabColor
                                     isToday    -> tabColor.copy(alpha = 0.10f)
-                                    else       -> Slate800
+                                    else       -> AppColorState.surface
                                 }
                             )
                             .then(
@@ -564,7 +571,7 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                     ) {
                         Text(
                             displayDaysShort[idx],
-                            color = if (isSelected) Color.White else if (isToday) tabColor else TextSecondary,
+                            color = if (isSelected) Color.White else if (isToday) tabColor else AppColorState.textSecondary,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal
                         )
@@ -617,7 +624,7 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                     if (dayEntries.isEmpty()) stringResource(R.string.no_sessions)
                     else if (dayEntries.size == 1) stringResource(R.string.sessions_count_one, dayEntries.size)
                     else stringResource(R.string.sessions_count, dayEntries.size),
-                    color = TextSecondary,
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -651,11 +658,11 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                 showRequestDialog = false
                 reqSelectedCourse = null; reqSelectedClass = null; reqSelectedTime = ""; reqNote = ""
             },
-            containerColor = com.example.academicmanager.ui.theme.Slate800,
+            containerColor = com.example.academicmanager.ui.theme.AppColorState.surface,
             title = { Text(stringResource(R.string.availability_dialog_title), color = EmeraldGreen, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(stringResource(R.string.availability_desc), color = com.example.academicmanager.ui.theme.TextSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.availability_desc), color = com.example.academicmanager.ui.theme.AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.CalendarToday, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
@@ -672,9 +679,9 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                             shape = RoundedCornerShape(10.dp),
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen)
                         )
-                        ExposedDropdownMenu(expanded = timeDropExpanded, onDismissRequest = { timeDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.Slate800)) {
+                        ExposedDropdownMenu(expanded = timeDropExpanded, onDismissRequest = { timeDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.AppColorState.surface)) {
                             SCHEDULE_TIME_SLOTS.forEach { slot ->
-                                DropdownMenuItem(text = { Text(slot, color = com.example.academicmanager.ui.theme.TextPrimary) }, onClick = { reqSelectedTime = slot; timeDropExpanded = false })
+                                DropdownMenuItem(text = { Text(slot, color = com.example.academicmanager.ui.theme.AppColorState.textPrimary) }, onClick = { reqSelectedTime = slot; timeDropExpanded = false })
                             }
                         }
                     }
@@ -689,9 +696,9 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                             shape = RoundedCornerShape(10.dp),
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen)
                         )
-                        ExposedDropdownMenu(expanded = courseDropExpanded, onDismissRequest = { courseDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.Slate800)) {
+                        ExposedDropdownMenu(expanded = courseDropExpanded, onDismissRequest = { courseDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.AppColorState.surface)) {
                             courses.forEach { c ->
-                                DropdownMenuItem(text = { Text("${c.courseCode} – ${c.courseName}", color = com.example.academicmanager.ui.theme.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis) }, onClick = { reqSelectedCourse = c; courseDropExpanded = false })
+                                DropdownMenuItem(text = { Text("${c.courseCode} – ${c.courseName}", color = com.example.academicmanager.ui.theme.AppColorState.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis) }, onClick = { reqSelectedCourse = c; courseDropExpanded = false })
                             }
                         }
                     }
@@ -706,9 +713,9 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                             shape = RoundedCornerShape(10.dp),
                             colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, focusedLabelColor = EmeraldGreen)
                         )
-                        ExposedDropdownMenu(expanded = classDropExpanded, onDismissRequest = { classDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.Slate800)) {
+                        ExposedDropdownMenu(expanded = classDropExpanded, onDismissRequest = { classDropExpanded = false }, modifier = Modifier.background(com.example.academicmanager.ui.theme.AppColorState.surface)) {
                             classrooms.forEach { cl ->
-                                DropdownMenuItem(text = { Text("${cl.name} ${stringResource(R.string.classroom_cap_short, cl.capacity)}", color = com.example.academicmanager.ui.theme.TextPrimary) }, onClick = { reqSelectedClass = cl; classDropExpanded = false })
+                                DropdownMenuItem(text = { Text("${cl.name} ${stringResource(R.string.classroom_cap_short, cl.capacity)}", color = com.example.academicmanager.ui.theme.AppColorState.textPrimary) }, onClick = { reqSelectedClass = cl; classDropExpanded = false })
                             }
                         }
                     }
@@ -716,10 +723,10 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
                     OutlinedTextField(
                         value = reqNote, onValueChange = { reqNote = it },
                         label = { Text(stringResource(R.string.note_label)) },
-                        placeholder = { Text(stringResource(R.string.note_hint), color = com.example.academicmanager.ui.theme.TextSecondary.copy(alpha = 0.5f)) },
+                        placeholder = { Text(stringResource(R.string.note_hint), color = com.example.academicmanager.ui.theme.AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = com.example.academicmanager.ui.theme.Slate700, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = com.example.academicmanager.ui.theme.TextSecondary, focusedTextColor = com.example.academicmanager.ui.theme.TextPrimary, unfocusedTextColor = com.example.academicmanager.ui.theme.TextPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
+                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = EmeraldGreen, unfocusedBorderColor = com.example.academicmanager.ui.theme.AppColorState.surface2, focusedLabelColor = EmeraldGreen, unfocusedLabelColor = com.example.academicmanager.ui.theme.AppColorState.textSecondary, focusedTextColor = com.example.academicmanager.ui.theme.AppColorState.textPrimary, unfocusedTextColor = com.example.academicmanager.ui.theme.AppColorState.textPrimary, cursorColor = EmeraldGreen, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent)
                     )
                 }
             },
@@ -750,7 +757,7 @@ fun LecturerCalendarScreen(authViewModel: AuthViewModel, adminViewModel: AdminVi
             },
             dismissButton = {
                 TextButton(onClick = { showRequestDialog = false; reqSelectedCourse = null; reqSelectedClass = null; reqSelectedTime = ""; reqNote = "" }) {
-                    Text(stringResource(R.string.cancel), color = com.example.academicmanager.ui.theme.TextSecondary)
+                    Text(stringResource(R.string.cancel), color = com.example.academicmanager.ui.theme.AppColorState.textSecondary)
                 }
             }
         )
@@ -773,7 +780,7 @@ private fun TimelineRow(
         // ── Time label ──────────────────────────────────────
         Text(
             timeSlot.take(5),
-            color = if (entry != null) accentColor else TextSecondary.copy(alpha = 0.40f),
+            color = if (entry != null) accentColor else AppColorState.textSecondary.copy(alpha = 0.40f),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = if (entry != null) FontWeight.Bold else FontWeight.Normal,
             modifier = Modifier
@@ -798,7 +805,7 @@ private fun TimelineRow(
                         when {
                             entry != null -> accentColor
                             hasPending    -> pendingAmber
-                            else          -> TextSecondary.copy(alpha = 0.18f)
+                            else          -> AppColorState.textSecondary.copy(alpha = 0.18f)
                         }
                     )
             )
@@ -810,7 +817,7 @@ private fun TimelineRow(
                         when {
                             entry != null -> accentColor.copy(alpha = 0.22f)
                             hasPending    -> pendingAmber.copy(alpha = 0.22f)
-                            else          -> TextSecondary.copy(alpha = 0.07f)
+                            else          -> AppColorState.textSecondary.copy(alpha = 0.07f)
                         }
                     )
             )
@@ -833,7 +840,7 @@ private fun TimelineRow(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             entry.courseName,
-                            color = TextPrimary,
+                            color = AppColorState.textPrimary,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.bodyMedium,
                             maxLines = 1,
@@ -858,13 +865,13 @@ private fun TimelineRow(
                             Icon(
                                 Icons.Default.Home,
                                 contentDescription = null,
-                                tint = TextSecondary.copy(alpha = 0.55f),
+                                tint = AppColorState.textSecondary.copy(alpha = 0.55f),
                                 modifier = Modifier.size(12.dp)
                             )
                             Spacer(Modifier.width(3.dp))
                             Text(
                                 entry.classroomName,
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -902,7 +909,7 @@ private fun TimelineRow(
                     Spacer(Modifier.width(6.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.available_awaiting), color = pendingAmber, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
-                        Text(pendingRequest.courseName, color = TextSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(pendingRequest.courseName, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -913,7 +920,7 @@ private fun TimelineRow(
                     .height(26.dp),
                 contentAlignment = Alignment.CenterStart
             ) {
-                HorizontalDivider(color = TextSecondary.copy(alpha = 0.05f), thickness = 1.dp)
+                HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.05f), thickness = 1.dp)
             }
         }
     }
@@ -1130,11 +1137,11 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 }
                 Spacer(Modifier.width(14.dp))
                 Column {
-                    Text(stringResource(R.string.avail_screen_title), color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.avail_screen_title), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                     Text(
                         if (isFirstTime) stringResource(R.string.avail_first_time_hint)
                         else stringResource(R.string.avail_update_hint),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -1155,7 +1162,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     Spacer(Modifier.width(8.dp))
                     Column {
                         Text(stringResource(R.string.admin_note_label), color = ErrorRed, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelSmall)
-                        Text("\"${rejected.adminNote}\"", color = TextPrimary, style = MaterialTheme.typography.bodySmall)
+                        Text("\"${rejected.adminNote}\"", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -1190,14 +1197,14 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
         // ── Haftalık Grid (Interactive) ────────────────────────
         Text(
             stringResource(R.string.avail_select_slots),
-            color = TextPrimary,
+            color = AppColorState.textPrimary,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleSmall
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Slate800),
+            colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(0.dp)) {
@@ -1260,7 +1267,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     ) {
                         Text(
                             slot.take(5),
-                            color = TextSecondary.copy(alpha = 0.6f),
+                            color = AppColorState.textSecondary.copy(alpha = 0.6f),
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 10.sp,
                             modifier = Modifier.width(58.dp)
@@ -1273,8 +1280,8 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                                     .height(34.dp)
                                     .padding(horizontal = 2.dp)
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(if (isSelected) EmeraldGreen else Slate700)
-                                    .border(1.dp, if (isSelected) EmeraldGreen else TextSecondary.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                                    .background(if (isSelected) EmeraldGreen else AppColorState.surface2)
+                                    .border(1.dp, if (isSelected) EmeraldGreen else AppColorState.textSecondary.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
                                     .clickable { toggleSlot(dayIdx, slotIdx) },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -1302,8 +1309,8 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 OutlinedButton(
                     onClick = { selectedSlots = emptyMap() },
                     modifier = Modifier.weight(0.35f),
-                    border = BorderStroke(1.dp, TextSecondary.copy(alpha = 0.3f)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary),
+                    border = BorderStroke(1.dp, AppColorState.textSecondary.copy(alpha = 0.3f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColorState.textSecondary),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(Icons.Default.Clear, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -1335,7 +1342,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = when {
-                        totalSelected == 0         -> TextSecondary.copy(alpha = 0.3f)
+                        totalSelected == 0         -> AppColorState.textSecondary.copy(alpha = 0.3f)
                         isFirstTime                -> Color(0xFF6366F1)  // mor — ilk gönderim
                         else                       -> EmeraldGreen
                     }
@@ -1372,7 +1379,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
     if (showFirstTimeConfirm) {
         AlertDialog(
             onDismissRequest = { showFirstTimeConfirm = false },
-            containerColor = Slate800,
+            containerColor = AppColorState.surface,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.EventAvailable, contentDescription = null, tint = Color(0xFF6366F1), modifier = Modifier.size(22.dp))
@@ -1384,12 +1391,12 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
                         stringResource(R.string.avail_submit_msg1),
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         stringResource(R.string.avail_submit_msg2),
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                     Row(
@@ -1435,7 +1442,7 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             },
             dismissButton = {
                 TextButton(onClick = { showFirstTimeConfirm = false }) {
-                    Text(stringResource(R.string.cancel), color = TextSecondary)
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }
         )
@@ -1470,7 +1477,7 @@ private fun AvailabilityGridReadOnly(
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     slot.take(5),
-                    color = TextSecondary.copy(alpha = 0.5f),
+                    color = AppColorState.textSecondary.copy(alpha = 0.5f),
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 9.sp,
                     modifier = Modifier.width(48.dp)
@@ -1483,7 +1490,7 @@ private fun AvailabilityGridReadOnly(
                             .height(26.dp)
                             .padding(horizontal = 1.dp)
                             .clip(RoundedCornerShape(5.dp))
-                            .background(if (selected) accentColor.copy(alpha = 0.8f) else Slate700),
+                            .background(if (selected) accentColor.copy(alpha = 0.8f) else AppColorState.surface2),
                         contentAlignment = Alignment.Center
                     ) {
                         if (selected) {

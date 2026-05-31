@@ -33,6 +33,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.res.stringResource
+import com.example.academicmanager.R
 import com.example.academicmanager.data.*
 import com.example.academicmanager.ui.theme.*
 import com.example.academicmanager.ui.viewmodels.AdminViewModel
@@ -63,14 +65,14 @@ fun ImportIdleScreen(
         item {
             Column {
                 Text(
-                    "Data Import",
+                    stringResource(R.string.import_data_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Upload courses and lecturers via Excel spreadsheet",
-                    color = TextSecondary,
+                    stringResource(R.string.import_data_subtitle),
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -109,11 +111,12 @@ fun ImportIdleScreen(
         // ── Courses import card ──────────────────────────────
         item {
             ImportTypeCard(
-                title = "Courses",
-                subtitle = "Import your course catalog",
+                title = stringResource(R.string.tab_courses_name),
+                subtitle = stringResource(R.string.tab_courses_sub),
                 accentColor = IndigoAccent,
                 expectedColumns = listOf("Course Code", "Course Name", "Department"),
                 note = null,
+                icon = Icons.AutoMirrored.Filled.List,
                 onDownload = onDownloadCourses,
                 onImport = onImportCourses
             )
@@ -122,11 +125,12 @@ fun ImportIdleScreen(
         // ── Lecturers import card ────────────────────────────
         item {
             ImportTypeCard(
-                title = "Lecturers",
-                subtitle = "Import faculty members",
+                title = stringResource(R.string.tab_lecturers_name),
+                subtitle = stringResource(R.string.tab_lecturers_sub),
                 accentColor = EmeraldGreen,
                 expectedColumns = listOf("Name", "Title", "Working Type", "Department"),
-                note = "Login credentials (username + 6-char password) are auto-generated per lecturer.",
+                note = stringResource(R.string.lecturer_creds_auto),
+                icon = Icons.Default.Person,
                 onDownload = onDownloadLecturers,
                 onImport = onImportLecturers
             )
@@ -140,13 +144,13 @@ fun ImportIdleScreen(
 private fun WorkflowStepsCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "How it works",
-                color = TextSecondary,
+                stringResource(R.string.how_it_works),
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -155,13 +159,13 @@ private fun WorkflowStepsCard() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                StepBubble(number = "1", label = "Download\nTemplate", color = EmeraldGreen)
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(TextSecondary.copy(alpha = 0.2f)))
-                StepBubble(number = "2", label = "Fill in\nData", color = IndigoAccent)
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(TextSecondary.copy(alpha = 0.2f)))
-                StepBubble(number = "3", label = "Import\n& Preview", color = Color(0xFFF59E0B))
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(TextSecondary.copy(alpha = 0.2f)))
-                StepBubble(number = "4", label = "Save to\nFirebase", color = Color(0xFF8B5CF6))
+                StepBubble(number = "1", label = stringResource(R.string.step_download), color = EmeraldGreen)
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(AppColorState.textSecondary.copy(alpha = 0.2f)))
+                StepBubble(number = "2", label = stringResource(R.string.step_fill), color = IndigoAccent)
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(AppColorState.textSecondary.copy(alpha = 0.2f)))
+                StepBubble(number = "3", label = stringResource(R.string.step_import), color = Color(0xFFF59E0B))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(AppColorState.textSecondary.copy(alpha = 0.2f)))
+                StepBubble(number = "4", label = stringResource(R.string.step_save), color = Color(0xFF8B5CF6))
             }
         }
     }
@@ -190,7 +194,7 @@ private fun StepBubble(number: String, label: String, color: Color) {
         Spacer(Modifier.height(6.dp))
         Text(
             label,
-            color = TextSecondary,
+            color = AppColorState.textSecondary,
             style = MaterialTheme.typography.labelSmall,
             textAlign = TextAlign.Center,
             lineHeight = 13.sp
@@ -205,12 +209,13 @@ private fun ImportTypeCard(
     accentColor: Color,
     expectedColumns: List<String>,
     note: String?,
+    icon: androidx.compose.ui.graphics.vector.ImageVector = Icons.AutoMirrored.Filled.List,
     onDownload: () -> Unit,
     onImport: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -224,46 +229,37 @@ private fun ImportTypeCard(
                         .background(accentColor.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (title == "Courses") {
-                        Icon(
-                            Icons.AutoMirrored.Filled.List,
-                            contentDescription = null,
-                            tint = accentColor,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    } else {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            tint = accentColor,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
                 Spacer(Modifier.width(14.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         title,
-                        color = TextPrimary,
+                        color = AppColorState.textPrimary,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         subtitle,
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-            HorizontalDivider(color = TextSecondary.copy(alpha = 0.08f))
+            HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.08f))
             Spacer(Modifier.height(14.dp))
 
             // ── Expected columns ──────────────────────────────
             Text(
-                "EXCEL COLUMNS",
-                color = TextSecondary.copy(alpha = 0.7f),
+                stringResource(R.string.excel_columns_label),
+                color = AppColorState.textSecondary.copy(alpha = 0.7f),
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 1.sp
             )
@@ -317,7 +313,7 @@ private fun ImportTypeCard(
                     Spacer(Modifier.width(6.dp))
                     Text(
                         note,
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.labelSmall,
                         lineHeight = 16.sp
                     )
@@ -344,7 +340,7 @@ private fun ImportTypeCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        "Template",
+                        stringResource(R.string.btn_template),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -364,7 +360,7 @@ private fun ImportTypeCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        "Import .xlsx",
+                        stringResource(R.string.btn_import_xlsx),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -392,15 +388,15 @@ fun ImportLoadingScreen() {
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "Parsing Excel file",
-                    color = TextPrimary,
+                    stringResource(R.string.importing_excel),
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.titleSmall
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Please wait...",
-                    color = TextSecondary,
+                    stringResource(R.string.please_wait),
+                    color = AppColorState.textSecondary,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -420,7 +416,7 @@ fun ImportPreviewScreen(
 ) {
     val isLecturers = state.type == ImportType.LECTURERS
     val accentColor = if (isLecturers) EmeraldGreen else IndigoAccent
-    val typeLabel = if (isLecturers) "Lecturers" else "Courses"
+    val typeLabel = if (isLecturers) stringResource(R.string.tab_lecturers_name) else stringResource(R.string.tab_courses_name)
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -439,15 +435,15 @@ fun ImportPreviewScreen(
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    "Verify $typeLabel",
+                    stringResource(R.string.preview_verify, typeLabel),
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.width(10.dp))
                 Badge(containerColor = accentColor.copy(alpha = 0.2f)) {
                     Text(
-                        "${state.items.size} rows",
+                        stringResource(R.string.preview_rows, state.items.size),
                         color = accentColor,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.labelSmall,
@@ -457,13 +453,13 @@ fun ImportPreviewScreen(
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                "Review all entries carefully before uploading to Firebase.",
-                color = TextSecondary,
+                stringResource(R.string.preview_review_msg),
+                color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.bodySmall
             )
         }
 
-        HorizontalDivider(color = TextSecondary.copy(alpha = 0.08f))
+        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.08f))
 
         // ── Item list ─────────────────────────────────────────
         LazyColumn(
@@ -485,7 +481,7 @@ fun ImportPreviewScreen(
         }
 
         // ── Bottom actions ────────────────────────────────────
-        HorizontalDivider(color = TextSecondary.copy(alpha = 0.08f))
+        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.08f))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -503,7 +499,7 @@ fun ImportPreviewScreen(
             ) {
                 Icon(Icons.Default.Close, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Discard", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.btn_discard), fontWeight = FontWeight.SemiBold)
             }
             Button(
                 onClick = onSave,
@@ -516,7 +512,7 @@ fun ImportPreviewScreen(
                 Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Save ${state.items.size} ${typeLabel}",
+                    stringResource(R.string.btn_save_count, state.items.size, typeLabel),
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -528,7 +524,7 @@ fun ImportPreviewScreen(
 private fun LecturerPreviewCard(index: Int, lecturer: Lecturer, accentColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(14.dp)
     ) {
         Row(
@@ -538,7 +534,7 @@ private fun LecturerPreviewCard(index: Int, lecturer: Lecturer, accentColor: Col
             // Row number
             Text(
                 "$index",
-                color = TextSecondary.copy(alpha = 0.5f),
+                color = AppColorState.textSecondary.copy(alpha = 0.5f),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.width(20.dp)
             )
@@ -565,7 +561,7 @@ private fun LecturerPreviewCard(index: Int, lecturer: Lecturer, accentColor: Col
                         if (lecturer.title.isNotBlank()) append("${lecturer.title} ")
                         append(lecturer.fullName)
                     },
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -573,7 +569,7 @@ private fun LecturerPreviewCard(index: Int, lecturer: Lecturer, accentColor: Col
                 if (lecturer.workingType.isNotBlank()) {
                     Text(
                         lecturer.workingType,
-                        color = TextSecondary,
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -631,7 +627,7 @@ private fun CredentialChip(
 private fun CoursePreviewCard(index: Int, course: Course, accentColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(14.dp)
     ) {
         Row(
@@ -641,7 +637,7 @@ private fun CoursePreviewCard(index: Int, course: Course, accentColor: Color) {
             // Row number
             Text(
                 "$index",
-                color = TextSecondary.copy(alpha = 0.5f),
+                color = AppColorState.textSecondary.copy(alpha = 0.5f),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.width(20.dp)
             )
@@ -664,7 +660,7 @@ private fun CoursePreviewCard(index: Int, course: Course, accentColor: Color) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     course.courseName,
-                    color = TextPrimary,
+                    color = AppColorState.textPrimary,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -685,17 +681,17 @@ private fun CoursePreviewCard(index: Int, course: Course, accentColor: Color) {
 private fun SimplePreviewRow(index: Int, text: String, accentColor: Color) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Slate800),
+        colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 "$index",
-                color = TextSecondary.copy(alpha = 0.5f),
+                color = AppColorState.textSecondary.copy(alpha = 0.5f),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.width(24.dp)
             )
-            Text(text, color = TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text, color = AppColorState.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -715,7 +711,7 @@ fun CredentialSheetScreen(
         val text = credentials.joinToString("\n") { (u, p) -> "$u  →  $p" }
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         cm.setPrimaryClip(ClipData.newPlainText("credentials", text))
-        Toast.makeText(context, "Tüm şifreler kopyalandı!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.copied_all), Toast.LENGTH_SHORT).show()
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -739,14 +735,14 @@ fun CredentialSheetScreen(
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(
-                        "Giriş Bilgileri",
+                        stringResource(R.string.cred_title),
                         style = MaterialTheme.typography.titleLarge,
                         color = EmeraldGreen,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "${credentials.size} hoca eklendi — şifreler sadece bir kez gösterilir!",
-                        color = TextSecondary,
+                        stringResource(R.string.cred_subtitle, credentials.size),
+                        color = AppColorState.textSecondary,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -763,14 +759,14 @@ fun CredentialSheetScreen(
                 Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Bu şifreler veritabanında hash'li saklanır. Lütfen not alın veya hemen kopyalayın.",
+                    stringResource(R.string.cred_warning),
                     color = Color(0xFFF59E0B),
                     style = MaterialTheme.typography.labelSmall
                 )
             }
         }
 
-        HorizontalDivider(color = TextSecondary.copy(alpha = 0.08f))
+        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.08f))
 
         // ── Credential List ───────────────────────────────────
         LazyColumn(
@@ -783,7 +779,7 @@ fun CredentialSheetScreen(
             itemsIndexed(credentials) { index, (username, password) ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Row(
@@ -843,10 +839,10 @@ fun CredentialSheetScreen(
                             onClick = {
                                 val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                 cm.setPrimaryClip(ClipData.newPlainText("cred", "$username  →  $password"))
-                                Toast.makeText(context, "Kopyalandı: $username", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.copied_one, username), Toast.LENGTH_SHORT).show()
                             }
                         ) {
-                            Icon(Icons.Default.ContentCopy, contentDescription = "Kopyala", tint = TextSecondary, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.ContentCopy, contentDescription = stringResource(R.string.copy), tint = AppColorState.textSecondary, modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -854,7 +850,7 @@ fun CredentialSheetScreen(
         }
 
         // ── Bottom actions ─────────────────────────────────────
-        HorizontalDivider(color = TextSecondary.copy(alpha = 0.08f))
+        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.08f))
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -870,7 +866,7 @@ fun CredentialSheetScreen(
             ) {
                 Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Tümünü Kopyala", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.btn_copy_all), fontWeight = FontWeight.SemiBold)
             }
             Button(
                 onClick = onDone,
@@ -880,7 +876,7 @@ fun CredentialSheetScreen(
             ) {
                 Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Anladım, Devam Et", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.btn_got_it), fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -904,8 +900,8 @@ fun CourseImportTab(
     ) {
         item {
             Column {
-                Text("Ders İçe Aktar", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
-                Text("Excel dosyasından ders kataloğunu yükle", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.course_import_title), style = MaterialTheme.typography.titleMedium, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.course_import_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
             }
         }
         if (errorMsg != null) {
@@ -914,11 +910,12 @@ fun CourseImportTab(
         item { WorkflowStepsCard() }
         item {
             ImportTypeCard(
-                title = "Dersler",
-                subtitle = "Ders kataloğunu içe aktar",
+                title = stringResource(R.string.tab_courses_name),
+                subtitle = stringResource(R.string.tab_courses_sub),
                 accentColor = IndigoAccent,
                 expectedColumns = listOf("Course Code", "Course Name", "Department"),
                 note = null,
+                icon = Icons.AutoMirrored.Filled.List,
                 onDownload = { importVM.downloadTemplate(context, ImportType.COURSES) },
                 onImport   = { onLaunch(ImportType.COURSES) }
             )
@@ -940,8 +937,8 @@ fun LecturerImportTab(
     ) {
         item {
             Column {
-                Text("Öğretmen İçe Aktar", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
-                Text("Excel dosyasından öğretim görevlilerini yükle", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.lecturer_import_title), style = MaterialTheme.typography.titleMedium, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.lecturer_import_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
             }
         }
         if (errorMsg != null) {
@@ -950,11 +947,12 @@ fun LecturerImportTab(
         item { WorkflowStepsCard() }
         item {
             ImportTypeCard(
-                title = "Öğretmenler",
-                subtitle = "Öğretim görevlilerini içe aktar",
+                title = stringResource(R.string.tab_lecturers_name),
+                subtitle = stringResource(R.string.tab_lecturers_sub),
                 accentColor = EmeraldGreen,
                 expectedColumns = listOf("Name", "Title", "Working Type", "Department"),
-                note = "Giriş bilgileri (kullanıcı adı + 6 karakterli şifre) otomatik oluşturulur.",
+                note = stringResource(R.string.lecturer_creds_auto),
+                icon = Icons.Default.Person,
                 onDownload = { importVM.downloadTemplate(context, ImportType.LECTURERS) },
                 onImport   = { onLaunch(ImportType.LECTURERS) }
             )
@@ -988,8 +986,8 @@ fun ClassroomDataTab(
         // Başlık
         item {
             Column {
-                Text("Sınıf Yönetimi", style = MaterialTheme.typography.titleMedium, color = TextPrimary, fontWeight = FontWeight.Bold)
-                Text("Manuel ekle veya Excel ile içe aktar", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.classroom_mgmt_title), style = MaterialTheme.typography.titleMedium, color = AppColorState.textPrimary, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.classroom_mgmt_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
             }
         }
 
@@ -997,7 +995,7 @@ fun ClassroomDataTab(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors   = CardDefaults.cardColors(containerColor = Slate800),
+                colors   = CardDefaults.cardColors(containerColor = AppColorState.surface),
                 shape    = RoundedCornerShape(18.dp)
             ) {
                 Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -1007,22 +1005,22 @@ fun ClassroomDataTab(
                             contentAlignment = Alignment.Center
                         ) { Icon(Icons.Default.Add, null, tint = accentColor, modifier = Modifier.size(18.dp)) }
                         Spacer(Modifier.width(10.dp))
-                        Text("Manuel Sınıf Ekle", color = TextPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.manual_classroom_add_btn), color = AppColorState.textPrimary, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                     }
 
                     // Sınıf adı
                     OutlinedTextField(
                         value = roomName,
                         onValueChange = { roomName = it },
-                        label = { Text("Sınıf Adı (Örn. A-101, Lab-2)") },
-                        placeholder = { Text("Metin girin", color = TextSecondary.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.classroom_name_ex)) },
+                        placeholder = { Text(stringResource(R.string.enter_text_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
-                            focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = accentColor, unfocusedBorderColor = AppColorState.surface2,
+                            focusedLabelColor = accentColor, unfocusedLabelColor = AppColorState.textSecondary,
+                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                             cursorColor = accentColor, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
                     )
@@ -1031,16 +1029,16 @@ fun ClassroomDataTab(
                     OutlinedTextField(
                         value = capacityText,
                         onValueChange = { capacityText = it.filter { c -> c.isDigit() }.take(4) },
-                        label = { Text("Kapasite (1–2000)") },
-                        placeholder = { Text("Sayı girin", color = TextSecondary.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.capacity_ex)) },
+                        placeholder = { Text(stringResource(R.string.enter_number_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
-                            focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                            focusedBorderColor = accentColor, unfocusedBorderColor = AppColorState.surface2,
+                            focusedLabelColor = accentColor, unfocusedLabelColor = AppColorState.textSecondary,
+                            focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                             cursorColor = accentColor, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                         )
                     )
@@ -1050,21 +1048,21 @@ fun ClassroomDataTab(
                         OutlinedTextField(
                             value = ClassroomType.displayName(roomType),
                             onValueChange = {}, readOnly = true,
-                            label = { Text("Sınıf Tipi") },
+                            label = { Text(stringResource(R.string.classroom_type_label)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded) },
                             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = accentColor, unfocusedBorderColor = Slate700,
-                                focusedLabelColor = accentColor, unfocusedLabelColor = TextSecondary,
-                                focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
+                                focusedBorderColor = accentColor, unfocusedBorderColor = AppColorState.surface2,
+                                focusedLabelColor = accentColor, unfocusedLabelColor = AppColorState.textSecondary,
+                                focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary,
                                 focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent
                             )
                         )
-                        ExposedDropdownMenu(expanded = typeExpanded, onDismissRequest = { typeExpanded = false }, modifier = Modifier.background(Slate800)) {
+                        ExposedDropdownMenu(expanded = typeExpanded, onDismissRequest = { typeExpanded = false }, modifier = Modifier.background(AppColorState.surface)) {
                             ClassroomType.all.forEach { t ->
                                 DropdownMenuItem(
-                                    text = { Text(ClassroomType.displayName(t), color = TextPrimary) },
+                                    text = { Text(ClassroomType.displayName(t), color = AppColorState.textPrimary) },
                                     onClick = { roomType = t; typeExpanded = false }
                                 )
                             }
@@ -1075,12 +1073,12 @@ fun ClassroomDataTab(
                         onClick = {
                             val cap = capacityText.toIntOrNull() ?: 0
                             when {
-                                roomName.isBlank() -> Toast.makeText(context, "Sınıf adı boş olamaz", Toast.LENGTH_SHORT).show()
-                                cap < 1 || cap > 2000 -> Toast.makeText(context, "Kapasite 1–2000 arasında olmalı", Toast.LENGTH_SHORT).show()
+                                roomName.isBlank() -> Toast.makeText(context, context.getString(R.string.room_name_empty), Toast.LENGTH_SHORT).show()
+                                cap < 1 || cap > 2000 -> Toast.makeText(context, context.getString(R.string.capacity_range_error), Toast.LENGTH_SHORT).show()
                                 else -> {
                                     adminVM.addClassroom(roomName.trim(), cap, roomType)
+                                    Toast.makeText(context, context.getString(R.string.classroom_added_toast), Toast.LENGTH_SHORT).show()
                                     roomName = ""; capacityText = ""
-                                    Toast.makeText(context, "Sınıf eklendi: ${roomName.trim().ifBlank { "OK" }}", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
@@ -1090,7 +1088,7 @@ fun ClassroomDataTab(
                     ) {
                         Icon(Icons.Default.Add, null, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Sınıfı Kaydet", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.btn_save_room), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -1099,11 +1097,12 @@ fun ClassroomDataTab(
         // Excel import kartı
         item {
             ImportTypeCard(
-                title = "Sınıflar (Excel)",
-                subtitle = "Excel dosyasından toplu sınıf ekle",
+                title = stringResource(R.string.classrooms_excel_title),
+                subtitle = stringResource(R.string.classrooms_excel_subtitle),
                 accentColor = accentColor,
                 expectedColumns = listOf("Name", "Capacity", "Type"),
-                note = "Type sütunu: LECTURE, LAB veya COMPUTER_LAB değerlerinden biri olmalı.",
+                note = stringResource(R.string.classroom_type_note),
+                icon = Icons.Default.MeetingRoom,
                 onDownload = { importVM.downloadClassroomTemplate(context) },
                 onImport   = { onLaunch(ImportType.CLASSROOMS) }
             )
@@ -1113,7 +1112,7 @@ fun ClassroomDataTab(
         if (classrooms.isNotEmpty()) {
             item {
                 Text(
-                    "Kayıtlı Sınıflar (${classrooms.size})",
+                    stringResource(R.string.registered_classrooms, classrooms.size),
                     color = accentColor, fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(top = 4.dp)
@@ -1123,7 +1122,7 @@ fun ClassroomDataTab(
                 val bookingCount = scheduleEntries.count { it.classroomName == classroom.name }
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Slate800),
+                    colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1136,13 +1135,13 @@ fun ClassroomDataTab(
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(classroom.name, color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                                Text(classroom.name, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold)
                                 Spacer(Modifier.width(8.dp))
                                 Box(Modifier.clip(RoundedCornerShape(5.dp)).background(accentColor.copy(alpha = 0.15f)).padding(horizontal = 6.dp, vertical = 2.dp)) {
                                     Text(ClassroomType.displayName(classroom.classroomType), color = accentColor, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                                 }
                             }
-                            Text("Kapasite: ${classroom.capacity} · $bookingCount rezervasyon", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.capacity_bookings, classroom.capacity, bookingCount), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
                         }
                         var showDel by remember { mutableStateOf(false) }
                         IconButton(onClick = { showDel = true }, modifier = Modifier.size(32.dp)) {
@@ -1151,13 +1150,13 @@ fun ClassroomDataTab(
                         if (showDel) {
                             AlertDialog(
                                 onDismissRequest = { showDel = false },
-                                containerColor = Slate800,
-                                title = { Text("Sınıfı Sil", color = ErrorRed) },
-                                text  = { Text("${classroom.name} sınıfını silmek istiyor musunuz?", color = TextPrimary) },
+                                containerColor = AppColorState.surface,
+                                title = { Text(stringResource(R.string.delete_classroom_title), color = ErrorRed) },
+                                text  = { Text(stringResource(R.string.delete_classroom_msg, classroom.name), color = AppColorState.textPrimary) },
                                 confirmButton = {
-                                    Button(onClick = { adminVM.deleteClassroom(classroom.id); showDel = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text("Sil") }
+                                    Button(onClick = { adminVM.deleteClassroom(classroom.id); showDel = false }, colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)) { Text(stringResource(R.string.delete)) }
                                 },
-                                dismissButton = { TextButton(onClick = { showDel = false }) { Text("İptal", color = TextSecondary) } }
+                                dismissButton = { TextButton(onClick = { showDel = false }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) } }
                             )
                         }
                     }
@@ -1170,8 +1169,8 @@ fun ClassroomDataTab(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(Icons.Default.MeetingRoom, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
-                        Text("Henüz sınıf eklenmedi", color = TextSecondary)
+                        Icon(Icons.Default.MeetingRoom, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(48.dp))
+                        Text(stringResource(R.string.no_classrooms), color = AppColorState.textSecondary)
                     }
                 }
             }

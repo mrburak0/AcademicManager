@@ -51,7 +51,16 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.storage)
     implementation(libs.firebase.common.ktx)
+
+    // QR Kod oluşturma (ZXing core)
+    implementation("com.google.zxing:core:3.5.3")
+    // QR Kod tarama (ZXing Android)
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0") { isTransitive = false }
+    // Compose izin yönetimi
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
 
     // Navigation Compose
     implementation(libs.androidx.navigation.compose)

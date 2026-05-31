@@ -43,6 +43,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private val CAL_DAYS  = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+// These are only for PDF export (non-composable context); UI uses calDaysFull/calDaysShort composable helpers
 private val CAL_DAYS_TR = listOf("Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma")
 private val CAL_DAYS_TR_SHORT = listOf("Pzt", "Sal", "Çar", "Per", "Cum")
 private val CAL_SLOTS = listOf(
@@ -55,6 +57,24 @@ private val PALETTE = listOf(
     Color(0xFF6366F1), Color(0xFF10B981), Color(0xFFF59E0B), Color(0xFFEF4444),
     Color(0xFF8B5CF6), Color(0xFF06B6D4), Color(0xFFF97316), Color(0xFF84CC16),
     Color(0xFFEC4899), Color(0xFF14B8A6)
+)
+
+@Composable
+private fun calDaysFull() = listOf(
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_monday),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_tuesday),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_wednesday),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_thursday),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_friday)
+)
+
+@Composable
+private fun calDaysShort() = listOf(
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_mon),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_tue),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_wed),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_thu),
+    androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.day_fri)
 )
 
 private fun lecturerColor(name: String, all: List<String>): Color {
@@ -92,8 +112,8 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
             TopAppBar(
                 title = {
                     Column {
-                        Text("Haftalık Takvim", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-                        Text("${filteredEntries.size} ders gösteriliyor", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.schedule_calendar_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium, color = AppColorState.textPrimary)
+                        Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.schedule_showing_count, filteredEntries.size), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 },
                 navigationIcon = {
@@ -113,7 +133,7 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
                                 isPdfLoading = false
                                 Toast.makeText(
                                     context,
-                                    if (ok) "Takvim PDF olarak kaydedildi" else "PDF oluşturulamadı",
+                                    if (ok) context.getString(com.example.academicmanager.R.string.calendar_pdf_ok) else context.getString(com.example.academicmanager.R.string.calendar_pdf_err),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
@@ -123,11 +143,11 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
                         if (isPdfLoading) {
                             CircularProgressIndicator(modifier = Modifier.size(20.dp), color = EmeraldGreen, strokeWidth = 2.dp)
                         } else {
-                            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF İndir", tint = EmeraldGreen)
+                            Icon(Icons.Default.PictureAsPdf, contentDescription = androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.pdf_export_btn), tint = EmeraldGreen)
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = TextPrimary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = AppColorState.textPrimary)
             )
         }
     ) { innerPadding ->
@@ -143,26 +163,26 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 OutlinedTextField(
-                    value = selectedLecturer ?: "Tüm Hocalar",
+                    value = selectedLecturer ?: androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.filter_all_lecturers),
                     onValueChange = {},
                     readOnly = true,
-                    label = { Text("Hoca Filtresi", color = TextSecondary) },
+                    label = { Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.filter_lecturer), color = AppColorState.textSecondary) },
                     leadingIcon = { Icon(Icons.Default.FilterList, null, tint = EmeraldGreen, modifier = Modifier.size(18.dp)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = lecturerDropdown) },
                     modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = EmeraldGreen, unfocusedBorderColor = Slate700,
-                        focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary
+                        focusedBorderColor = EmeraldGreen, unfocusedBorderColor = AppColorState.surface2,
+                        focusedTextColor = AppColorState.textPrimary, unfocusedTextColor = AppColorState.textPrimary
                     )
                 )
                 ExposedDropdownMenu(
                     expanded = lecturerDropdown,
                     onDismissRequest = { lecturerDropdown = false },
-                    modifier = Modifier.background(Slate800)
+                    modifier = Modifier.background(AppColorState.surface)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Tüm Hocalar", color = EmeraldGreen, fontWeight = FontWeight.SemiBold) },
+                        text = { Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.filter_all_lecturers), color = EmeraldGreen, fontWeight = FontWeight.SemiBold) },
                         onClick = { selectedLecturer = null; lecturerDropdown = false }
                     )
                     allLecturerNames.forEach { name ->
@@ -172,7 +192,7 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Box(Modifier.size(10.dp).clip(CircleShape).background(color))
                                     Spacer(Modifier.width(8.dp))
-                                    Text(name, color = TextPrimary)
+                                    Text(name, color = AppColorState.textPrimary)
                                 }
                             },
                             onClick = { selectedLecturer = name; lecturerDropdown = false }
@@ -191,9 +211,9 @@ fun ScheduleCalendarScreen(adminVM: AdminViewModel, navController: NavController
                 if (filteredEntries.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Icon(Icons.Default.CalendarToday, null, tint = TextSecondary.copy(alpha = 0.4f), modifier = Modifier.size(64.dp))
-                            Text("Gösterilecek ders yok", color = TextSecondary, style = MaterialTheme.typography.bodyLarge)
-                            Text("Demo veriyi yükleyin veya ders atayın.", color = TextSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                            Icon(Icons.Default.CalendarToday, null, tint = AppColorState.textSecondary.copy(alpha = 0.4f), modifier = Modifier.size(64.dp))
+                            Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.no_courses_to_show), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodyLarge)
+                            Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.load_demo_or_assign), color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 } else {
@@ -240,29 +260,31 @@ private val SLOT_HEIGHT:    Dp = 88.dp
 private fun WeeklyCalendarGrid(entries: List<ScheduleEntry>, allNames: List<String>) {
     val hScroll = rememberScrollState()
     val vScroll = rememberScrollState()
+    val daysFull  = calDaysFull()
+    val daysShort = calDaysShort()
 
     Column {
         // Sticky gün başlıkları (yatay kaydırılıyor ama dikey sabit)
         Row(modifier = Modifier.horizontalScroll(hScroll)) {
             Box(Modifier.width(TIME_COL_WIDTH)) // boş köşe
-            CAL_DAYS.forEachIndexed { i, day ->
+            CAL_DAYS.forEachIndexed { i, _ ->
                 Box(
                     modifier = Modifier
                         .width(DAY_COL_WIDTH)
-                        .background(Slate800)
+                        .background(AppColorState.surface)
                         .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            CAL_DAYS_TR_SHORT[i],
+                            daysShort[i],
                             color = PALETTE[i % PALETTE.size],
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.labelMedium
                         )
                         Text(
-                            CAL_DAYS_TR[i],
-                            color = TextSecondary,
+                            daysFull[i],
+                            color = AppColorState.textSecondary,
                             style = MaterialTheme.typography.labelSmall,
                             fontSize = 10.sp
                         )
@@ -271,7 +293,7 @@ private fun WeeklyCalendarGrid(entries: List<ScheduleEntry>, allNames: List<Stri
             }
         }
 
-        HorizontalDivider(color = TextSecondary.copy(alpha = 0.15f))
+        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.15f))
 
         // Zaman dilimleri + hücreler (her iki yönde kaydırılabilir)
         Box(
@@ -288,13 +310,13 @@ private fun WeeklyCalendarGrid(entries: List<ScheduleEntry>, allNames: List<Stri
                             modifier = Modifier
                                 .width(TIME_COL_WIDTH)
                                 .height(SLOT_HEIGHT)
-                                .background(Slate800.copy(alpha = 0.6f))
+                                .background(AppColorState.surface.copy(alpha = 0.6f))
                                 .padding(horizontal = 4.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 slot.take(5),
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 10.sp,
@@ -324,7 +346,7 @@ private fun CalendarCell(entries: List<ScheduleEntry>, slot: String, allNames: L
         modifier = Modifier
             .width(DAY_COL_WIDTH)
             .height(SLOT_HEIGHT)
-            .border(0.5.dp, TextSecondary.copy(alpha = 0.08f))
+            .border(0.5.dp, AppColorState.textSecondary.copy(alpha = 0.08f))
             .background(if (entries.isEmpty()) Color.Transparent else Color.Transparent)
             .padding(3.dp)
     ) {
@@ -356,7 +378,7 @@ private fun CalendarCell(entries: List<ScheduleEntry>, slot: String, allNames: L
                             )
                             Text(
                                 entry.lecturerName.split(" ").lastOrNull() ?: entry.lecturerName,
-                                color = TextSecondary,
+                                color = AppColorState.textSecondary,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontSize = 9.sp,
                                 maxLines = 1,
@@ -376,7 +398,7 @@ private fun CalendarCell(entries: List<ScheduleEntry>, slot: String, allNames: L
                                     Box(
                                         Modifier.clip(RoundedCornerShape(3.dp)).background(color.copy(alpha = 0.3f)).padding(horizontal = 3.dp, vertical = 1.dp)
                                     ) {
-                                        Text("LAB", color = color, fontSize = 7.sp, fontWeight = FontWeight.Bold)
+                                        Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.session_lab), color = color, fontSize = 7.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -384,7 +406,7 @@ private fun CalendarCell(entries: List<ScheduleEntry>, slot: String, allNames: L
                     }
                 }
                 if (entries.size > 2) {
-                    Text("+${entries.size - 2} daha", color = TextSecondary, fontSize = 8.sp, modifier = Modifier.padding(start = 4.dp))
+                    Text(androidx.compose.ui.res.stringResource(com.example.academicmanager.R.string.more_items, entries.size - 2), color = AppColorState.textSecondary, fontSize = 8.sp, modifier = Modifier.padding(start = 4.dp))
                 }
             }
         }
@@ -424,7 +446,7 @@ private fun exportCalendarPdf(
         // Başlık
         boldPaint.textSize = 14f
         boldPaint.color = android.graphics.Color.parseColor("#10B981")
-        canvas.drawText("Haftalık Ders Programı", marginLeft, marginTop - 12f, boldPaint)
+        canvas.drawText(context.getString(com.example.academicmanager.R.string.weekly_schedule_pdf), marginLeft, marginTop - 12f, boldPaint)
         boldPaint.textSize = 8f
 
         // Gün başlıkları
@@ -432,7 +454,14 @@ private fun exportCalendarPdf(
         headerPaint.color = android.graphics.Color.parseColor("#1E2535")
         canvas.drawRect(marginLeft, marginTop, pageWidth - 20f, headerY, headerPaint)
 
-        CAL_DAYS_TR_SHORT.forEachIndexed { i, dayShort ->
+        val pdfDaysShort = listOf(
+            context.getString(com.example.academicmanager.R.string.day_mon),
+            context.getString(com.example.academicmanager.R.string.day_tue),
+            context.getString(com.example.academicmanager.R.string.day_wed),
+            context.getString(com.example.academicmanager.R.string.day_thu),
+            context.getString(com.example.academicmanager.R.string.day_fri)
+        )
+        pdfDaysShort.forEachIndexed { i, dayShort ->
             val x = marginLeft + timeColW + i * dayColW + dayColW / 2f
             boldPaint.color = android.graphics.Color.WHITE
             boldPaint.textAlign = Paint.Align.CENTER
@@ -484,7 +513,7 @@ private fun exportCalendarPdf(
                     canvas.drawText(entry.classroomName, x + 3f, y + 31f, textPaint)
                     if (dayEntries.size > 1) {
                         textPaint.color = android.graphics.Color.parseColor("#9CA3AF")
-                        canvas.drawText("+${dayEntries.size - 1} daha", x + 3f, y + 40f, textPaint)
+                        canvas.drawText(context.getString(com.example.academicmanager.R.string.more_items, dayEntries.size - 1), x + 3f, y + 40f, textPaint)
                     }
                 }
             }

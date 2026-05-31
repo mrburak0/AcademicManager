@@ -1,0 +1,126 @@
+
+COURSE PROJECT
+Phase 2: Central Database & Multi-User Architecture
+
+
+
+1. Project Overview
+In Phase 1, students built a local Android application for managing course schedules, with data stored only on the device. In Phase 2, the application is extended with a centralized database backend, enabling multi-device access, role-based authentication, and a richer scheduling interface.
+
+
+
+2. Database & Backend Requirements
+Students must migrate from local-only storage to a centralized database. The choice of database technology is flexible, but must meet the multi-device access requirement.
+
+2.1 Accepted Database Options
+
+
+2.2 Required Database Tables / Collections
+The central database must contain at minimum the following tables (or Firestore collections):
+
+
+3. Authentication & User Management
+3.1 Auto-Generated Credentials
+When the Admin imports a lecturer list (from Excel/TXT as in Phase 1), the system must automatically generate a username and an initial password for each new lecturer who does not already have an account in the central database.
+
+
+Example:
+
+3.2 First Login & Password Change
+When a lecturer logs in for the first time (must_change_password = true), the application must immediately navigate to a password change screen.
+The password change screen must contain:
+Current password field
+New password field
+Confirm new password field
+Save button
+After a successful password change, must_change_password is set to false in the database.
+The lecturer cannot access any other screen until the password is changed.
+
+3.3 Login Screen
+A login screen must be added to the application as the entry point. The login screen must:
+Display username and password input fields.
+Authenticate against the central database.
+Route the user to the appropriate home screen based on their role:
+Admin role → Admin Home (full navigation)
+Lecturer role → Lecturer Home (limited navigation: Home + Calendar only)
+Show an error message for invalid credentials.
+
+4. Lecturer Profile & Calendar View
+4.1 Lecturer Home Screen
+After a successful login, a Lecturer user sees a personalized home screen with the following information:
+Welcome message: Welcome, [Title] [First Name] [Last Name]
+Department name
+A summary of total assigned courses for the current week
+
+4.2 Calendar View (My Schedule)
+Each lecturer must be able to view their own weekly schedule in a calendar format. This is accessible via the Calendar navigation menu.
+
+
+Display a weekly grid (Monday through Friday).
+Show time slots as rows (at minimum 2 slots per day; full hourly slots are a bonus).
+Each assigned course must appear in the corresponding day/time cell showing:
+Course code and course name
+Assigned classroom code
+Empty slots must be visually distinguishable from occupied slots.
+The calendar must load data from the central database based on the logged-in lecturer's ID.
+
+Example Calendar Layout:
+
+
+5. Classroom Management
+5.1 Classroom Table
+A new Classrooms section must be added to the application (accessible from the Admin navigation). This screen lists all available classrooms and allows management of classroom data.
+
+Each classroom record must include:
+Room code (e.g., A101, B204, LAB-1)
+Capacity (number of students)
+Department or building (optional but recommended)
+The Admin must be able to add new classrooms manually from this screen.
+Classrooms can also be imported from a file (same mechanism as courses).
+
+5.2 Course – Lecturer – Classroom Assignment
+The Admin must be able to assign a course to a lecturer and a classroom in a specific time slot. This assignment screen must:
+
+Allow selection of:
+A course from the courses list
+A lecturer from the lecturers list
+A classroom from the classrooms list
+Day of the week (Monday – Friday)
+Time slot
+Prevent double-booking: the same classroom or lecturer cannot be assigned to two different courses in the same time slot.
+Save the assignment to the central database (schedule_entries table).
+Display all current assignments in a list or table view.
+
+6. Admin Dashboard Enhancements
+The Admin home screen must provide quick visibility into the current state of the schedule. Three summary panels must be shown on the Admin home page:
+
+
+
+
+Additionally, the Admin navigation must now include a 5th menu item:
+
+7. Technical Requirements
+7.1 Architecture & Code Quality
+Follow the MVVM (Model-View-ViewModel) architecture pattern.
+Use Repository pattern to abstract database access.
+Network/database operations must run on background threads (use Coroutines or RxJava — do not block the main thread).
+Passwords must not be stored in plaintext. Use hashing (e.g., SHA-256 or bcrypt).
+
+7.2 Error Handling & UX
+Show loading indicators (ProgressBar or shimmer) while fetching data from the database.
+Handle no-internet / no-connection states gracefully with an appropriate message.
+Validate all forms before submission (empty fields, password mismatch, etc.).
+Show confirmation dialogs before any destructive or irreversible action.
+
+7.3 Security
+Session management: store the logged-in user's token/session securely (SharedPreferences with encryption or equivalent).
+A lecturer must only be able to see their own data — enforce this at the query level, not just the UI level.
+Admin credentials must be set up separately and not be importable from the Excel file.
+
+8. Deliverables
+Students must submit the following:
+
+
+9. Grading Criteria
+
+Appendix: Summary of New Screens in Phase 2
