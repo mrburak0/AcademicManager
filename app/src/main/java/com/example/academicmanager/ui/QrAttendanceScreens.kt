@@ -1,6 +1,7 @@
 package com.example.academicmanager.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
 import android.content.pm.PackageManager
@@ -82,6 +83,7 @@ fun LecturerQrSessionScreen(
 ) {
     val user       = authViewModel.currentUser ?: return
     val allEntries by adminViewModel.scheduleEntries.collectAsState()
+    val allCourses by adminViewModel.courses.collectAsState()
     val colors     = LocalAppColors.current
     val context    = LocalContext.current
     val scope      = rememberCoroutineScope()
@@ -213,7 +215,7 @@ fun LecturerQrSessionScreen(
                             courseName       = entry.courseName,
                             lecturerUsername = user.username,
                             lecturerName     = user.fullName,
-                            department       = entry.courseName,
+                            department       = allCourses.find { it.courseCode == entry.courseCode }?.department ?: user.department,
                             dayOfWeek        = entry.dayOfWeek,
                             timeSlot         = entry.timeSlot,
                             sessionType      = entry.sessionType
@@ -380,33 +382,17 @@ fun StudentQrScanScreen(
         }
     }
 
-    // BLE yakınlık doğrulaması
+    // BLE yakınlık doğrulaması — izin kontrolü yapıldıktan sonra çağrılır
     LaunchedEffect(bleCheckActive, pendingCode) {
         if (bleCheckActive && pendingCode != null) {
             val code = pendingCode!!
             val btAdapter = BluetoothAdapter.getDefaultAdapter()
             val hasBle = btAdapter != null && context.packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
+            val blePermOk = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
 
-            if (hasBle && btAdapter.isEnabled &&
-                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-                 ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED)) {
-                // BLE tarama — 5 saniye içinde yakında hoca cihazı var mı?
-                var foundNearby = false
-                val scanner = btAdapter.bluetoothLeScanner
-                val scanCallback = object : ScanCallback() {
-                    override fun onScanResult(callbackType: Int, result: ScanResult) {
-                        val data = result.scanRecord?.getServiceData(APP_BLE_UUID)
-                        if (data != null && String(data).startsWith(code.take(8))) {
-                            if (result.rssi > -85) foundNearby = true
-                        }
-                    }
-                }
-                val filters = listOf(ScanFilter.Builder().setServiceUuid(APP_BLE_UUID).build())
-                val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-                scanner?.startScan(filters, settings, scanCallback)
-                delay(5000)
-                scanner?.stopScan(scanCallback)
-
+            if (hasBle && btAdapter!!.isEnabled && blePermOk) {
+                val foundNearby = scanBleForSession(btAdapter, code)
                 if (foundNearby) {
                     isChecking = true
                     attendanceViewModel.joinSessionByCode(code, user.username, user.fullName, allStudents)
@@ -526,6 +512,7 @@ fun StudentQrScanScreen(
 // YARDIMCILAR: BLE Advertise Başlat/Durdur
 // ─────────────────────────────────────────────────────────────
 
+@SuppressLint("MissingPermission")
 private fun startBleAdvertising(
     context    : android.content.Context,
     sessionCode: String,
@@ -568,6 +555,29 @@ private fun startBleAdvertising(
     }
 }
 
+@SuppressLint("MissingPermission")
 private fun stopBleAdvertising(advertiser: BluetoothLeAdvertiser?, callback: AdvertiseCallback?) {
     try { advertiser?.stopAdvertising(callback) } catch (_: Exception) {}
+}
+
+@SuppressLint("MissingPermission")
+private suspend fun scanBleForSession(btAdapter: BluetoothAdapter, sessionCode: String): Boolean {
+    var foundNearby = false
+    val scanner = btAdapter.bluetoothLeScanner ?: return false
+    val scanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val data = result.scanRecord?.getServiceData(APP_BLE_UUID)
+            if (data != null && String(data).startsWith(sessionCode.take(8))) {
+                if (result.rssi > -85) foundNearby = true
+            }
+        }
+    }
+    val filters  = listOf(ScanFilter.Builder().setServiceUuid(APP_BLE_UUID).build())
+    val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+    try {
+        scanner.startScan(filters, settings, scanCallback)
+        delay(5000)
+        scanner.stopScan(scanCallback)
+    } catch (_: Exception) {}
+    return foundNearby
 }
