@@ -396,4 +396,80 @@ class UniversityRepositoryImpl(
     override suspend fun updateAttendance(record: AttendanceRecord) {
         firestore.collection("attendance").document(record.id).set(record).await()
     }
+
+    // ── Ödev Takibi ───────────────────────────────────────────
+
+    override fun getAssignments(): Flow<List<AssignmentEntry>> {
+        return firestore.collection("assignments")
+            .snapshots()
+            .map { it.toObjects(AssignmentEntry::class.java) }
+    }
+
+    override fun getAssignmentsByDepartment(department: String): Flow<List<AssignmentEntry>> {
+        return firestore.collection("assignments")
+            .whereEqualTo("department", department)
+            .snapshots()
+            .map { it.toObjects(AssignmentEntry::class.java) }
+    }
+
+    override fun getAssignmentsByLecturer(lecturerUsername: String): Flow<List<AssignmentEntry>> {
+        return firestore.collection("assignments")
+            .whereEqualTo("lecturerUsername", lecturerUsername)
+            .snapshots()
+            .map { it.toObjects(AssignmentEntry::class.java) }
+    }
+
+    override suspend fun addAssignment(assignment: AssignmentEntry) {
+        val docRef = if (assignment.id.isEmpty())
+            firestore.collection("assignments").document()
+        else
+            firestore.collection("assignments").document(assignment.id)
+        docRef.set(assignment.copy(id = docRef.id, timestamp = System.currentTimeMillis())).await()
+    }
+
+    override suspend fun deleteAssignment(id: String) {
+        firestore.collection("assignments").document(id).delete().await()
+    }
+
+    override fun getSubmissions(assignmentId: String): Flow<List<AssignmentSubmission>> {
+        return firestore.collection("assignment_submissions")
+            .whereEqualTo("assignmentId", assignmentId)
+            .snapshots()
+            .map { it.toObjects(AssignmentSubmission::class.java) }
+    }
+
+    override fun getSubmissionsByStudent(studentUsername: String): Flow<List<AssignmentSubmission>> {
+        return firestore.collection("assignment_submissions")
+            .whereEqualTo("studentUsername", studentUsername)
+            .snapshots()
+            .map { it.toObjects(AssignmentSubmission::class.java) }
+    }
+
+    override suspend fun submitAssignment(submission: AssignmentSubmission) {
+        val docRef = if (submission.id.isEmpty())
+            firestore.collection("assignment_submissions").document()
+        else
+            firestore.collection("assignment_submissions").document(submission.id)
+        docRef.set(submission.copy(id = docRef.id, submittedAt = System.currentTimeMillis())).await()
+    }
+
+    // ── Akademik Takvim ───────────────────────────────────────
+
+    override fun getAcademicEvents(): Flow<List<AcademicEvent>> {
+        return firestore.collection("academic_events")
+            .snapshots()
+            .map { it.toObjects(AcademicEvent::class.java) }
+    }
+
+    override suspend fun addAcademicEvent(event: AcademicEvent) {
+        val docRef = if (event.id.isEmpty())
+            firestore.collection("academic_events").document()
+        else
+            firestore.collection("academic_events").document(event.id)
+        docRef.set(event.copy(id = docRef.id, timestamp = System.currentTimeMillis())).await()
+    }
+
+    override suspend fun deleteAcademicEvent(id: String) {
+        firestore.collection("academic_events").document(id).delete().await()
+    }
 }

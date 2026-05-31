@@ -583,4 +583,55 @@
     <string name="days_remaining">days left</string>
     <string name="exam_schedule_action">Exam Schedule</string>
     <string name="my_exam_schedule_action">My Exams</string>
+
+    <!-- ── Assignments ────────────────────────────────────────── -->
+    <string name="nav_assignments">Assignments</string>
+    <string name="assignments_lecturer_title">My Assignments</string>
+    <string name="assignments_lecturer_sub">%d assignments</string>
+    <string name="assignments_student_title">My Assignments</string>
+    <string name="add_assignment">Add Assignment</string>
+    <string name="add_assignment_hint">Tap + to create the first assignment</string>
+    <string name="no_assignments_yet">No assignments yet</string>
+    <string name="no_assignments_dept">No assignments for your department</string>
+    <string name="delete_assignment_title">Delete Assignment?</string>
+    <string name="assignment_title_field">Assignment Title</string>
+    <string name="assignment_description">Description (optional)</string>
+    <string name="assignment_due_date">Due Date</string>
+    <string name="assignment_due_time">Due Time</string>
+    <string name="assignment_max_points">Max Points</string>
+    <string name="select_course_assignment">Select Course</string>
+    <string name="submit_assignment">Submit</string>
+    <string name="submit_late">Submit Late</string>
+    <string name="submitted_badge">Submitted ✓</string>
+    <string name="overdue_badge">Overdue</string>
+    <string name="pending_badge">Pending</string>
+    <string name="submission_note">Note (optional)</string>
+    <string name="no_submissions_yet">No submissions yet</string>
+    <string name="past_assignments">Past (%d)</string>
+    <string name="upcoming_assignments">Upcoming</string>
+    <string name="next_deadline_label">Next Deadline</string>
+    <string name="assignment_action">Assignments</string>
+    <string name="my_assignments_action">Assignments</string>
+
+    <!-- ── Academic Calendar ──────────────────────────────────── -->
+    <string name="nav_academic_calendar">Calendar</string>
+    <string name="academic_calendar_title">Academic Calendar</string>
+    <string name="academic_calendar_sub">%d events</string>
+    <string name="add_event">Add Event</string>
+    <string name="add_event_hint">Tap + to add the first event</string>
+    <string name="no_events_yet">No events scheduled yet</string>
+    <string name="delete_event_title">Delete Event?</string>
+    <string name="event_title_field">Event Title</string>
+    <string name="event_description_opt">Description (optional)</string>
+    <string name="event_start_date">Start Date</string>
+    <string name="event_end_date">End Date</string>
+    <string name="event_has_end_date">Multi-day event</string>
+    <string name="event_type_label_cal">Event Type</string>
+    <string name="upcoming_events_cal">Upcoming</string>
+    <string name="past_events_cal">Past (%d)</string>
+    <string name="ongoing_events">Ongoing</string>
+    <string name="ongoing_badge">Active</string>
+    <string name="next_event_label">Next Event</string>
+    <string name="all_departments">All Departments</string>
+    <string name="academic_calendar_action">Academic Calendar</string>
 </resources>

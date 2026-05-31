@@ -46,6 +46,14 @@ class ViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return ExamViewModel(repository) as T
         }
+        if (modelClass.isAssignableFrom(AssignmentViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AssignmentViewModel(repository) as T
+        }
+        if (modelClass.isAssignableFrom(AcademicCalendarViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AcademicCalendarViewModel(repository) as T
+        }
         throw IllegalArgumentException("Bilinmeyen ViewModel sınıfı: ${modelClass.name}")
     }
 }

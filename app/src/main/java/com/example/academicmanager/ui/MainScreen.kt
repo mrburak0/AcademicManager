@@ -154,8 +154,12 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object AdminGrades          : Screen("admin_grades",          R.string.nav_grades,        Icons.Default.Grade)
     object AttendanceEntry      : Screen("attendance_entry",      R.string.nav_attendance,    Icons.Default.HowToReg)
     object MyAttendance         : Screen("my_attendance",         R.string.nav_attendance,    Icons.Default.HowToReg)
-    object AdminExamSchedule    : Screen("admin_exam_schedule",   R.string.nav_exam_schedule, Icons.AutoMirrored.Filled.EventNote)
-    object StudentExamSchedule  : Screen("student_exam_schedule", R.string.nav_exam_schedule, Icons.AutoMirrored.Filled.EventNote)
+    object AdminExamSchedule    : Screen("admin_exam_schedule",   R.string.nav_exam_schedule,       Icons.AutoMirrored.Filled.EventNote)
+    object StudentExamSchedule  : Screen("student_exam_schedule", R.string.nav_exam_schedule,       Icons.AutoMirrored.Filled.EventNote)
+    object LecturerAssignments  : Screen("lecturer_assignments",  R.string.nav_assignments,         Icons.Default.Assignment)
+    object StudentAssignments   : Screen("student_assignments",   R.string.nav_assignments,         Icons.Default.Assignment)
+    object AdminAcademicCal     : Screen("admin_academic_cal",    R.string.nav_academic_calendar,   Icons.Default.DateRange)
+    object AcademicCalendar     : Screen("academic_calendar",     R.string.nav_academic_calendar,   Icons.Default.DateRange)
 }
 
 @Composable
@@ -178,6 +182,8 @@ fun MainScreen(
     val gradeViewModel: com.example.academicmanager.ui.viewmodels.GradeViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val attendanceViewModel: com.example.academicmanager.ui.viewmodels.AttendanceViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val examViewModel: com.example.academicmanager.ui.viewmodels.ExamViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val assignmentViewModel: com.example.academicmanager.ui.viewmodels.AssignmentViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val academicCalendarViewModel: com.example.academicmanager.ui.viewmodels.AcademicCalendarViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val authState by authViewModel.authState.collectAsState()
 
     // Restore session on app startup
@@ -317,6 +323,12 @@ fun MainScreen(
                 // ── Sınav Takvimi ─────────────────────────────────
                 composable(Screen.AdminExamSchedule.route)   { AdminExamScheduleScreen(adminViewModel, examViewModel, navController) }
                 composable(Screen.StudentExamSchedule.route) { StudentExamScheduleScreen(authViewModel, examViewModel, navController) }
+                // ── Ödev Takibi ────────────────────────────────────
+                composable(Screen.LecturerAssignments.route) { LecturerAssignmentScreen(authViewModel, adminViewModel, assignmentViewModel, navController) }
+                composable(Screen.StudentAssignments.route)  { StudentAssignmentScreen(authViewModel, assignmentViewModel, navController) }
+                // ── Akademik Takvim ────────────────────────────────
+                composable(Screen.AdminAcademicCal.route)  { AdminAcademicCalendarScreen(academicCalendarViewModel, navController) }
+                composable(Screen.AcademicCalendar.route)  { AcademicCalendarScreen(authViewModel, academicCalendarViewModel, navController) }
                 // ── Phase 1 geriye dönük uyumluluk ────────────────
                 composable(Screen.Home.route)     { HomeScreen(dao) }
                 composable(Screen.Calendar.route) { CalendarScreen(authViewModel, dao) }

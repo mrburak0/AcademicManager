@@ -148,31 +148,46 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
 
         // ── Quick Actions ─────────────────────────────────────
         Text(stringResource(R.string.quick_actions), color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StudentActionCard(
-                label = stringResource(R.string.my_grades_action),
-                icon = Icons.Default.Grade,
-                color = IndigoAccent,
-                modifier = Modifier.weight(1f),
-                onClick = { navController.navigate("my_grades") }
-            )
-            StudentActionCard(
-                label = stringResource(R.string.my_attendance_action),
-                icon = Icons.Default.HowToReg,
-                color = Color(0xFFF59E0B),
-                modifier = Modifier.weight(1f),
-                onClick = { navController.navigate("my_attendance") }
-            )
-            StudentActionCard(
-                label = stringResource(R.string.my_exam_schedule_action),
-                icon = Icons.AutoMirrored.Filled.EventNote,
-                color = Color(0xFFEF4444),
-                modifier = Modifier.weight(1f),
-                onClick = { navController.navigate("student_exam_schedule") }
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StudentActionCard(
+                    label = stringResource(R.string.my_grades_action),
+                    icon = Icons.Default.Grade,
+                    color = IndigoAccent,
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("my_grades") }
+                )
+                StudentActionCard(
+                    label = stringResource(R.string.my_attendance_action),
+                    icon = Icons.Default.HowToReg,
+                    color = Color(0xFFF59E0B),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("my_attendance") }
+                )
+                StudentActionCard(
+                    label = stringResource(R.string.my_exam_schedule_action),
+                    icon = Icons.AutoMirrored.Filled.EventNote,
+                    color = Color(0xFFEF4444),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("student_exam_schedule") }
+                )
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StudentActionCard(
+                    label = stringResource(R.string.my_assignments_action),
+                    icon = Icons.Default.Assignment,
+                    color = Color(0xFF8B5CF6),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("student_assignments") }
+                )
+                StudentActionCard(
+                    label = stringResource(R.string.academic_calendar_action),
+                    icon = Icons.Default.CalendarMonth,
+                    color = Color(0xFF3B82F6),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("academic_calendar") }
+                )
+            }
         }
 
         // ── Weekly Schedule ──────────────────────────────────

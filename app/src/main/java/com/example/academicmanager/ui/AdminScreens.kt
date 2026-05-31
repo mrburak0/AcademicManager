@@ -444,43 +444,66 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
             }
         }
 
-        // ── Grades & Attendance Overview ──────────────────────
+        // ── Grades, Exams, Assignments, Calendar, Announcements ──
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { navController.navigate("admin_grades") },
-                    modifier = Modifier.weight(1f),
-                    border = BorderStroke(1.dp, EmeraldGreen.copy(alpha = 0.5f)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = EmeraldGreen),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Grade, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.panel_grades), fontWeight = FontWeight.SemiBold)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = { navController.navigate("admin_grades") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, EmeraldGreen.copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = EmeraldGreen),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Grade, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.panel_grades), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
+                    OutlinedButton(
+                        onClick = { navController.navigate("admin_exam_schedule") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.EventNote, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.exam_schedule_action), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
-                OutlinedButton(
-                    onClick = { navController.navigate("admin_exam_schedule") },
-                    modifier = Modifier.weight(1f),
-                    border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.EventNote, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.exam_schedule_action), fontWeight = FontWeight.SemiBold)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = { navController.navigate("lecturer_assignments") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFF8B5CF6).copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF8B5CF6)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Assignment, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.nav_assignments), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
+                    OutlinedButton(
+                        onClick = { navController.navigate("admin_academic_cal") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF3B82F6)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.nav_academic_calendar), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
                 OutlinedButton(
                     onClick = { navController.navigate("announcements") },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.5f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFF59E0B)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(6.dp))
+                    Icon(Icons.Default.Notifications, contentDescription = null, modifier = Modifier.size(15.dp))
+                    Spacer(Modifier.width(5.dp))
                     Text(stringResource(R.string.nav_announcements), fontWeight = FontWeight.SemiBold)
                 }
             }

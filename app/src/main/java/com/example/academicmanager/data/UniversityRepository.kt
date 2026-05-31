@@ -81,4 +81,19 @@ interface UniversityRepository {
     fun getAttendanceByLecturer(lecturerUsername: String): Flow<List<AttendanceRecord>>
     suspend fun saveAttendance(record: AttendanceRecord)
     suspend fun updateAttendance(record: AttendanceRecord)
+
+    // Ödev takibi
+    fun getAssignments(): Flow<List<AssignmentEntry>>
+    fun getAssignmentsByDepartment(department: String): Flow<List<AssignmentEntry>>
+    fun getAssignmentsByLecturer(lecturerUsername: String): Flow<List<AssignmentEntry>>
+    suspend fun addAssignment(assignment: AssignmentEntry)
+    suspend fun deleteAssignment(id: String)
+    fun getSubmissions(assignmentId: String): Flow<List<AssignmentSubmission>>
+    fun getSubmissionsByStudent(studentUsername: String): Flow<List<AssignmentSubmission>>
+    suspend fun submitAssignment(submission: AssignmentSubmission)
+
+    // Akademik takvim
+    fun getAcademicEvents(): Flow<List<AcademicEvent>>
+    suspend fun addAcademicEvent(event: AcademicEvent)
+    suspend fun deleteAcademicEvent(id: String)
 }

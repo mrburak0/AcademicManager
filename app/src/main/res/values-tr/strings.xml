@@ -583,4 +583,55 @@
     <string name="days_remaining">gün kaldı</string>
     <string name="exam_schedule_action">Sınav Takvimi</string>
     <string name="my_exam_schedule_action">Sınavlarım</string>
+
+    <!-- ── Ödevler ────────────────────────────────────────────── -->
+    <string name="nav_assignments">Ödevler</string>
+    <string name="assignments_lecturer_title">Ödevlerim</string>
+    <string name="assignments_lecturer_sub">%d ödev</string>
+    <string name="assignments_student_title">Ödevlerim</string>
+    <string name="add_assignment">Ödev Ekle</string>
+    <string name="add_assignment_hint">İlk ödevi eklemek için + tuşuna basın</string>
+    <string name="no_assignments_yet">Henüz ödev yok</string>
+    <string name="no_assignments_dept">Bölümünüz için henüz ödev yok</string>
+    <string name="delete_assignment_title">Ödev Silinsin mi?</string>
+    <string name="assignment_title_field">Ödev Başlığı</string>
+    <string name="assignment_description">Açıklama (isteğe bağlı)</string>
+    <string name="assignment_due_date">Son Teslim Tarihi</string>
+    <string name="assignment_due_time">Son Teslim Saati</string>
+    <string name="assignment_max_points">Maksimum Puan</string>
+    <string name="select_course_assignment">Ders Seçin</string>
+    <string name="submit_assignment">Teslim Et</string>
+    <string name="submit_late">Geç Teslim Et</string>
+    <string name="submitted_badge">Teslim Edildi ✓</string>
+    <string name="overdue_badge">Süresi Doldu</string>
+    <string name="pending_badge">Bekliyor</string>
+    <string name="submission_note">Not (isteğe bağlı)</string>
+    <string name="no_submissions_yet">Henüz teslim yok</string>
+    <string name="past_assignments">Geçmiş (%d)</string>
+    <string name="upcoming_assignments">Yaklaşan Ödevler</string>
+    <string name="next_deadline_label">Sonraki Teslim</string>
+    <string name="assignment_action">Ödevler</string>
+    <string name="my_assignments_action">Ödevlerim</string>
+
+    <!-- ── Akademik Takvim ────────────────────────────────────── -->
+    <string name="nav_academic_calendar">Takvim</string>
+    <string name="academic_calendar_title">Akademik Takvim</string>
+    <string name="academic_calendar_sub">%d etkinlik</string>
+    <string name="add_event">Etkinlik Ekle</string>
+    <string name="add_event_hint">İlk etkinliği eklemek için + tuşuna basın</string>
+    <string name="no_events_yet">Henüz etkinlik planlanmadı</string>
+    <string name="delete_event_title">Etkinlik Silinsin mi?</string>
+    <string name="event_title_field">Etkinlik Başlığı</string>
+    <string name="event_description_opt">Açıklama (isteğe bağlı)</string>
+    <string name="event_start_date">Başlangıç Tarihi</string>
+    <string name="event_end_date">Bitiş Tarihi</string>
+    <string name="event_has_end_date">Çok günlü etkinlik</string>
+    <string name="event_type_label_cal">Etkinlik Türü</string>
+    <string name="upcoming_events_cal">Yaklaşan Etkinlikler</string>
+    <string name="past_events_cal">Geçmiş (%d)</string>
+    <string name="ongoing_events">Devam Eden Etkinlikler</string>
+    <string name="ongoing_badge">Aktif</string>
+    <string name="next_event_label">Sonraki Etkinlik</string>
+    <string name="all_departments">Tüm Bölümler</string>
+    <string name="academic_calendar_action">Akademik Takvim</string>
 </resources>
