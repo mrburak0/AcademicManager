@@ -67,14 +67,6 @@ interface UniversityRepository {
     suspend fun addExamEntry(entry: ExamEntry)
     suspend fun deleteExamEntry(id: String)
 
-    // Not yönetimi
-    fun getGrades(): Flow<List<GradeRecord>>
-    fun getGradesByCourse(courseCode: String): Flow<List<GradeRecord>>
-    fun getGradesByStudent(studentUsername: String): Flow<List<GradeRecord>>
-    fun getGradesByLecturer(lecturerUsername: String): Flow<List<GradeRecord>>
-    suspend fun saveGrade(grade: GradeRecord)
-    suspend fun deleteGrade(gradeId: String)
-
     // Yoklama takibi
     fun getAttendanceRecords(): Flow<List<AttendanceRecord>>
     fun getAttendanceByCourse(courseCode: String): Flow<List<AttendanceRecord>>
@@ -103,8 +95,25 @@ interface UniversityRepository {
 
     // QR Yoklama oturumları
     fun getActiveSession(courseCode: String): Flow<AttendanceSession?>
+    fun getActiveSessionsByDepartment(department: String): Flow<List<AttendanceSession>>
+    suspend fun getSessionById(id: String): AttendanceSession?
     suspend fun createSession(session: AttendanceSession): AttendanceSession
     suspend fun updateSession(session: AttendanceSession)
     suspend fun getSessionByCode(sessionCode: String): AttendanceSession?
     suspend fun addStudentToSession(sessionId: String, studentUsername: String)
+    suspend fun addStudentToSessionWithMethod(sessionId: String, username: String, method: String)
+
+    // Telafi dersi sistemi
+    fun getMakeupRequestsByDepartment(department: String): Flow<List<MakeupRequest>>
+    fun getMakeupRequestsByLecturer(lecturerUsername: String): Flow<List<MakeupRequest>>
+    suspend fun getMakeupRequestById(id: String): MakeupRequest?
+    suspend fun saveMakeupRequest(request: MakeupRequest): MakeupRequest
+    suspend fun updateMakeupRequest(request: MakeupRequest)
+    suspend fun voteForMakeupSlot(requestId: String, studentUsername: String, slotId: String)
+
+    // Akran eşleştirme
+    fun getPeerMatchesByDepartment(department: String): Flow<List<PeerMatch>>
+    fun getPeerMatchesByStudent(username: String): Flow<List<PeerMatch>>
+    suspend fun savePeerMatch(match: PeerMatch): PeerMatch
+    suspend fun updatePeerMatch(match: PeerMatch)
 }

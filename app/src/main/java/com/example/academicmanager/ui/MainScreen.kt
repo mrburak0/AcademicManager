@@ -149,9 +149,6 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object Announcements        : Screen("announcements",         R.string.nav_announcements, Icons.Default.Notifications)
     object AdminAvailability    : Screen("admin_availability",    R.string.nav_availability,  Icons.Default.CalendarMonth)
     object AutoAssign           : Screen("auto_assign",           R.string.nav_schedule,      Icons.Default.AutoAwesome)
-    object GradeEntry           : Screen("grade_entry",           R.string.nav_grades,        Icons.Default.Grade)
-    object MyGrades             : Screen("my_grades",             R.string.nav_grades,        Icons.Default.Grade)
-    object AdminGrades          : Screen("admin_grades",          R.string.nav_grades,        Icons.Default.Grade)
     object AttendanceEntry      : Screen("attendance_entry",      R.string.nav_attendance,    Icons.Default.HowToReg)
     object MyAttendance         : Screen("my_attendance",         R.string.nav_attendance,    Icons.Default.HowToReg)
     object AdminExamSchedule    : Screen("admin_exam_schedule",   R.string.nav_exam_schedule,       Icons.AutoMirrored.Filled.EventNote)
@@ -162,6 +159,12 @@ sealed class Screen(val route: String, @androidx.annotation.StringRes val labelR
     object AcademicCalendar     : Screen("academic_calendar",     R.string.nav_academic_calendar,   Icons.Default.DateRange)
     object QrSession            : Screen("qr_session",            R.string.nav_attendance,          Icons.Default.QrCode)
     object QrScan               : Screen("qr_scan",               R.string.nav_attendance,          Icons.Default.QrCodeScanner)
+    object LecturerMakeup       : Screen("lecturer_makeup",        R.string.nav_makeup,              Icons.Default.EventRepeat)
+    object StudentMakeupVoting  : Screen("student_makeup",         R.string.nav_makeup,              Icons.Default.HowToVote)
+    object LecturerRisk         : Screen("lecturer_risk",          R.string.nav_risk,                Icons.Default.Warning)
+    object AdminRisk            : Screen("admin_risk",             R.string.nav_risk,                Icons.Default.Warning)
+    object AdminPeerMatch       : Screen("admin_peer_match",       R.string.nav_peer_match,          Icons.Default.People)
+    object StudentPeerMatch     : Screen("student_peer_match",     R.string.nav_peer_match,          Icons.Default.PeopleAlt)
 }
 
 @Composable
@@ -181,11 +184,13 @@ fun MainScreen(
     val authViewModel: AuthViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val adminViewModel: AdminViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val announcementsViewModel: AnnouncementsViewModel = viewModel(factory = ViewModelFactory(dao, repository))
-    val gradeViewModel: com.example.academicmanager.ui.viewmodels.GradeViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val attendanceViewModel: com.example.academicmanager.ui.viewmodels.AttendanceViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val examViewModel: com.example.academicmanager.ui.viewmodels.ExamViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val assignmentViewModel: com.example.academicmanager.ui.viewmodels.AssignmentViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val academicCalendarViewModel: com.example.academicmanager.ui.viewmodels.AcademicCalendarViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val makeupViewModel: com.example.academicmanager.ui.viewmodels.MakeupViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val riskViewModel: com.example.academicmanager.ui.viewmodels.AttendanceRiskViewModel = viewModel(factory = ViewModelFactory(dao, repository))
+    val peerMatchViewModel: com.example.academicmanager.ui.viewmodels.PeerMatchViewModel = viewModel(factory = ViewModelFactory(dao, repository))
     val authState by authViewModel.authState.collectAsState()
 
     // Restore session on app startup
@@ -315,10 +320,7 @@ fun MainScreen(
                         appSettings    = appSettings
                     )
                 }
-                // ── Not & Yoklama ekranları ───────────────────────
-                composable(Screen.GradeEntry.route)      { LecturerGradeEntryScreen(authViewModel, adminViewModel, gradeViewModel, navController) }
-                composable(Screen.MyGrades.route)        { StudentGradesScreen(authViewModel, adminViewModel, gradeViewModel, navController) }
-                composable(Screen.AdminGrades.route)     { AdminGradesOverviewScreen(adminViewModel, gradeViewModel, navController) }
+                // ── Yoklama ekranları ─────────────────────────────
                 composable(Screen.AttendanceEntry.route) { LecturerAttendanceScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
                 composable(Screen.MyAttendance.route)    { StudentAttendanceScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
                 // ── Sınav Takvimi ─────────────────────────────────
@@ -333,6 +335,15 @@ fun MainScreen(
                 // ── QR Yoklama ─────────────────────────────────────
                 composable(Screen.QrSession.route) { LecturerQrSessionScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
                 composable(Screen.QrScan.route)    { StudentQrScanScreen(authViewModel, adminViewModel, attendanceViewModel, navController) }
+                // ── Telafi Dersi ───────────────────────────────────
+                composable(Screen.LecturerMakeup.route)      { LecturerMakeupScreen(authViewModel, adminViewModel, makeupViewModel, navController) }
+                composable(Screen.StudentMakeupVoting.route) { StudentMakeupVotingScreen(authViewModel, adminViewModel, makeupViewModel, navController) }
+                // ── Devamsızlık Riski ──────────────────────────────
+                composable(Screen.LecturerRisk.route) { LecturerRiskScreen(authViewModel, adminViewModel, riskViewModel, navController) }
+                composable(Screen.AdminRisk.route)    { AdminRiskScreen(adminViewModel, riskViewModel, navController) }
+                // ── Akran Eşleştirme ───────────────────────────────
+                composable(Screen.AdminPeerMatch.route)   { AdminPeerMatchScreen(adminViewModel, peerMatchViewModel, navController) }
+                composable(Screen.StudentPeerMatch.route) { StudentPeerMatchScreen(authViewModel, adminViewModel, peerMatchViewModel, navController) }
                 // ── Phase 1 geriye dönük uyumluluk ────────────────
                 composable(Screen.Home.route)     { HomeScreen(dao) }
                 composable(Screen.Calendar.route) { CalendarScreen(authViewModel, dao) }
@@ -478,7 +489,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
             // ── Login Card ───────────────────────────────────
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = AppColorState.surface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(28.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
@@ -498,13 +509,13 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                     Spacer(Modifier.height(24.dp))
 
                     val loginFieldColors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = AppColorState.surface2,
-                        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = AppColorState.textSecondary,
-                        focusedTextColor     = AppColorState.textPrimary,  unfocusedTextColor    = AppColorState.textPrimary,
+                        focusedBorderColor   = EmeraldGreen, unfocusedBorderColor  = MaterialTheme.colorScheme.surfaceVariant,
+                        focusedLabelColor    = EmeraldGreen, unfocusedLabelColor   = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        focusedTextColor     = MaterialTheme.colorScheme.onSurface, unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                         cursorColor          = EmeraldGreen,
                         focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
                         errorBorderColor     = ErrorRed, errorLabelColor   = ErrorRed,
-                        errorLeadingIconColor = ErrorRed, errorTextColor    = AppColorState.textPrimary,
+                        errorLeadingIconColor = ErrorRed, errorTextColor    = MaterialTheme.colorScheme.onSurface,
                         errorContainerColor  = Color.Transparent, errorSupportingTextColor = ErrorRed
                     )
                     val usernameError = submitted && username.isBlank()
@@ -515,7 +526,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         placeholder = { Text(stringResource(R.string.username_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         leadingIcon = { Icon(Icons.Default.Person, null, tint = if (usernameError) ErrorRed else if (username.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
                         isError = usernameError,
-                        supportingText = { if (usernameError) Text("Kullanıcı adı boş bırakılamaz", style = MaterialTheme.typography.labelSmall) },
+                        supportingText = { if (usernameError) Text(stringResource(R.string.val_username_required), style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         colors = loginFieldColors
@@ -537,7 +548,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         isError = passwordError,
-                        supportingText = { if (passwordError) Text("Şifre boş bırakılamaz", style = MaterialTheme.typography.labelSmall) },
+                        supportingText = { if (passwordError) Text(stringResource(R.string.val_password_required), style = MaterialTheme.typography.labelSmall) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         colors = loginFieldColors
@@ -549,7 +560,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                         val isUnverified = errorMsg.startsWith("EMAIL_NOT_VERIFIED:")
                         val displayMsg = if (isUnverified) {
                             val emailPart = errorMsg.removePrefix("EMAIL_NOT_VERIFIED:")
-                            "E-posta adresiniz ($emailPart) doğrulanmamış. Lütfen gelen kutunuzu kontrol edin."
+                            stringResource(R.string.email_unverified, emailPart)
                         } else errorMsg
                         Spacer(Modifier.height(10.dp))
                         Column(
@@ -573,7 +584,7 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
                                 ) {
                                     Icon(Icons.Default.Email, null, modifier = Modifier.size(13.dp), tint = EmeraldGreen)
                                     Spacer(Modifier.width(4.dp))
-                                    Text("Doğrulama Maili Yeniden Gönder", color = EmeraldGreen, style = MaterialTheme.typography.labelSmall)
+                                    Text(stringResource(R.string.resend_verification), color = EmeraldGreen, style = MaterialTheme.typography.labelSmall)
                                 }
                             }
                         }
@@ -653,8 +664,8 @@ fun LoginScreen(viewModel: AuthViewModel, navController: NavController) {
             // ── Kayıt Ol Linki ────────────────────────────────
             Spacer(Modifier.height(16.dp))
             TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-                Text("Hesabın yok mu? ", color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
-                Text("Kayıt Ol", color = EmeraldGreen, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.no_account_prompt), color = AppColorState.textSecondary, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.register_btn_text), color = EmeraldGreen, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(40.dp))
@@ -686,15 +697,15 @@ fun PasswordStrengthRow(password: String) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            StrengthChip("6+ karakter", hasMinLength, Modifier.weight(1f))
-            StrengthChip("Büyük harf",  hasUppercase, Modifier.weight(1f))
+            StrengthChip(stringResource(R.string.pwd_req_length), hasMinLength, Modifier.weight(1f))
+            StrengthChip(stringResource(R.string.pwd_req_upper),  hasUppercase, Modifier.weight(1f))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            StrengthChip("Küçük harf", hasLowercase, Modifier.weight(1f))
-            StrengthChip("Rakam",      hasDigit,     Modifier.weight(1f))
+            StrengthChip(stringResource(R.string.pwd_req_lower), hasLowercase, Modifier.weight(1f))
+            StrengthChip(stringResource(R.string.pwd_req_digit), hasDigit,     Modifier.weight(1f))
         }
     }
 }
@@ -1041,6 +1052,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                             label = { Text(stringResource(R.string.full_name)) },
                             placeholder = { Text(stringResource(R.string.full_name_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                             leadingIcon = { Icon(Icons.Default.Person, null, tint = if (fullNameError) ErrorRed else if (fullName.isNotBlank()) EmeraldGreen else AppColorState.textSecondary) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, autoCorrect = false),
                             isError = fullNameError,
                             supportingText = { if (fullNameError) Text(stringResource(R.string.full_name_required)) },
                             modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = fieldColors
@@ -1115,7 +1127,7 @@ fun RegisterScreen(viewModel: AuthViewModel, navController: NavController) {
                                 )
                                 ExposedDropdownMenu(expanded = cityExpanded, onDismissRequest = { cityExpanded = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 280.dp)) {
                                     UniversityApiViewModel.TURKISH_CITIES.forEach { city ->
-                                        DropdownMenuItem(text = { Text(city, color = AppColorState.textPrimary) }, onClick = { selectedCity = city; selectedUniversity = ""; department = ""; cityExpanded = false })
+                                        DropdownMenuItem(text = { Text(city, color = AppColorState.textPrimary) }, onClick = { uniViewModel.filterByCity(city); selectedCity = city; selectedUniversity = ""; department = ""; cityExpanded = false })
                                     }
                                 }
                             }
@@ -1527,7 +1539,7 @@ fun DataScreen(importVM: DataImportViewModel, adminVM: AdminViewModel) {
                 )
             }
         ) {
-            listOf("Dersler", "Öğretmenler", "Sınıflar").forEachIndexed { i, label ->
+            listOf(stringResource(R.string.tab_courses_data), stringResource(R.string.tab_lecturers_data), stringResource(R.string.tab_classrooms_data)).forEachIndexed { i, label ->
                 Tab(
                     selected = selectedTab == i,
                     onClick  = { selectedTab = i; if (errorMsg != null) importVM.resetState() },
@@ -1639,7 +1651,7 @@ fun ProfileScreen(
             confirmButton = {
                 Button(onClick = {
                     if (user.username == "admin") {
-                        Toast.makeText(context, "Admin şifresi sistem tarafından yönetilir.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.admin_password_managed), Toast.LENGTH_SHORT).show()
                     } else if (com.example.academicmanager.util.CredentialUtils.hashPassword(oldPassword) != user.password) {
                         Toast.makeText(context, context.getString(R.string.old_password_incorrect), Toast.LENGTH_SHORT).show()
                     } else if (newPassword != confirmPassword) {
@@ -1698,7 +1710,7 @@ fun ProfileScreen(
                         Spacer(Modifier.width(16.dp))
                         Column {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Sistem Yöneticisi", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.admin_system_manager), color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
                                 Spacer(Modifier.width(8.dp))
                                 Surface(shape = RoundedCornerShape(6.dp), color = adminAccent.copy(alpha = 0.3f)) {
                                     Text("  ADMIN  ", color = adminAccent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp))
@@ -1714,10 +1726,10 @@ fun ProfileScreen(
             // ── İstatistik Satırı ─────────────────────────
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(
-                    Triple(lecturers.size, "Hoca", EmeraldGreen),
-                    Triple(students.size, "Öğrenci", adminAccent),
-                    Triple(courses.size, "Ders", Color(0xFF06B6D4)),
-                    Triple(pendingRegs.size, "Bekleyen", amberColor)
+                    Triple(lecturers.size, stringResource(R.string.admin_stat_lecturers), EmeraldGreen),
+                    Triple(students.size, stringResource(R.string.admin_stat_students), adminAccent),
+                    Triple(courses.size, stringResource(R.string.admin_stat_courses), Color(0xFF06B6D4)),
+                    Triple(pendingRegs.size, stringResource(R.string.admin_stat_pending), amberColor)
                 ).forEach { (count, label, color) ->
                     Card(modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = AppColorState.surface), border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.25f))) {
                         Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -1733,7 +1745,7 @@ fun ProfileScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.HourglassEmpty, null, tint = amberColor, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Onay Bekleyen Kayıtlar", color = amberColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.admin_pending_regs_title), color = amberColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                     Spacer(Modifier.width(8.dp))
                     Surface(shape = CircleShape, color = amberColor) {
                         Text(" ${pendingRegs.size} ", color = Color.White, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
@@ -1772,8 +1784,9 @@ fun ProfileScreen(
                                     UserRole.ADMIN   -> amberColor.copy(alpha = 0.15f)
                                     else             -> EmeraldGreen.copy(alpha = 0.15f)
                                 }, modifier = Modifier.padding(top = 3.dp)) {
+                                    val roleLabel = when (reg.role) { UserRole.STUDENT -> stringResource(R.string.role_label_student); UserRole.ADMIN -> stringResource(R.string.role_label_admin); else -> stringResource(R.string.role_label_lecturer) }
                                     Text(
-                                        when (reg.role) { UserRole.STUDENT -> "  Öğrenci  "; UserRole.ADMIN -> "  Admin  "; else -> "  Hoca  " },
+                                        roleLabel,
                                         color = when (reg.role) { UserRole.STUDENT -> adminAccent; UserRole.ADMIN -> amberColor; else -> EmeraldGreen },
                                         style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold
                                     )
@@ -1798,13 +1811,13 @@ fun ProfileScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Settings, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Sistem Ayarları", color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.admin_system_settings), color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
                     }
                     HorizontalDivider(color = AppColorState.surface2)
                     // Tema
-                    Text("Tema", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.theme_label), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(AppSettings.THEME_SYSTEM to "Sistem", AppSettings.THEME_LIGHT to "Açık", AppSettings.THEME_DARK to "Koyu").forEach { (mode, label) ->
+                        listOf(AppSettings.THEME_SYSTEM to stringResource(R.string.theme_system), AppSettings.THEME_LIGHT to stringResource(R.string.theme_light), AppSettings.THEME_DARK to stringResource(R.string.theme_dark)).forEach { (mode, label) ->
                             val sel = currentTheme == mode
                             OutlinedButton(onClick = { onThemeChange(mode) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else AppColorState.surface2), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
                                 Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
@@ -1812,10 +1825,10 @@ fun ProfileScreen(
                         }
                     }
                     // Dil
-                    Text("Dil", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.language_section), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelMedium)
                     val currentLang = appSettings?.language ?: AppSettings.LANG_TR
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(AppSettings.LANG_TR to "Türkçe", AppSettings.LANG_EN to "English").forEach { (code, label) ->
+                        listOf(AppSettings.LANG_TR to stringResource(R.string.lang_turkish), AppSettings.LANG_EN to stringResource(R.string.lang_english)).forEach { (code, label) ->
                             val sel = currentLang == code
                             OutlinedButton(onClick = { appSettings?.language = code; Toast.makeText(context, context.getString(R.string.language_changed), Toast.LENGTH_SHORT).show(); val i = android.content.Intent(context, com.example.academicmanager.MainActivity::class.java); i.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK or android.content.Intent.FLAG_ACTIVITY_NEW_TASK); context.startActivity(i) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.outlinedButtonColors(containerColor = if (sel) adminAccent.copy(alpha = 0.15f) else Color.Transparent, contentColor = if (sel) adminAccent else AppColorState.textSecondary), border = androidx.compose.foundation.BorderStroke(1.dp, if (sel) adminAccent else AppColorState.surface2), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)) {
                                 Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal)
@@ -1831,7 +1844,7 @@ fun ProfileScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Security, null, tint = AppColorState.textSecondary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Hesap Güvenliği", color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.admin_account_security), color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleSmall)
                     }
                     HorizontalDivider(color = AppColorState.surface2)
                     Row(

@@ -102,6 +102,8 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
     // Reject dialog state (availability)
     var rejectAvailTarget  by remember { mutableStateOf<LecturerAvailability?>(null) }
     var rejectAvailNote    by remember { mutableStateOf("") }
+    // Approve dialog (migrasyon onayı)
+    var approveAvailTarget by remember { mutableStateOf<LecturerAvailability?>(null) }
     // View availability + schedule dialog
     var viewAvailTarget    by remember { mutableStateOf<LecturerAvailability?>(null) }
 
@@ -257,9 +259,13 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                 }
             } else {
                 items(pendingAvailabilities) { avail ->
+                    val isUpdate = allAvailabilities.any {
+                        it.lecturerUsername == avail.lecturerUsername && it.status == AvailabilityStatus.APPROVED
+                    }
                     PendingAvailabilityCard(
                         avail     = avail,
-                        onApprove = { viewModel.approveAvailability(avail) },
+                        isUpdate  = isUpdate,
+                        onApprove = { approveAvailTarget = avail },
                         onReject  = { rejectAvailTarget = avail; rejectAvailNote = "" },
                         onView    = { viewAvailTarget = avail }
                     )
@@ -444,21 +450,10 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
             }
         }
 
-        // ── Grades, Exams, Assignments, Calendar, Announcements ──
+        // ── Exams, Assignments, Calendar, Announcements ──
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
-                        onClick = { navController.navigate("admin_grades") },
-                        modifier = Modifier.weight(1f),
-                        border = BorderStroke(1.dp, EmeraldGreen.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = EmeraldGreen),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(Icons.Default.Grade, contentDescription = null, modifier = Modifier.size(15.dp))
-                        Spacer(Modifier.width(5.dp))
-                        Text(stringResource(R.string.panel_grades), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
-                    }
                     OutlinedButton(
                         onClick = { navController.navigate("admin_exam_schedule") },
                         modifier = Modifier.weight(1f),
@@ -506,10 +501,138 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     Spacer(Modifier.width(5.dp))
                     Text(stringResource(R.string.nav_announcements), fontWeight = FontWeight.SemiBold)
                 }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = { navController.navigate("admin_risk") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFEF4444)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.risk_action), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
+                    OutlinedButton(
+                        onClick = { navController.navigate("admin_peer_match") },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, Color(0xFF8B5CF6).copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF8B5CF6)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.People, contentDescription = null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.peer_match_action), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
             }
         }
 
         item { Spacer(Modifier.height(80.dp)) }
+    }
+
+    // ── Availability Approve Dialog (migrasyon) ─────────────
+    approveAvailTarget?.let { avail ->
+        val weekDaysShortLocal = weekDaysShort()
+        val newSlotKeys = WEEK_DAYS.flatMap { day ->
+            avail.slotsForDay(day).map { slot -> "$day|$slot" }
+        }.toSet()
+        val conflicting = scheduleEntries.filter { entry ->
+            entry.lecturerName == avail.lecturerName && "${entry.dayOfWeek}|${entry.timeSlot}" !in newSlotKeys
+        }
+        val isUpdate = allAvailabilities.any {
+            it.lecturerUsername == avail.lecturerUsername && it.status == AvailabilityStatus.APPROVED
+        }
+        AlertDialog(
+            onDismissRequest = { approveAvailTarget = null },
+            containerColor = AppColorState.surface,
+            modifier = Modifier.fillMaxWidth(),
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.EventAvailable, null, tint = EmeraldGreen, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            if (isUpdate) stringResource(R.string.avail_approve_update_title) else stringResource(R.string.avail_approve_title),
+                            color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(avail.lecturerName, color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Yeni müsaitlik özeti
+                    Text(stringResource(R.string.avail_approve_map_label), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
+                    AdminAvailabilityGrid(avail = avail, accentColor = EmeraldGreen)
+
+                    if (conflicting.isNotEmpty()) {
+                        HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.12f))
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.1f)).padding(10.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp).padding(top = 1.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.avail_approve_conflict_warn, conflicting.size),
+                                color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                        conflicting.sortedWith(compareBy({ WEEK_DAYS.indexOf(it.dayOfWeek) }, { it.timeSlot })).forEach { entry ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(ErrorRed.copy(alpha = 0.07f)).padding(horizontal = 10.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(modifier = Modifier.size(22.dp).clip(RoundedCornerShape(4.dp)).background(ErrorRed.copy(alpha = 0.15f)), contentAlignment = Alignment.Center) {
+                                    Text(dayLocalizedShort(entry.dayOfWeek, weekDaysShortLocal), color = ErrorRed, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 8.sp)
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(entry.courseName, color = AppColorState.textPrimary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text("${entry.timeSlot} · ${entry.classroomName}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+                                }
+                                Icon(Icons.Default.DeleteForever, null, tint = ErrorRed.copy(alpha = 0.6f), modifier = Modifier.size(14.dp))
+                            }
+                        }
+                    } else if (isUpdate) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(EmeraldGreen.copy(alpha = 0.08f)).padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.CheckCircle, null, tint = EmeraldGreen, modifier = Modifier.size(14.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.avail_approve_compatible), color = EmeraldGreen, style = MaterialTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (isUpdate || conflicting.isNotEmpty()) {
+                            viewModel.approveAvailabilityWithMigration(avail)
+                        } else {
+                            viewModel.approveAvailability(avail)
+                        }
+                        approveAvailTarget = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen)
+                ) {
+                    Icon(Icons.Default.Check, null, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.approve), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { approveAvailTarget = null }) {
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
+                }
+            }
+        )
     }
 
     // ── Availability Reject Dialog ───────────────────────────
@@ -626,7 +749,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     Spacer(Modifier.width(10.dp))
                     Column {
                         Text(avail.lecturerName, color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
-                        Text("${avail.totalSlots} müsait slot", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.avail_slot_count_short, avail.totalSlots), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 }
             },
@@ -641,7 +764,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
 
                     if (lecturerEntries.isNotEmpty()) {
                         HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.12f))
-                        Text("Mevcut Ders Takvimi (${lecturerEntries.size} ders)", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.lecturer_schedule_count, lecturerEntries.size), color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                         lecturerEntries.sortedWith(compareBy({ WEEK_DAYS.indexOf(it.dayOfWeek) }, { it.timeSlot })).forEach { entry ->
                             Row(
                                 modifier = Modifier
@@ -671,7 +794,7 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                         ) {
                             Icon(Icons.Default.DateRange, null, tint = AppColorState.textSecondary, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Henüz ders atanmamış", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.no_courses_assigned_yet), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                         }
                     }
                 }
@@ -704,8 +827,8 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                     unfocusedContainerColor = Color.Transparent
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedTextField(value = studentFullName, onValueChange = { studentFullName = it.filter { c -> c.isLetter() || c.isWhitespace() || c == '-' } }, label = { Text(stringResource(R.string.student_name_label)) }, placeholder = { Text("Örn. Ali Vural", color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
-                    OutlinedTextField(value = studentUsername, onValueChange = { studentUsername = it.filter { c -> c.isLetterOrDigit() || c == '_' }.lowercase() }, label = { Text(stringResource(R.string.student_username_label)) }, placeholder = { Text("Örn. ali_vural", color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
+                    OutlinedTextField(value = studentFullName, onValueChange = { studentFullName = it.filter { c -> c.isLetter() || c.isWhitespace() || c == '-' } }, label = { Text(stringResource(R.string.student_name_label)) }, placeholder = { Text(stringResource(R.string.full_name_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
+                    OutlinedTextField(value = studentUsername, onValueChange = { studentUsername = it.filter { c -> c.isLetterOrDigit() || c == '_' }.lowercase() }, label = { Text(stringResource(R.string.student_username_label)) }, placeholder = { Text(stringResource(R.string.username_hint_detail), color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf)
                     OutlinedTextField(value = studentPassword, onValueChange = { studentPassword = it }, label = { Text(stringResource(R.string.student_password_label)) }, placeholder = { Text(stringResource(R.string.new_password_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), colors = sf, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
                     if (studentPassword.isNotEmpty()) {
                         PasswordStrengthRow(studentPassword)
@@ -752,15 +875,15 @@ fun AdminHomeScreen(viewModel: AdminViewModel, navController: NavController) {
                 Button(
                     onClick = {
                         if (studentFullName.trim().length < 3) {
-                            Toast.makeText(context, "Ad soyad en az 3 karakter olmalıdır", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_name_min_3), Toast.LENGTH_SHORT).show()
                         } else if (studentUsername.trim().length < 3) {
-                            Toast.makeText(context, "Kullanıcı adı en az 3 karakter olmalıdır", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_username_min_3), Toast.LENGTH_SHORT).show()
                         } else if (studentPassword.length < 6) {
-                            Toast.makeText(context, "Şifre en az 6 karakter olmalıdır", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_password_min_6), Toast.LENGTH_SHORT).show()
                         } else if (studentDepartment.isBlank()) {
-                            Toast.makeText(context, "Bölüm seçiniz", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_select_dept), Toast.LENGTH_SHORT).show()
                         } else if (studentYear.isBlank()) {
-                            Toast.makeText(context, "Sınıf yılı seçiniz", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_select_year), Toast.LENGTH_SHORT).show()
                         } else {
                             viewModel.addStudent(studentFullName.trim(), studentUsername.trim(), studentPassword, studentDepartment, studentYear, studentId)
                             showAddStudentDialog = false
@@ -941,8 +1064,8 @@ private fun LecturerInfoRow(
         assignmentResult.collect { result ->
             when (result) {
                 is AssignmentResult.Success -> { showDetailDialog = false }
-                is AssignmentResult.LecturerClash   -> assignError = "Çakışma: ${result.existing.courseName} aynı saatte!"
-                is AssignmentResult.ClassroomClash  -> assignError = "Sınıf meşgul: ${result.existing.courseName}"
+                is AssignmentResult.LecturerClash   -> assignError = context.getString(R.string.error_lecturer_clash, result.existing.courseName)
+                is AssignmentResult.ClassroomClash  -> assignError = context.getString(R.string.error_classroom_clash, result.existing.courseName)
                 is AssignmentResult.CapacityWarning -> assignError = result.message
                 is AssignmentResult.Error           -> assignError = result.message
             }
@@ -999,7 +1122,7 @@ private fun LecturerInfoRow(
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
                         Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(10.dp))
                         Spacer(Modifier.width(3.dp))
-                        Text("Şifre değiştirilmedi", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.password_not_changed), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -1064,13 +1187,13 @@ private fun LecturerInfoRow(
                         ) {
                             Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Onaylı müsaitlik haritası yok — tüm saatler gösterilir", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                            Text(stringResource(R.string.assign_no_avail_warn), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
                         }
                     }
 
                     if (onAssignCourse != null) {
                         HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.12f))
-                        Text("Ders Ata", color = IndigoAccent, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.assign_course_title), color = IndigoAccent, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
 
                         // Hata mesajı
                         assignError?.let { err ->
@@ -1097,7 +1220,7 @@ private fun LecturerInfoRow(
                             OutlinedTextField(
                                 value = selCourse?.let { "${it.courseCode} – ${it.courseName}" } ?: stringResource(R.string.select_course),
                                 onValueChange = {}, readOnly = true,
-                                label = { Text("Ders") },
+                                label = { Text(stringResource(R.string.course_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = courseExp) },
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
@@ -1131,9 +1254,9 @@ private fun LecturerInfoRow(
                         var timeExp by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(expanded = timeExp, onExpandedChange = { if (selDay.isNotEmpty()) timeExp = !timeExp }) {
                             OutlinedTextField(
-                                value = selTime.ifEmpty { "Önce gün seçin" },
+                                value = selTime.ifEmpty { stringResource(R.string.select_day_first) },
                                 onValueChange = {}, readOnly = true,
-                                label = { Text("Saat${if (availability != null) " (müsait saatler)" else ""}") },
+                                label = { Text(if (availability != null) stringResource(R.string.time_label_avail) else stringResource(R.string.time_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = timeExp) },
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors,
@@ -1152,14 +1275,14 @@ private fun LecturerInfoRow(
                             OutlinedTextField(
                                 value = selClassroom?.let { "${it.name} (${it.capacity})" } ?: stringResource(R.string.select_classroom),
                                 onValueChange = {}, readOnly = true,
-                                label = { Text("Sınıf") },
+                                label = { Text(stringResource(R.string.classroom_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = clsExp) },
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
                             ExposedDropdownMenu(expanded = clsExp, onDismissRequest = { clsExp = false }, modifier = Modifier.background(AppColorState.surface).heightIn(max = 200.dp)) {
                                 classrooms.forEach { cls ->
-                                    DropdownMenuItem(text = { Text("${cls.name} · ${cls.capacity} kişi · ${ClassroomType.displayName(cls.classroomType)}", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selClassroom = cls; clsExp = false })
+                                    DropdownMenuItem(text = { Text(stringResource(R.string.classroom_person_count, cls.name, cls.capacity, ClassroomType.displayName(cls.classroomType)), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall) }, onClick = { selClassroom = cls; clsExp = false })
                                 }
                             }
                         }
@@ -1170,14 +1293,14 @@ private fun LecturerInfoRow(
                             OutlinedTextField(
                                 value = SessionType.displayName(selSession),
                                 onValueChange = {}, readOnly = true,
-                                label = { Text("Seans Tipi") },
+                                label = { Text(stringResource(R.string.session_type_label)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = sessExp) },
                                 modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth(),
                                 shape = RoundedCornerShape(10.dp), colors = fieldColors
                             )
                             ExposedDropdownMenu(expanded = sessExp, onDismissRequest = { sessExp = false }, modifier = Modifier.background(AppColorState.surface)) {
-                                DropdownMenuItem(text = { Text("Teorik", color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LECTURE; sessExp = false })
-                                DropdownMenuItem(text = { Text("Lab", color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LAB; sessExp = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.session_lecture_text), color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LECTURE; sessExp = false })
+                                DropdownMenuItem(text = { Text(stringResource(R.string.session_lab_text), color = AppColorState.textPrimary) }, onClick = { selSession = SessionType.LAB; sessExp = false })
                             }
                         }
                     }
@@ -1201,7 +1324,7 @@ private fun LecturerInfoRow(
                         ) {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(14.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("Ata", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.assign_btn_short), fontWeight = FontWeight.Bold)
                         }
                     }
                     TextButton(onClick = { showDetailDialog = false; assignError = null }) {
@@ -1217,15 +1340,15 @@ private fun LecturerInfoRow(
         AlertDialog(
             onDismissRequest = { showResetPwdDialog = false; newPwd = "" },
             containerColor = AppColorState.surface,
-            title = { Text("Şifre Sıfırla", color = IndigoAccent, fontWeight = FontWeight.Bold) },
+            title = { Text(stringResource(R.string.reset_password_title), color = IndigoAccent, fontWeight = FontWeight.Bold) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("${lecturer.fullName} (@${lecturer.username}) için yeni şifre belirleyin.", color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.reset_password_for, lecturer.fullName, lecturer.username), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(
                         value = newPwd,
                         onValueChange = { newPwd = it },
-                        label = { Text("Yeni Şifre") },
-                        placeholder = { Text("En az 6 karakter", color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
+                        label = { Text(stringResource(R.string.new_password_label)) },
+                        placeholder = { Text(stringResource(R.string.min_6_chars_hint), color = AppColorState.textSecondary.copy(alpha = 0.5f)) },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp),
@@ -1237,27 +1360,27 @@ private fun LecturerInfoRow(
                         )
                     )
                     if (newPwd.isNotEmpty()) PasswordStrengthRow(newPwd)
-                    Text("Hoca bir sonraki girişte şifresini değiştirmek zorunda kalacak.", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.reset_password_note), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
                         if (newPwd.length < 6) {
-                            Toast.makeText(context, "Şifre en az 6 karakter olmalıdır", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.val_password_min_6), Toast.LENGTH_SHORT).show()
                         } else {
                             onResetPassword(newPwd) { success ->
                                 if (success) {
-                                    Toast.makeText(context, "${lecturer.fullName} şifresi sıfırlandı.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.reset_password_success, lecturer.fullName), Toast.LENGTH_SHORT).show()
                                     showResetPwdDialog = false; newPwd = ""
                                 } else {
-                                    Toast.makeText(context, "Şifre sıfırlama başarısız.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.reset_password_failed), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent)
-                ) { Text("Sıfırla") }
+                ) { Text(stringResource(R.string.reset_btn)) }
             },
             dismissButton = {
                 TextButton(onClick = { showResetPwdDialog = false; newPwd = "" }) { Text(stringResource(R.string.cancel), color = AppColorState.textSecondary) }
@@ -1365,7 +1488,7 @@ private fun StudentInfoRow(student: Lecturer, onDelete: () -> Unit = {}) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
                         Icon(Icons.Default.Warning, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(10.dp))
                         Spacer(Modifier.width(3.dp))
-                        Text("Şifre değiştirilmedi", color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.password_not_changed), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
@@ -1421,14 +1544,14 @@ private fun PendingRequestCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.MeetingRoom, null, tint = AppColorState.textSecondary, modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Tercih: ${request.proposedClassroom}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.preference_label) + " ${request.proposedClassroom}", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                 }
             }
             if (request.courseName.isNotBlank()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.AutoMirrored.Filled.List, null, tint = EmeraldGreen, modifier = Modifier.size(12.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("Tercih: ${request.courseName}", color = EmeraldGreen, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(stringResource(R.string.preference_label) + " ${request.courseName}", color = EmeraldGreen, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             if (request.lecturerNote.isNotBlank()) {
@@ -1566,6 +1689,7 @@ private fun AllAssignedBanner(message: String) {
 @Composable
 private fun PendingAvailabilityCard(
     avail: LecturerAvailability,
+    isUpdate: Boolean = false,
     onApprove: () -> Unit,
     onReject: () -> Unit,
     onView: () -> Unit = {}
@@ -1587,7 +1711,17 @@ private fun PendingAvailabilityCard(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(avail.lecturerName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(avail.lecturerName, color = AppColorState.textPrimary, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                        if (isUpdate) {
+                            Spacer(Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.2f)).padding(horizontal = 5.dp, vertical = 1.dp)
+                            ) {
+                                Text(stringResource(R.string.badge_update), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                            }
+                        }
+                    }
                     Text(
                         stringResource(R.string.admin_avail_slots_count, avail.totalSlots),
                         color = AppColorState.textSecondary,
@@ -1631,7 +1765,7 @@ private fun PendingAvailabilityCard(
                 ) {
                     Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(13.dp))
                     Spacer(Modifier.width(3.dp))
-                    Text("Görüntüle", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.view_btn), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
                 }
                 Button(
                     onClick = onApprove,
@@ -1805,10 +1939,13 @@ fun AdminAvailabilityScreen(viewModel: AdminViewModel, navController: NavControl
 
 @Composable
 private fun AdminAvailabilityDetailCard(avail: LecturerAvailability) {
+    val approvedStr = stringResource(R.string.status_approved)
+    val rejectedStr = stringResource(R.string.status_rejected)
+    val pendingStr  = stringResource(R.string.status_pending)
     val (statusColor, statusLabel) = when (avail.status) {
-        AvailabilityStatus.APPROVED -> EmeraldGreen to "Onaylandı"
-        AvailabilityStatus.REJECTED -> ErrorRed     to "Reddedildi"
-        else                        -> Color(0xFFF59E0B) to "Onay Bekliyor"
+        AvailabilityStatus.APPROVED -> EmeraldGreen to approvedStr
+        AvailabilityStatus.REJECTED -> ErrorRed     to rejectedStr
+        else                        -> Color(0xFFF59E0B) to pendingStr
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1836,7 +1973,7 @@ private fun AdminAvailabilityDetailCard(avail: LecturerAvailability) {
             // Read-only grid
             AdminAvailabilityGrid(avail = avail, accentColor = statusColor)
             if (avail.adminNote.isNotBlank()) {
-                Text("Not: \"${avail.adminNote}\"", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.admin_note_display, avail.adminNote), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
             }
         }
     }
@@ -1857,7 +1994,7 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
                 style      = MaterialTheme.typography.titleSmall
             )
             Text(
-                "${availabilities.size} hoca müsaitlik haritası",
+                stringResource(R.string.avail_count_title, availabilities.size),
                 color = AppColorState.textSecondary,
                 style = MaterialTheme.typography.labelSmall
             )
@@ -1916,7 +2053,7 @@ private fun AdminAllLecturersGrid(availabilities: List<LecturerAvailability>) {
             Spacer(Modifier.height(4.dp))
             HorizontalDivider(color = AppColorState.textSecondary.copy(alpha = 0.1f))
             Spacer(Modifier.height(2.dp))
-            Text("Sayı = o saatte müsait hoca adedi", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
+            Text(stringResource(R.string.avail_grid_legend), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall, fontSize = 10.sp)
         }
     }
 }
@@ -2155,7 +2292,7 @@ fun ClassroomsScreen(viewModel: AdminViewModel) {
                         if (name.isBlank()) {
                             Toast.makeText(context, context.getString(R.string.room_name_empty), Toast.LENGTH_SHORT).show()
                         } else if (parsedCapacity < 1 || parsedCapacity > 2000) {
-                            Toast.makeText(context, "Kapasite 1 ile 2000 arasında olmalıdır", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.classroom_capacity_error), Toast.LENGTH_SHORT).show()
                         } else {
                             viewModel.addClassroom(
                                 name          = name.trim(),
@@ -2320,7 +2457,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
                     val e = result.existing
                     Toast.makeText(
                         context,
-                        "Çakışma! ${e.lecturerName} aynı saatte ${e.courseName} dersini veriyor\n(${e.dayOfWeek} ${e.timeSlot})",
+                        context.getString(R.string.clash_lecturer_detail, e.lecturerName, e.courseName, e.dayOfWeek, e.timeSlot),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -2328,7 +2465,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
                     val e = result.existing
                     Toast.makeText(
                         context,
-                        "Çakışma! ${e.classroomName} sınıfı aynı saatte ${e.courseName} dersine atanmış\n(${e.dayOfWeek} ${e.timeSlot})",
+                        context.getString(R.string.clash_classroom_detail, e.classroomName, e.courseName, e.dayOfWeek, e.timeSlot),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -2336,7 +2473,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
                     warningMessage = result.message
                 }
                 is AssignmentResult.Error -> {
-                    Toast.makeText(context, "Hata: ${result.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.error_prefix, result.message), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -2371,7 +2508,7 @@ fun AssignmentScreen(viewModel: AdminViewModel, navController: NavController) {
             ) {
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Otomatik Ata", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.auto_assign_btn), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -2586,7 +2723,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
             val s = state as AdminViewModel.AutoAssignState.Done
             Toast.makeText(
                 context,
-                "${s.saved} ders atandı${if (s.failed > 0) ", ${s.failed} hata" else ""}",
+                context.getString(R.string.auto_assign_result, s.saved, if (s.failed > 0) ", ${s.failed} hata" else ""),
                 Toast.LENGTH_LONG
             ).show()
             kotlinx.coroutines.delay(1500)
@@ -2600,8 +2737,8 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
             TopAppBar(
                 title = {
                     Column {
-                        Text("Otomatik Ders Atama", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
-                        Text("Müsaitlik haritasına göre dersler otomatik atanır", color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.auto_assign_title), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(R.string.auto_assign_subtitle), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, titleContentColor = AppColorState.textPrimary)
@@ -2629,8 +2766,8 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                         Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(color = accentColor, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
-                                Text("Hesaplanıyor...", color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
-                                Text("Müsaitlikler ve sınıflar kontrol ediliyor", color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.auto_assign_computing), color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.auto_assign_computing_desc), color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -2641,10 +2778,10 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                     // Summary row
                     item {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            AutoAssignStatChip("${s.proposals.count { it.included }} seçili", accentColor, Modifier.weight(1f))
-                            AutoAssignStatChip("${s.unassigned.size} atanamadı", ErrorRed, Modifier.weight(1f))
+                            AutoAssignStatChip(stringResource(R.string.auto_assign_selected_count, s.proposals.count { it.included }), accentColor, Modifier.weight(1f))
+                            AutoAssignStatChip(stringResource(R.string.auto_assign_failed_count, s.unassigned.size), ErrorRed, Modifier.weight(1f))
                             if (s.warnings.isNotEmpty())
-                                AutoAssignStatChip("${s.warnings.size} uyarı", Color(0xFFF59E0B), Modifier.weight(1f))
+                                AutoAssignStatChip(stringResource(R.string.auto_assign_warnings_count, s.warnings.size), Color(0xFFF59E0B), Modifier.weight(1f))
                         }
                     }
 
@@ -2658,7 +2795,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                                 colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor),
                                 shape = RoundedCornerShape(10.dp),
                                 contentPadding = PaddingValues(vertical = 6.dp)
-                            ) { Text("Tümünü Seç", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                            ) { Text(stringResource(R.string.select_all_btn), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                             OutlinedButton(
                                 onClick = { viewModel.selectAllProposals(false) },
                                 modifier = Modifier.weight(1f),
@@ -2666,7 +2803,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                                 colors = ButtonDefaults.outlinedButtonColors(contentColor = AppColorState.textSecondary),
                                 shape = RoundedCornerShape(10.dp),
                                 contentPadding = PaddingValues(vertical = 6.dp)
-                            ) { Text("Tümünü Kaldır", style = MaterialTheme.typography.labelSmall) }
+                            ) { Text(stringResource(R.string.deselect_all_btn), style = MaterialTheme.typography.labelSmall) }
                             OutlinedButton(
                                 onClick = { viewModel.runAutoAssign() },
                                 modifier = Modifier.weight(1f),
@@ -2677,7 +2814,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                             ) {
                                 Icon(Icons.Default.Refresh, null, modifier = Modifier.size(13.dp))
                                 Spacer(Modifier.width(4.dp))
-                                Text("Yenile", style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(R.string.refresh_btn), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -2689,15 +2826,15 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                                 Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(Icons.Default.SearchOff, null, tint = AppColorState.textSecondary, modifier = Modifier.size(36.dp))
                                     Spacer(Modifier.height(8.dp))
-                                    Text("Atanacak ders bulunamadı", color = AppColorState.textSecondary)
-                                    Text("Hocaların müsaitlik haritası girilmiş olmalı", color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(R.string.auto_assign_empty), color = AppColorState.textSecondary)
+                                    Text(stringResource(R.string.auto_assign_empty_hint), color = AppColorState.textSecondary.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
                     } else {
                         item {
                             Text(
-                                "Önerilen Atamalar (${s.proposals.size})",
+                                stringResource(R.string.auto_assign_proposals, s.proposals.size),
                                 color = accentColor, fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleSmall
                             )
@@ -2715,7 +2852,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                     if (s.unassigned.isNotEmpty()) {
                         item {
                             Text(
-                                "Atanamayan Dersler (${s.unassigned.size})",
+                                stringResource(R.string.auto_assign_unassigned, s.unassigned.size),
                                 color = ErrorRed, fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleSmall,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -2738,7 +2875,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                                     Spacer(Modifier.width(10.dp))
                                     Column(Modifier.weight(1f)) {
                                         Text(course.courseName, color = AppColorState.textPrimary, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Text("Uygun hoca/saat/sınıf bulunamadı", color = ErrorRed, style = MaterialTheme.typography.labelSmall)
+                                        Text(stringResource(R.string.auto_assign_no_fit), color = ErrorRed, style = MaterialTheme.typography.labelSmall)
                                     }
                                 }
                             }
@@ -2748,7 +2885,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                     // Warnings
                     if (s.warnings.isNotEmpty()) {
                         item {
-                            Text("Uyarılar", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
+                            Text(stringResource(R.string.warnings_title), color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 4.dp))
                         }
                         items(s.warnings) { warning ->
                             Row(
@@ -2779,7 +2916,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                             Icon(Icons.Default.Check, null, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                if (selectedCount > 0) "$selectedCount Atamayı Kaydet" else "Atama Seçilmedi",
+                                if (selectedCount > 0) stringResource(R.string.auto_assign_save, selectedCount) else stringResource(R.string.auto_assign_none),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
@@ -2794,7 +2931,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                         Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 CircularProgressIndicator(color = EmeraldGreen, strokeWidth = 3.dp, modifier = Modifier.size(56.dp))
-                                Text("Firebase'e kaydediliyor...", color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(R.string.saving_firebase), color = AppColorState.textSecondary, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -2806,7 +2943,7 @@ fun AutoAssignScreen(viewModel: AdminViewModel) {
                         Box(Modifier.fillMaxWidth().padding(top = 80.dp), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Icon(Icons.Default.CheckCircle, null, tint = EmeraldGreen, modifier = Modifier.size(64.dp))
-                                Text("Tamamlandı!", color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                                Text(stringResource(R.string.done_title), color = EmeraldGreen, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
                             }
                         }
                     }
@@ -2837,14 +2974,14 @@ private fun AutoAssignIdleSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.AutoAwesome, null, tint = accentColor, modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(10.dp))
-                    Text("Nasıl Çalışır?", color = accentColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.how_it_works_title), color = accentColor, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
                 }
                 listOf(
-                    "Hocaların müsaitlik haritaları incelenir",
-                    "Her ders için uygun hoca, saat ve sınıf bulunur",
-                    "Çakışmalar otomatik engellenir",
-                    "Lab dersleri için ayrı lab seansı eklenir",
-                    "Yük dengeleme ile adil dağılım sağlanır"
+                    stringResource(R.string.auto_step_1),
+                    stringResource(R.string.auto_step_2),
+                    stringResource(R.string.auto_step_3),
+                    stringResource(R.string.auto_step_4),
+                    stringResource(R.string.auto_step_5)
                 ).forEachIndexed { i, text ->
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -2860,9 +2997,9 @@ private fun AutoAssignIdleSection(
 
         // Stats
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AutoAssignStatChip("${unassignedCourses.size} ders bekliyor", accentColor, Modifier.weight(1f))
-            AutoAssignStatChip("$approvedAvailCount hoca müsait", EmeraldGreen, Modifier.weight(1f))
-            AutoAssignStatChip("${classrooms.size} sınıf var", Color(0xFFF59E0B), Modifier.weight(1f))
+            AutoAssignStatChip(stringResource(R.string.auto_assign_courses_waiting, unassignedCourses.size), accentColor, Modifier.weight(1f))
+            AutoAssignStatChip(stringResource(R.string.auto_assign_lecturers_avail, approvedAvailCount), EmeraldGreen, Modifier.weight(1f))
+            AutoAssignStatChip(stringResource(R.string.auto_assign_classrooms_count, classrooms.size), Color(0xFFF59E0B), Modifier.weight(1f))
         }
 
         // Requirements check
@@ -2878,11 +3015,11 @@ private fun AutoAssignIdleSection(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Warning, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Ön Koşullar", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.prerequisites), color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
                     }
-                    RequirementRow("Atanacak ders var", unassignedCourses.isNotEmpty())
-                    RequirementRow("Onaylı müsaitlik var", approvedAvailCount > 0)
-                    RequirementRow("Sınıf tanımlı", classrooms.isNotEmpty())
+                    RequirementRow(stringResource(R.string.prereq_courses), unassignedCourses.isNotEmpty())
+                    RequirementRow(stringResource(R.string.prereq_avail), approvedAvailCount > 0)
+                    RequirementRow(stringResource(R.string.prereq_classrooms), classrooms.isNotEmpty())
                 }
             }
         }
@@ -2896,7 +3033,7 @@ private fun AutoAssignIdleSection(
         ) {
             Icon(Icons.Default.AutoAwesome, null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
-            Text("Otomatik Atamayı Başlat", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text(stringResource(R.string.start_auto_assign), fontWeight = FontWeight.Bold, fontSize = 15.sp)
         }
     }
 }

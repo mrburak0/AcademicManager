@@ -146,7 +146,7 @@
 
     <!-- Pending registrations -->
     <string name="reject_reg_title">Kaydı Reddet</string>
-    <string name="reject_reg_msg">%s (@%s) kullanıcısının kaydı silinecek.</string>
+    <string name="reject_reg_msg">%1$s (@%2$s) kullanıcısının kaydı silinecek.</string>
     <string name="reject_and_delete">Reddet &amp; Sil</string>
 
     <!-- ── Classrooms ──────────────────────────────────────────── -->
@@ -189,7 +189,7 @@
     <string name="current_schedule">Mevcut Program (%d)</string>
     <string name="assignment_saved">Atama başarıyla kaydedildi!</string>
     <string name="remove_assignment_title">Atamayı Kaldır</string>
-    <string name="remove_assignment_msg">%s dersini %s gününde %s saatinden kaldır?</string>
+    <string name="remove_assignment_msg">%1$s dersini %2$s gününde %3$s saatinden kaldır?</string>
     <string name="remove">Kaldır</string>
 
     <!-- ── Weekdays ───────────────────────────────────────────── -->
@@ -483,6 +483,14 @@
     <string name="avail_update_success">Müsaitlik haritanız güncellendi!</string>
     <string name="avail_update_failed">Güncelleme başarısız, tekrar deneyin.</string>
     <string name="avail_sent_admin_msg">Müsaitliğiniz admin onayına gönderildi!</string>
+    <string name="avail_update_pending_title">Değişiklik onay bekliyor</string>
+    <string name="avail_update_pending_body">Müsaitlik değişikliğiniz adminde. Onaylanana kadar mevcut haritanız geçerli.</string>
+    <string name="avail_update_waiting">Onay bekleniyor…</string>
+    <string name="avail_update_already_pending">Zaten onay bekleyen bir değişiklik mevcut.</string>
+    <string name="avail_update_confirm_title">Güncelleme Talebi Gönder</string>
+    <string name="avail_update_confirm_body">Güncellenmiş müsaitliğiniz admin onayına gönderilecek. Kaldırılan saatlerdeki dersler onay sonrası programdan çıkarılacak.</string>
+    <string name="avail_update_confirm_warn">Uyumsuz program girişleri onay sonrası silinerek yeniden atanmaya hazır hale gelecek.</string>
+    <string name="avail_update_sent_msg">Müsaitlik değişikliğiniz admin onayına gönderildi!</string>
     <string name="avail_map_active">Haritanız aktif (%d slot)</string>
     <string name="avail_rejected_edit">Reddedildi — lütfen düzenleyin</string>
     <string name="avail_pending_approval">Admin onayı bekleniyor</string>
@@ -493,52 +501,17 @@
     <string name="copy">Kopyala</string>
 
     <!-- ── Navigasyon (yeni) ──────────────────────────────────── -->
-    <string name="nav_grades">Notlar</string>
     <string name="nav_attendance">Yoklama</string>
 
     <!-- ── Hızlı Eylemler ────────────────────────────────────── -->
     <string name="quick_actions">Hızlı Eylemler</string>
-    <string name="grade_entry_action">Not Gir</string>
     <string name="attendance_action">Yoklama Al</string>
-    <string name="my_grades_action">Notlarım</string>
     <string name="my_attendance_action">Yoklamam</string>
 
-    <!-- ── Not Girişi (Öğretim Görevlisi) ───────────────────── -->
-    <string name="grade_entry_title">Not Girişi</string>
-    <string name="grade_entry_subtitle">Not girmek için bir ders seçin</string>
+    <!-- ── Yoklama ortak stringler ───────────────────────────── -->
     <string name="no_assigned_courses">Henüz size atanmış ders yok.</string>
-    <string name="students_label">öğrenci</string>
     <string name="no_students_in_dept">Bu bölümde kayıtlı öğrenci bulunamadı.</string>
-    <string name="grade_midterm">Vize</string>
-    <string name="grade_assignment">Ödev</string>
-    <string name="grade_lab">Lab</string>
-    <string name="grade_final">Final</string>
-    <string name="grade_preview">Ağırlıklı Ortalama / Harf Notu</string>
-    <string name="grade_save">Notu Kaydet</string>
-
-    <!-- ── Notlarım (Öğrenci) ────────────────────────────────── -->
-    <string name="my_grades_title">Notlarım</string>
     <string name="no_dept_courses">Bölümünüze ait ders bulunamadı.</string>
-    <string name="grade_not_entered">Girilmedi</string>
-    <string name="grade_midterm_short">Vize: %d</string>
-    <string name="grade_assignment_short">Ödev: %d</string>
-    <string name="grade_lab_short">Lab: %d</string>
-    <string name="grade_final_short">Final: %d</string>
-    <string name="gpa_summary">GPA Özeti</string>
-    <string name="cumulative_gpa">GPA</string>
-    <string name="grade_passed">Geçti</string>
-    <string name="grade_failed">Kaldı</string>
-
-    <!-- ── Admin Not Özeti ────────────────────────────────────── -->
-    <string name="admin_grades_title">Not Özeti</string>
-    <string name="admin_grades_subtitle">Sistem geneli not istatistikleri</string>
-    <string name="avg_gpa">Ort. GPA</string>
-    <string name="total_entered">Kayıt</string>
-    <string name="pass_rate">Geçme Oranı</string>
-    <string name="grade_distribution">Not Dağılımı</string>
-    <string name="course_grade_summary">Derse Göre</string>
-    <string name="n_students">%d öğrenci</string>
-    <string name="panel_grades">Notlar</string>
 
     <!-- ── Yoklama Girişi (Öğretim Görevlisi) ────────────────── -->
     <string name="attendance_entry_title">Yoklama Al</string>
@@ -634,4 +607,348 @@
     <string name="next_event_label">Sonraki Etkinlik</string>
     <string name="all_departments">Tüm Bölümler</string>
     <string name="academic_calendar_action">Akademik Takvim</string>
+
+    <!-- ── Telafi Dersi ────────────────────────────────────────── -->
+    <string name="nav_makeup">Telafi</string>
+    <string name="makeup_action">Telafi Planlayıcı</string>
+    <string name="makeup_voting_action">Telafi Oylaması</string>
+    <string name="makeup_title">Telafi Dersi Planlayıcı</string>
+    <string name="makeup_select_course">İptal edilecek dersi seçin</string>
+    <string name="makeup_cancel_reason">İptal Gerekçesi</string>
+    <string name="makeup_reason_hint">Neden iptal ediyorsunuz?</string>
+    <string name="makeup_propose_slots">Uygun Slot Öner</string>
+    <string name="makeup_start_voting">Oylama Başlat</string>
+    <string name="makeup_active_requests">Aktif Talepler</string>
+    <string name="makeup_no_active">Aktif oylama yok</string>
+    <string name="makeup_vote_label">Oy Ver</string>
+    <string name="makeup_confirm_slot">Saati Onayla</string>
+    <string name="makeup_confirmed">Onaylandı</string>
+    <string name="makeup_voting">Oylama Devam Ediyor</string>
+    <string name="makeup_cancelled">İptal Edildi</string>
+    <string name="makeup_no_conflict">Çakışma yok</string>
+    <string name="makeup_conflicts">%d çakışma</string>
+
+    <!-- ── Devamsızlık Riski ──────────────────────────────────── -->
+    <string name="nav_risk">Risk</string>
+    <string name="risk_action">Risk Dashboard</string>
+    <string name="risk_title">Devamsızlık Riski</string>
+    <string name="risk_critical">Kritik</string>
+    <string name="risk_warning">Uyarı</string>
+    <string name="risk_all">Tümü</string>
+    <string name="risk_no_risk">Risk altında öğrenci yok!</string>
+    <string name="risk_consec_missed">%d ardışık kaçırıldı</string>
+    <string name="risk_last_seen">Son görülme: %s</string>
+
+    <!-- ── Akran Eşleştirme ───────────────────────────────────── -->
+    <string name="nav_peer_match">Akran</string>
+    <string name="peer_match_action">Akran Eşleştirme</string>
+    <string name="peer_match_title">Akran Eşleştirme</string>
+    <string name="peer_match_run">Eşleştirmeyi Çalıştır</string>
+    <string name="peer_match_mentor">Mentor</string>
+    <string name="peer_match_mentee">Mentee</string>
+    <string name="peer_match_active">Aktif</string>
+    <string name="peer_match_pending">Bekliyor</string>
+    <string name="peer_match_declined">Reddedildi</string>
+    <string name="peer_match_accept">Kabul Et</string>
+    <string name="peer_match_decline">Reddet</string>
+    <string name="peer_match_no_matches">Henüz eşleşme yok</string>
+    <string name="peer_match_identity_hidden">Kimlik ikisi de kabul edene kadar gizlidir</string>
+
+    <!-- ── Müsaitlik Onayı ───────────────────────────────────── -->
+    <string name="avail_approve_update_title">Müsaitlik Güncellemesi</string>
+    <string name="avail_approve_title">Müsaitlik Onayı</string>
+    <string name="avail_approve_map_label">Yeni müsaitlik haritası onaylanacak:</string>
+    <string name="avail_approve_conflict_warn">%1$d ders yeni müsaitlikle uyumsuz — programdan kaldırılacak ve otomatik atama ile yeniden atanabilecek:</string>
+    <string name="avail_approve_compatible">Mevcut dersler yeni saatlerle uyumlu — program korunacak.</string>
+    <string name="badge_update">Güncelleme</string>
+    <string name="avail_slot_count_short">%1$d müsait slot</string>
+    <string name="lecturer_schedule_count">Mevcut Ders Takvimi (%1$d ders)</string>
+    <string name="no_courses_assigned_yet">Henüz ders atanmamış</string>
+    <string name="view_btn">Görüntüle</string>
+
+    <!-- ── Öğrenci ekleme doğrulama ─────────────────────────── -->
+    <string name="val_name_min_3">Ad soyad en az 3 karakter olmalıdır</string>
+    <string name="val_username_min_3">Kullanıcı adı en az 3 karakter olmalıdır</string>
+    <string name="val_password_min_6">Şifre en az 6 karakter olmalıdır</string>
+    <string name="val_select_dept">Bölüm seçiniz</string>
+    <string name="val_select_year">Sınıf yılı seçiniz</string>
+
+    <!-- ── Ders atama diyalogu ──────────────────────────────── -->
+    <string name="assign_no_avail_warn">Onaylı müsaitlik haritası yok — tüm saatler gösterilir</string>
+    <string name="assign_course_title">Ders Ata</string>
+    <string name="course_label">Ders</string>
+    <string name="select_day_first">Önce gün seçin</string>
+    <string name="time_label">Saat</string>
+    <string name="time_label_avail">Saat (müsait saatler)</string>
+    <string name="classroom_label">Sınıf</string>
+    <string name="session_type_label">Seans Tipi</string>
+    <string name="session_lecture_text">Teorik</string>
+    <string name="session_lab_text">Lab</string>
+    <string name="assign_btn_short">Ata</string>
+
+    <!-- ── Atama hata mesajları ─────────────────────────────── -->
+    <string name="error_lecturer_clash">Çakışma: %1$s aynı saatte!</string>
+    <string name="error_classroom_clash">Sınıf meşgul: %1$s</string>
+    <string name="clash_lecturer_detail">Çakışma! %1$s aynı saatte %2$s dersini veriyor\n(%3$s %4$s)</string>
+    <string name="clash_classroom_detail">Çakışma! %1$s sınıfı aynı saatte %2$s dersine atanmış\n(%3$s %4$s)</string>
+    <string name="error_prefix">Hata: %1$s</string>
+
+    <!-- ── Şifre sıfırlama ──────────────────────────────────── -->
+    <string name="password_not_changed">Şifre değiştirilmedi</string>
+    <string name="reset_password_title">Şifre Sıfırla</string>
+    <string name="reset_password_for">%1$s (@%2$s) için yeni şifre belirleyin.</string>
+    <string name="new_password_label">Yeni Şifre</string>
+    <string name="min_6_chars_hint">En az 6 karakter</string>
+    <string name="reset_password_note">Hoca bir sonraki girişte şifresini değiştirmek zorunda kalacak.</string>
+    <string name="reset_password_success">%1$s şifresi sıfırlandı.</string>
+    <string name="reset_password_failed">Şifre sıfırlama başarısız.</string>
+    <string name="reset_btn">Sıfırla</string>
+
+    <!-- ── Otomatik Atama Ekranı ────────────────────────────── -->
+    <string name="auto_assign_title">Otomatik Ders Atama</string>
+    <string name="auto_assign_subtitle">Müsaitlik haritasına göre dersler otomatik atanır</string>
+    <string name="auto_assign_computing">Hesaplanıyor…</string>
+    <string name="auto_assign_computing_desc">Müsaitlikler ve sınıflar kontrol ediliyor</string>
+    <string name="select_all_btn">Tümünü Seç</string>
+    <string name="deselect_all_btn">Tümünü Kaldır</string>
+    <string name="refresh_btn">Yenile</string>
+    <string name="auto_assign_empty">Atanacak ders bulunamadı</string>
+    <string name="auto_assign_empty_hint">Hocaların müsaitlik haritası girilmiş olmalı</string>
+    <string name="auto_assign_proposals">Önerilen Atamalar (%1$d)</string>
+    <string name="auto_assign_unassigned">Atanamayan Dersler (%1$d)</string>
+    <string name="auto_assign_no_fit">Uygun hoca/saat/sınıf bulunamadı</string>
+    <string name="warnings_title">Uyarılar</string>
+    <string name="auto_assign_save">%1$d Atamayı Kaydet</string>
+    <string name="auto_assign_none">Atama Seçilmedi</string>
+    <string name="saving_firebase">Firebase\'e kaydediliyor…</string>
+    <string name="done_title">Tamamlandı!</string>
+    <string name="how_it_works_title">Nasıl Çalışır?</string>
+    <string name="auto_step_1">Hocaların müsaitlik haritaları incelenir</string>
+    <string name="auto_step_2">Her ders için uygun hoca, saat ve sınıf bulunur</string>
+    <string name="auto_step_3">Çakışmalar otomatik engellenir</string>
+    <string name="auto_step_4">Lab dersleri için ayrı lab seansı eklenir</string>
+    <string name="auto_step_5">Yük dengeleme ile adil dağılım sağlanır</string>
+    <string name="prerequisites">Ön Koşullar</string>
+    <string name="prereq_courses">Atanacak ders var</string>
+    <string name="prereq_avail">Onaylı müsaitlik var</string>
+    <string name="prereq_classrooms">Sınıf tanımlı</string>
+    <string name="start_auto_assign">Otomatik Atamayı Başlat</string>
+    <string name="auto_assign_btn">Otomatik Ata</string>
+    <string name="auto_assign_result">%1$d ders atandı%2$s</string>
+
+    <!-- ── Müsaitlik yönetici ekranı ────────────────────────── -->
+    <string name="status_approved">Onaylandı</string>
+    <string name="status_rejected">Reddedildi</string>
+    <string name="status_pending">Onay Bekliyor</string>
+    <string name="admin_note_display">Not: \"%1$s\"</string>
+    <string name="avail_count_title">%1$d hoca müsaitlik haritası</string>
+    <string name="avail_grid_legend">Sayı = o saatte müsait hoca adedi</string>
+
+    <!-- ── Program giriş tercih etiketi ─────────────────────── -->
+    <string name="preference_label">Tercih:</string>
+
+    <!-- ── Sınıf kapasite hatası ─────────────────────────────── -->
+    <string name="classroom_capacity_error">Kapasite 1 ile 2000 arasında olmalıdır</string>
+
+    <!-- ── Giriş doğrulama ───────────────────────────────────── -->
+    <string name="val_username_required">Kullanıcı adı boş bırakılamaz</string>
+    <string name="val_password_required">Şifre boş bırakılamaz</string>
+    <string name="pwd_req_length">6+ karakter</string>
+    <string name="pwd_req_upper">Büyük harf</string>
+    <string name="pwd_req_lower">Küçük harf</string>
+    <string name="pwd_req_digit">Rakam</string>
+    <string name="no_account_prompt">Hesabın yok mu? </string>
+    <string name="register_btn_text">Kayıt Ol</string>
+    <string name="resend_verification">Doğrulama Maili Yeniden Gönder</string>
+    <string name="email_unverified">E-posta adresiniz (%1$s) doğrulanmamış. Lütfen gelen kutunuzu kontrol edin.</string>
+
+    <!-- ── QR Yoklama ekranları ──────────────────────────────── -->
+    <string name="qr_session_create_failed">Oturum oluşturulamadı</string>
+    <string name="qr_select_course_hint">Yoklama almak istediğiniz dersi seçin</string>
+    <string name="qr_no_courses">Atanmış ders bulunamadı.</string>
+    <string name="qr_course_not_scheduled">Bu ders şu an programda görünmüyor. Yine de yoklama başlatabilirsiniz.</string>
+    <string name="qr_creating_session">Oturum oluşturuluyor…</string>
+    <string name="qr_start_attendance">Yoklamayı Başlat (%1$d dk)</string>
+    <string name="qr_duration_label">Yoklama Süresi</string>
+    <string name="qr_time_left">%1$02d:%2$02d kaldı</string>
+    <string name="qr_time_warning">Süre bitiyor!</string>
+    <string name="qr_students_attending">Katılan Öğrenciler (%1$d)</string>
+    <string name="qr_no_students_yet">Henüz kimse katılmadı…</string>
+    <string name="qr_end_session">Yoklamayı Bitir</string>
+    <string name="qr_code_label">QR Kodu — Her 30 saniyede bir değişir</string>
+    <string name="qr_preparing">QR hazırlanıyor…</string>
+    <string name="ble_active">Bluetooth Yayını Aktif</string>
+    <string name="ble_inactive">Bluetooth Yayını Kapalı</string>
+    <string name="ble_hint_active">Öğrenciler BLE ile yakınlık doğrulayabilir (kod: %1$s)</string>
+    <string name="ble_hint_inactive">Aktif etmek öğrencilerin otomatik doğrulamasını sağlar</string>
+    <string name="qr_extend_time">Süreyi Uzat</string>
+    <string name="qr_scan_prompt">Hocanın ekranındaki QR kodu tarayın</string>
+    <string name="qr_active_sessions_title">Aktif Yoklama Oturumları</string>
+    <string name="qr_active_sessions_desc">Bölümünüzde şu an açık olan yoklama oturumlarını görmektesiniz.</string>
+    <string name="qr_no_active_sessions">Şu an aktif yoklama oturumu yok</string>
+    <string name="qr_no_active_hint">Hocanız yoklamayı başlattığında burada görünür.</string>
+    <string name="qr_time_remaining">%1$d dk kaldı</string>
+    <string name="qr_students_count">  %1$d katıldı  </string>
+    <string name="qr_join_attendance">Yoklamaya Katıl</string>
+    <string name="qr_ble_verifying">Bluetooth ile Doğrulanıyor</string>
+    <string name="qr_ble_searching">Hocanın cihazı aranıyor… (%1$ds)</string>
+    <string name="qr_ble_fallback">Bluetooth çalışmıyor → QR ile devam et</string>
+    <string name="qr_scan_title">QR Kodu ile Katıl</string>
+    <string name="qr_scan_subtitle">Hocanın ekranındaki QR kodu tarayın.\nQR kodu 30 saniyede bir yenilenir.</string>
+    <string name="qr_result_success">Yoklamanız Alındı!</string>
+    <string name="qr_result_already">Zaten Kaydedilmiş</string>
+    <string name="qr_result_expired">Oturum Süresi Dolmuş</string>
+    <string name="qr_result_invalid">Geçersiz QR Kodu</string>
+    <string name="qr_result_error">Bir Hata Oluştu</string>
+    <string name="qr_detail_success">%1$s dersine %2$s ile katıldınız.</string>
+    <string name="qr_detail_already">%1$s için yoklamanız zaten kaydedilmiş.</string>
+    <string name="qr_detail_expired">Bu yoklama oturumunun süresi dolmuş.</string>
+    <string name="qr_detail_invalid">QR kod geçersiz ya da süresi geçmiş. Güncel kodu tarayın.</string>
+    <string name="qr_detail_error">Lütfen tekrar deneyin.</string>
+    <string name="qr_attendance_title">Yoklama</string>
+    <string name="ble_disabled">Bluetooth kapalı — lütfen açın</string>
+    <string name="ble_not_supported">Bu cihaz BLE yayını desteklemiyor</string>
+    <string name="ble_start_failed">BLE başlatılamadı: %1$s</string>
+    <string name="ble_advertise_perm">Bluetooth Advertise izni gerekli</string>
+
+    <!-- ── Telafi Dersi ekranları ────────────────────────────── -->
+    <string name="makeup_planner_title">Telafi Dersi Planlayıcı</string>
+    <string name="makeup_no_courses">Atanmış ders bulunamadı.</string>
+    <string name="makeup_enter_reason">İptal Gerekçesi Gir</string>
+    <string name="makeup_reason_label">İptal Gerekçesi</string>
+    <string name="makeup_propose_btn">Uygun Slot Öner</string>
+    <string name="makeup_propose_desc">Öğrencilerin oylayacağı 3 öneri</string>
+    <string name="makeup_no_slots_found">Uygun slot bulunamadı. Süreli aramayı genişletin.</string>
+    <string name="makeup_selected_slots">Çakışan öğrenci sayısı en az olan slotlar seçildi.</string>
+    <string name="makeup_start_voting_btn">Oylama Başlat</string>
+    <string name="makeup_voting_title">Telafi Oylaması</string>
+    <string name="makeup_voting_desc">Katılabileceğiniz telafi saatini seçin.</string>
+    <string name="makeup_past_requests">Geçmiş Talepler</string>
+    <string name="makeup_lecturer_cancelled">%1$s • İptal: %2$s %3$s</string>
+    <string name="makeup_votes_left">%1$d oy • %2$ds kaldı</string>
+    <string name="makeup_already_voted">Oy kullandınız</string>
+    <string name="makeup_cancel_btn">İptal</string>
+    <string name="makeup_best_slot_label">En çok oy alan slot:</string>
+    <string name="makeup_no_votes_yet">Henüz oy yok — bir slot seçin.</string>
+    <string name="makeup_all_slots_label">Tüm slotlar:</string>
+    <string name="makeup_confirm_top">En Çok Oylanı Onayla</string>
+    <string name="makeup_status_confirmed">Onaylandı</string>
+    <string name="makeup_status_cancelled">İptal Edildi</string>
+    <string name="makeup_no_conflict_label">Çakışma yok</string>
+    <string name="makeup_conflict_count">%1$d çakışma</string>
+
+    <!-- ── Telafi ekstra keyler ────────────────────────────────── -->
+    <string name="makeup_active_section">Aktif Talepler</string>
+    <string name="makeup_which_course">Hangi dersi iptal edeceksiniz?</string>
+    <string name="makeup_saving">Kaydediliyor…</string>
+    <string name="makeup_no_active_hint">Hocanız bir dersi iptal ettiğinde burada oylama görünecek.</string>
+    <string name="makeup_active_count">%1$d aktif oylama var</string>
+    <string name="makeup_join_time_hint">Katılabileceğiniz telafi saatini seçin.</string>
+    <string name="makeup_status_voting">Oylama Devam Ediyor</string>
+    <string name="makeup_date_time">Telafi Tarihi: %1$s %2$s</string>
+    <string name="makeup_vote_detail">%1$s · %2$s · %3$d oy</string>
+    <string name="makeup_slot_detail">%1$s %2$s · %3$d oy</string>
+    <string name="makeup_vote_btn">Oy Ver</string>
+    <string name="makeup_voted_badge">Oy kullandınız</string>
+    <string name="makeup_approve_btn">Onayla</string>
+    <string name="makeup_cancel_request_btn">İptal</string>
+    <string name="makeup_which_time_dialog">Hangi zaman uygun?</string>
+    <string name="makeup_confirm_slot_title">Telafi Saatini Onayla</string>
+    <string name="makeup_vote_count">%1$d oy</string>
+
+    <!-- ── Akran Eşleştirme ekranları ───────────────────────── -->
+    <string name="peer_admin_title">Akran Eşleştirme</string>
+    <string name="peer_select_dept">Bölüm Seç</string>
+    <string name="peer_run_auto">Otomatik Eşleştir</string>
+    <string name="peer_result_found">%1$d yeni eşleşme oluşturuldu.</string>
+    <string name="peer_result_none">Yeni eşleşme bulunamadı (zaten eşleşmiş ya da yeterli veri yok).</string>
+    <string name="peer_running">Eşleştiriliyor…</string>
+    <string name="peer_run_btn">Eşleştirmeyi Çalıştır</string>
+    <string name="peer_active_matches">Aktif Eşleşmeler (%1$d)</string>
+    <string name="peer_no_matches">Henüz eşleşme yok.</string>
+    <string name="peer_past_matches">Geçmiş (%1$d)</string>
+    <string name="peer_student_title">Akran Eşleşmelerim</string>
+    <string name="peer_student_subtitle">Mentor / Mentee bağlantıları</string>
+    <string name="peer_no_student_matches">Henüz eşleşme yok</string>
+    <string name="peer_no_student_hint">Bölüm admini eşleştirme çalıştırdığında burada görünecek.</string>
+    <string name="peer_active_section">Aktif Eşleşmeler</string>
+    <string name="peer_past_section">Geçmiş</string>
+    <string name="peer_cancel_match">Eşleşmeyi İptal Et</string>
+    <string name="peer_you_are_mentor">Siz mentor olarak seçildiniz</string>
+    <string name="peer_mentor_assigned">Size mentor atandı</string>
+    <string name="peer_mentee_hidden">Mentee — kimlik gizli (henüz aktif değil)</string>
+    <string name="peer_mentor_hidden">Mentor — kimlik gizli (henüz aktif değil)</string>
+    <string name="peer_you_accepted">Kabul ettiniz — diğer taraf bekleniyor</string>
+    <string name="peer_status_expired">Süresi Doldu</string>
+
+    <!-- ── Akran eşleştirme ekstra ──────────────────────────────── -->
+    <string name="peer_admin_subtitle">Mentor–Mentee otomatik pairing</string>
+    <string name="peer_criteria">≥ 75%% devam = mentor · &lt; 65%% devam = mentee</string>
+    <string name="peer_status_active">Aktif</string>
+    <string name="peer_status_declined">Reddedildi</string>
+    <string name="peer_status_pending">Bekliyor</string>
+
+    <!-- ── Devamsızlık Riski ekranları ──────────────────────── -->
+    <string name="risk_screen_title">Devamsızlık Riski</string>
+    <string name="risk_screen_subtitle">Derslerinizdeki risk altındaki öğrenciler</string>
+    <string name="risk_empty_title">Risk altında öğrenci yok!</string>
+    <string name="risk_empty_desc">Seçili filtrede risk kaydı bulunamadı.</string>
+    <string name="risk_warning_count">Uyarı</string>
+    <string name="risk_filter_all">Tümü</string>
+    <string name="risk_filter_critical">Kritik</string>
+    <string name="risk_filter_warning">Uyarı</string>
+    <string name="risk_detail_attended">Katıldı</string>
+    <string name="risk_detail_consec">Ardışık Kaçırdı</string>
+    <string name="risk_detail_consec_val">%1$d seans</string>
+    <string name="risk_detail_last_seen">Son Görülme</string>
+
+    <!-- ── Risk ekranı ekstra ───────────────────────────────────── -->
+    <string name="risk_admin_title">Risk Dashboard</string>
+    <string name="risk_admin_subtitle">Bölüm: %1$s</string>
+    <string name="risk_summary_critical">Kritik</string>
+    <string name="risk_summary_warning">Uyarı</string>
+    <string name="risk_summary_total">Toplam</string>
+    <string name="risk_course_header">  %1$s (%2$s) · %3$d öğrenci  </string>
+    <string name="risk_sessions_fraction">%1$d / %2$d seans</string>
+
+    <!-- ── Otomatik atama istatistik fişleri ────────────────── -->
+    <string name="auto_assign_selected_count">%1$d seçili</string>
+    <string name="auto_assign_failed_count">%1$d atanamadı</string>
+    <string name="auto_assign_warnings_count">%1$d uyarı</string>
+    <string name="auto_assign_courses_waiting">%1$d ders bekliyor</string>
+    <string name="auto_assign_lecturers_avail">%1$d hoca müsait</string>
+    <string name="auto_assign_classrooms_count">%1$d sınıf var</string>
+    <string name="classroom_person_count">%1$s · %2$d kişi · %3$s</string>
+
+    <!-- ── Admin ayarlar ekranı ──────────────────────────────── -->
+    <string name="admin_system_manager">Sistem Yöneticisi</string>
+    <string name="admin_stat_lecturers">Hoca</string>
+    <string name="admin_stat_students">Öğrenci</string>
+    <string name="admin_stat_courses">Ders</string>
+    <string name="admin_stat_pending">Bekleyen</string>
+    <string name="admin_pending_regs_title">Onay Bekleyen Kayıtlar</string>
+    <string name="admin_system_settings">Sistem Ayarları</string>
+    <string name="admin_account_security">Hesap Güvenliği</string>
+    <string name="admin_password_managed">Admin şifresi sistem tarafından yönetilir.</string>
+    <string name="role_label_student">  Öğrenci  </string>
+    <string name="role_label_admin">  Admin  </string>
+    <string name="role_label_lecturer">  Hoca  </string>
+    <string name="tab_courses_data">Dersler</string>
+    <string name="tab_lecturers_data">Öğretmenler</string>
+    <string name="tab_classrooms_data">Sınıflar</string>
+
+    <!-- ── QR/BLE ekranı ekstra ──────────────────────────────── -->
+    <string name="qr_title_lecturer">QR/BLE Yoklama</string>
+    <string name="qr_title_student">Yoklama Katılımı</string>
+    <string name="qr_session_ended_toast">Yoklama oturumu sona erdi</string>
+    <string name="qr_active_slot_badge">  Aktif Ders Saati  </string>
+    <string name="qr_saved_badge">Kaydedildi</string>
+    <string name="qr_mins_unit">dk</string>
+    <string name="qr_extend_title">Süreyi Uzat</string>
+    <string name="qr_extend_5">+5 dakika</string>
+    <string name="qr_extend_10">+10 dakika</string>
+    <string name="qr_extend_15">+15 dakika</string>
+    <string name="qr_extend_quick_5">+5 dk</string>
+    <string name="qr_extend_quick_10">+10 dk</string>
+    <string name="qr_ok_btn">Tamam</string>
 </resources>

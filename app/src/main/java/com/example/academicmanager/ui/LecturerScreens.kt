@@ -201,13 +201,6 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 LecturerActionCard(
-                    label = stringResource(R.string.grade_entry_action),
-                    icon = Icons.Default.Grade,
-                    color = EmeraldGreen,
-                    modifier = Modifier.weight(1f),
-                    onClick = { navController.navigate("grade_entry") }
-                )
-                LecturerActionCard(
                     label = stringResource(R.string.attendance_action),
                     icon = Icons.Default.HowToReg,
                     color = Color(0xFFF59E0B),
@@ -243,6 +236,22 @@ fun LecturerHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMo
                     color = Color(0xFF3B82F6),
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("academic_calendar") }
+                )
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                LecturerActionCard(
+                    label = stringResource(R.string.makeup_action),
+                    icon = Icons.Default.EventRepeat,
+                    color = Color(0xFFF97316),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("lecturer_makeup") }
+                )
+                LecturerActionCard(
+                    label = stringResource(R.string.risk_action),
+                    icon = Icons.Default.Warning,
+                    color = Color(0xFFEF4444),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("lecturer_risk") }
                 )
             }
         }
@@ -1053,28 +1062,32 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
         .sortedByDescending { it.timestamp }
     // Onaylı harita önce, yoksa en son gönderim
     val approvedMine = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.APPROVED }
-    val latestMine   = approvedMine ?: myAvailabilities.firstOrNull()
+    val pendingMine  = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.PENDING }
+    val latestMine   = approvedMine ?: pendingMine ?: myAvailabilities.firstOrNull()
 
     val displayDays  = weekDaysShort()
     val slots        = SCHEDULE_TIME_SLOTS
 
     // İlk kez mi gönderiliyor? (daha önce hiç gönderilmemişse true)
-    val isFirstTime = myAvailabilities.isEmpty()
+    val isFirstTime      = myAvailabilities.isEmpty()
+    // Onay bekleyen PENDING güncelleme var mı?
+    val hasPendingUpdate = pendingMine != null
 
     // selectedSlots[dayIdx] = set of slotIdx — mevcut onaylı haritadan başlat
     var selectedSlots        by remember { mutableStateOf<Map<Int, Set<Int>>>(emptyMap()) }
     var initialized          by remember { mutableStateOf(false) }
     var isSaving             by remember { mutableStateOf(false) }
     var showFirstTimeConfirm by remember { mutableStateOf(false) }
+    var showUpdateConfirm    by remember { mutableStateOf(false) }
     val context       = LocalContext.current
     val totalSelected = selectedSlots.values.sumOf { it.size }
 
-    // Onaylı harita gelince grid'e yükle (sadece bir kez — null iken initialized=true YAPMA)
-    LaunchedEffect(approvedMine) {
-        if (!initialized && approvedMine != null) {
+    // Onaylı/bekleyen harita gelince grid'e yükle (sadece bir kez)
+    LaunchedEffect(latestMine) {
+        if (!initialized && latestMine != null) {
             val loaded = mutableMapOf<Int, Set<Int>>()
             WEEK_DAYS_FULL.forEachIndexed { dayIdx, day ->
-                val daySlots = approvedMine.slotsForDay(day)
+                val daySlots = latestMine.slotsForDay(day)
                 if (daySlots.isNotEmpty()) {
                     loaded[dayIdx] = daySlots
                         .mapNotNull { s -> slots.indexOf(s).takeIf { it >= 0 } }
@@ -1148,8 +1161,27 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             }
         }
 
+        // ── Onay bekleyen güncelleme banner'ı ────────────────
+        if (hasPendingUpdate && approvedMine != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF59E0B).copy(alpha = 0.1f)),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.4f))
+            ) {
+                Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.HourglassTop, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text(stringResource(R.string.avail_update_pending_title), color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.avail_update_pending_body), color = AppColorState.textSecondary, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
+
         // ── Reddedildi notu (varsa) ───────────────────────────
-        val rejected = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.REJECTED }
+        val rejected = myAvailabilities.firstOrNull { it.status == AvailabilityStatus.REJECTED && it.adminNote != "superseded" }
         if (rejected != null && rejected.adminNote.isNotBlank()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -1323,28 +1355,26 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     } else if (isFirstTime) {
                         // İlk gönderim → onay dialogu göster
                         showFirstTimeConfirm = true
+                    } else if (hasPendingUpdate) {
+                        // Zaten onay bekleyen var — hiçbir şey yapma
+                        Toast.makeText(context, context.getString(R.string.avail_update_already_pending), Toast.LENGTH_SHORT).show()
                     } else {
-                        // Güncelleme → direkt APPROVED olarak kaydet
-                        isSaving = true
-                        adminViewModel.updateOwnAvailability(
-                            lecturerUsername = user.username,
-                            lecturerName     = user.fullName,
-                            slots            = buildSlotsMap(),
-                            onComplete       = { success ->
-                                isSaving = false
-                                val msg = if (success) context.getString(R.string.avail_update_success) else context.getString(R.string.avail_update_failed)
-                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                            }
-                        )
+                        // Güncelleme → admin onayına gönder (confirm dialog)
+                        showUpdateConfirm = true
                     }
                 },
-                enabled = !isSaving,
+                enabled = !isSaving && !hasPendingUpdate,
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = when {
-                        totalSelected == 0         -> AppColorState.textSecondary.copy(alpha = 0.3f)
-                        isFirstTime                -> Color(0xFF6366F1)  // mor — ilk gönderim
-                        else                       -> EmeraldGreen
+                        totalSelected == 0 -> AppColorState.textSecondary.copy(alpha = 0.3f)
+                        isFirstTime        -> Color(0xFF6366F1)
+                        hasPendingUpdate   -> Color(0xFFF59E0B)
+                        else               -> EmeraldGreen
+                    },
+                    disabledContainerColor = when {
+                        hasPendingUpdate -> Color(0xFFF59E0B).copy(alpha = 0.5f)
+                        else             -> AppColorState.textSecondary.copy(alpha = 0.3f)
                     }
                 ),
                 shape = RoundedCornerShape(12.dp)
@@ -1353,6 +1383,10 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
                     CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.avail_saving), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
+                } else if (hasPendingUpdate) {
+                    Icon(Icons.Default.HourglassTop, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.avail_update_waiting), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.labelLarge)
                 } else {
                     Icon(
                         if (isFirstTime) Icons.AutoMirrored.Filled.Send else Icons.Default.Check,
@@ -1442,6 +1476,63 @@ fun LecturerAvailabilityScreen(authViewModel: AuthViewModel, adminViewModel: Adm
             },
             dismissButton = {
                 TextButton(onClick = { showFirstTimeConfirm = false }) {
+                    Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
+                }
+            }
+        )
+    }
+
+    // ── Güncelleme onay dialogu (admin'e gönder) ──────────────
+    if (showUpdateConfirm) {
+        AlertDialog(
+            onDismissRequest = { showUpdateConfirm = false },
+            containerColor = AppColorState.surface,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.EventAvailable, contentDescription = null, tint = EmeraldGreen, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.avail_update_confirm_title), color = EmeraldGreen, fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(stringResource(R.string.avail_update_confirm_body), color = AppColorState.textPrimary, style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Color(0xFFF59E0B).copy(alpha = 0.1f)).padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.Info, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.avail_update_confirm_warn), color = Color(0xFFF59E0B), style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showUpdateConfirm = false
+                        isSaving = true
+                        adminViewModel.updateOwnAvailability(
+                            lecturerUsername = user.username,
+                            lecturerName     = user.fullName,
+                            slots            = buildSlotsMap(),
+                            onComplete       = { success ->
+                                isSaving = false
+                                val msg = if (success) context.getString(R.string.avail_update_sent_msg) else context.getString(R.string.avail_update_failed)
+                                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                            }
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = EmeraldGreen),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.Send, null, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.avail_yes_send), fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUpdateConfirm = false }) {
                     Text(stringResource(R.string.cancel), color = AppColorState.textSecondary)
                 }
             }

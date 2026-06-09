@@ -34,6 +34,10 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
     val students: StateFlow<List<Lecturer>> = repository.getStudents()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // Yoklama kayıtları (Peer Match algoritması için)
+    val attendanceRecords: StateFlow<List<AttendanceRecord>> = repository.getAttendanceRecords()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     // Atanmamış öğretim görevlileri (real-time panel)
     val unassignedLecturers: StateFlow<List<Lecturer>> = combine(lecturers, scheduleEntries) { lects, entries ->
         val assignedNames = entries.map { it.lecturerName }.toSet()
@@ -320,7 +324,7 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
         }
     }
 
-    // Hocanın kendi haritasını admin onayı olmadan direkt APPROVED olarak günceller
+    // Hocanın kendi haritası: PENDING olarak gönderir, admin onayına gider
     fun updateOwnAvailability(
         lecturerUsername: String,
         lecturerName: String,
@@ -329,26 +333,18 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
     ) {
         viewModelScope.launch {
             try {
-                val existing = availabilities.value
-                    .filter { it.lecturerUsername == lecturerUsername && it.status == AvailabilityStatus.APPROVED }
-                    .maxByOrNull { it.timestamp }
-
-                val updated = LecturerAvailability(
-                    id               = existing?.id ?: "",
-                    lecturerUsername = lecturerUsername,
-                    lecturerName     = lecturerName,
-                    monday           = slots["Monday"]    ?: emptyList(),
-                    tuesday          = slots["Tuesday"]   ?: emptyList(),
-                    wednesday        = slots["Wednesday"] ?: emptyList(),
-                    thursday         = slots["Thursday"]  ?: emptyList(),
-                    friday           = slots["Friday"]    ?: emptyList(),
-                    status           = AvailabilityStatus.APPROVED
+                repository.addAvailability(
+                    LecturerAvailability(
+                        lecturerUsername = lecturerUsername,
+                        lecturerName     = lecturerName,
+                        monday           = slots["Monday"]    ?: emptyList(),
+                        tuesday          = slots["Tuesday"]   ?: emptyList(),
+                        wednesday        = slots["Wednesday"] ?: emptyList(),
+                        thursday         = slots["Thursday"]  ?: emptyList(),
+                        friday           = slots["Friday"]    ?: emptyList(),
+                        status           = AvailabilityStatus.PENDING
+                    )
                 )
-                if (existing != null) {
-                    repository.updateAvailability(updated)
-                } else {
-                    repository.addAvailability(updated)
-                }
                 onComplete(true)
             } catch (_: Exception) {
                 onComplete(false)
@@ -362,6 +358,34 @@ class AdminViewModel(private val repository: UniversityRepository) : ViewModel()
                 repository.updateAvailability(
                     availability.copy(status = AvailabilityStatus.APPROVED)
                 )
+            } catch (_: Exception) { }
+        }
+    }
+
+    // Müsaitlik güncelleme onayı: çakışan program girişlerini siler, eski APPROVED kaydı reddeder
+    fun approveAvailabilityWithMigration(availability: LecturerAvailability) {
+        viewModelScope.launch {
+            try {
+                val DAYS = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+                val newSlotKeys = DAYS.flatMap { day ->
+                    availability.slotsForDay(day).map { slot -> "$day|$slot" }
+                }.toSet()
+
+                // Eski APPROVED kaydını "değiştirildi" olarak işaretle
+                availabilities.value
+                    .filter { it.lecturerUsername == availability.lecturerUsername && it.status == AvailabilityStatus.APPROVED }
+                    .forEach { old ->
+                        repository.updateAvailability(old.copy(status = AvailabilityStatus.REJECTED, adminNote = "superseded"))
+                    }
+
+                // Yeni saatlerle uyumsuz program girişlerini sil
+                scheduleEntries.value
+                    .filter { it.lecturerName == availability.lecturerName }
+                    .filter { "${it.dayOfWeek}|${it.timeSlot}" !in newSlotKeys }
+                    .forEach { repository.deleteScheduleEntry(it.id) }
+
+                // Yeni müsaitliği onayla
+                repository.updateAvailability(availability.copy(status = AvailabilityStatus.APPROVED))
             } catch (_: Exception) { }
         }
     }

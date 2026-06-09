@@ -151,13 +151,6 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StudentActionCard(
-                    label = stringResource(R.string.my_grades_action),
-                    icon = Icons.Default.Grade,
-                    color = IndigoAccent,
-                    modifier = Modifier.weight(1f),
-                    onClick = { navController.navigate("my_grades") }
-                )
-                StudentActionCard(
                     label = stringResource(R.string.my_attendance_action),
                     icon = Icons.Default.HowToReg,
                     color = Color(0xFFF59E0B),
@@ -193,6 +186,22 @@ fun StudentHomeScreen(authViewModel: AuthViewModel, adminViewModel: AdminViewMod
                     color = Color(0xFF3B82F6),
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("academic_calendar") }
+                )
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StudentActionCard(
+                    label = stringResource(R.string.makeup_voting_action),
+                    icon = Icons.Default.HowToVote,
+                    color = Color(0xFFF97316),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("student_makeup") }
+                )
+                StudentActionCard(
+                    label = stringResource(R.string.peer_match_action),
+                    icon = Icons.Default.People,
+                    color = Color(0xFF8B5CF6),
+                    modifier = Modifier.weight(1f),
+                    onClick = { navController.navigate("student_peer_match") }
                 )
             }
         }

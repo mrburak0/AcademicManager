@@ -146,7 +146,7 @@
 
     <!-- Pending registrations -->
     <string name="reject_reg_title">Reject Registration</string>
-    <string name="reject_reg_msg">%s (@%s) will be deleted.</string>
+    <string name="reject_reg_msg">%1$s (@%2$s) will be deleted.</string>
     <string name="reject_and_delete">Reject &amp; Delete</string>
 
     <!-- ── Classrooms ──────────────────────────────────────────── -->
@@ -189,7 +189,7 @@
     <string name="current_schedule">Current Schedule (%d)</string>
     <string name="assignment_saved">Assignment saved successfully!</string>
     <string name="remove_assignment_title">Remove Assignment</string>
-    <string name="remove_assignment_msg">Remove %s from %s at %s?</string>
+    <string name="remove_assignment_msg">Remove %1$s from %2$s at %3$s?</string>
     <string name="remove">Remove</string>
 
     <!-- ── Weekdays ───────────────────────────────────────────── -->
@@ -483,6 +483,14 @@
     <string name="avail_update_success">Your availability map has been updated!</string>
     <string name="avail_update_failed">Update failed, please try again.</string>
     <string name="avail_sent_admin_msg">Your availability has been sent for admin approval!</string>
+    <string name="avail_update_pending_title">Change pending approval</string>
+    <string name="avail_update_pending_body">Your availability change has been sent to admin. Current map remains active until approved.</string>
+    <string name="avail_update_waiting">Awaiting approval…</string>
+    <string name="avail_update_already_pending">A change is already pending admin approval.</string>
+    <string name="avail_update_confirm_title">Send Update Request</string>
+    <string name="avail_update_confirm_body">Your updated availability will be sent to the admin for approval. Courses assigned in removed slots will be unscheduled upon approval.</string>
+    <string name="avail_update_confirm_warn">Conflicting schedule entries will be removed on approval so they can be reassigned.</string>
+    <string name="avail_update_sent_msg">Your availability change has been sent for admin approval!</string>
     <string name="avail_map_active">Map active (%d slots)</string>
     <string name="avail_rejected_edit">Rejected — please edit</string>
     <string name="avail_pending_approval">Awaiting admin approval</string>
@@ -493,52 +501,17 @@
     <string name="copy">Copy</string>
 
     <!-- ── Navigation (new) ──────────────────────────────────── -->
-    <string name="nav_grades">Grades</string>
     <string name="nav_attendance">Attendance</string>
 
     <!-- ── Quick Actions ─────────────────────────────────────── -->
     <string name="quick_actions">Quick Actions</string>
-    <string name="grade_entry_action">Enter Grades</string>
     <string name="attendance_action">Attendance</string>
-    <string name="my_grades_action">My Grades</string>
     <string name="my_attendance_action">Attendance</string>
 
-    <!-- ── Grade Entry (Lecturer) ─────────────────────────────── -->
-    <string name="grade_entry_title">Grade Entry</string>
-    <string name="grade_entry_subtitle">Select a course to enter student grades</string>
+    <!-- ── Attendance Entry (Lecturer) ───────────────────────── -->
     <string name="no_assigned_courses">No courses assigned to you yet.</string>
-    <string name="students_label">students</string>
     <string name="no_students_in_dept">No students found in this department.</string>
-    <string name="grade_midterm">Midterm</string>
-    <string name="grade_assignment">Assignment</string>
-    <string name="grade_lab">Lab</string>
-    <string name="grade_final">Final</string>
-    <string name="grade_preview">Weighted Average / Letter Grade</string>
-    <string name="grade_save">Save Grade</string>
-
-    <!-- ── My Grades (Student) ────────────────────────────────── -->
-    <string name="my_grades_title">My Grades</string>
     <string name="no_dept_courses">No courses found for your department.</string>
-    <string name="grade_not_entered">Not entered</string>
-    <string name="grade_midterm_short">Vize: %d</string>
-    <string name="grade_assignment_short">Ödev: %d</string>
-    <string name="grade_lab_short">Lab: %d</string>
-    <string name="grade_final_short">Final: %d</string>
-    <string name="gpa_summary">GPA Summary</string>
-    <string name="cumulative_gpa">GPA</string>
-    <string name="grade_passed">Passed</string>
-    <string name="grade_failed">Failed</string>
-
-    <!-- ── Admin Grades Overview ──────────────────────────────── -->
-    <string name="admin_grades_title">Grades Overview</string>
-    <string name="admin_grades_subtitle">System-wide grade statistics</string>
-    <string name="avg_gpa">Avg GPA</string>
-    <string name="total_entered">Entries</string>
-    <string name="pass_rate">Pass Rate</string>
-    <string name="grade_distribution">Grade Distribution</string>
-    <string name="course_grade_summary">By Course</string>
-    <string name="n_students">%d students</string>
-    <string name="panel_grades">Grades</string>
 
     <!-- ── Attendance Entry (Lecturer) ───────────────────────── -->
     <string name="attendance_entry_title">Take Attendance</string>
@@ -634,4 +607,348 @@
     <string name="next_event_label">Next Event</string>
     <string name="all_departments">All Departments</string>
     <string name="academic_calendar_action">Academic Calendar</string>
+
+    <!-- ── Makeup Class Scheduler ────────────────────────────── -->
+    <string name="nav_makeup">Makeup</string>
+    <string name="makeup_action">Makeup Planner</string>
+    <string name="makeup_voting_action">Makeup Voting</string>
+    <string name="makeup_title">Makeup Class Planner</string>
+    <string name="makeup_select_course">Select the course to cancel</string>
+    <string name="makeup_cancel_reason">Cancellation Reason</string>
+    <string name="makeup_reason_hint">Why are you cancelling?</string>
+    <string name="makeup_propose_slots">Suggest Slots</string>
+    <string name="makeup_start_voting">Start Voting</string>
+    <string name="makeup_active_requests">Active Requests</string>
+    <string name="makeup_no_active">No active makeup voting</string>
+    <string name="makeup_vote_label">Vote</string>
+    <string name="makeup_confirm_slot">Confirm Slot</string>
+    <string name="makeup_confirmed">Confirmed</string>
+    <string name="makeup_voting">Voting in Progress</string>
+    <string name="makeup_cancelled">Cancelled</string>
+    <string name="makeup_no_conflict">No conflict</string>
+    <string name="makeup_conflicts">%d conflict(s)</string>
+
+    <!-- ── Attendance Risk ────────────────────────────────────── -->
+    <string name="nav_risk">Risk</string>
+    <string name="risk_action">Risk Dashboard</string>
+    <string name="risk_title">Attendance Risk</string>
+    <string name="risk_critical">Critical</string>
+    <string name="risk_warning">Warning</string>
+    <string name="risk_all">All</string>
+    <string name="risk_no_risk">No students at risk!</string>
+    <string name="risk_consec_missed">%d consecutive missed</string>
+    <string name="risk_last_seen">Last seen: %s</string>
+
+    <!-- ── Peer Matching ──────────────────────────────────────── -->
+    <string name="nav_peer_match">Peer Match</string>
+    <string name="peer_match_action">Peer Match</string>
+    <string name="peer_match_title">Peer Matching</string>
+    <string name="peer_match_run">Run Matching</string>
+    <string name="peer_match_mentor">Mentor</string>
+    <string name="peer_match_mentee">Mentee</string>
+    <string name="peer_match_active">Active</string>
+    <string name="peer_match_pending">Pending</string>
+    <string name="peer_match_declined">Declined</string>
+    <string name="peer_match_accept">Accept</string>
+    <string name="peer_match_decline">Decline</string>
+    <string name="peer_match_no_matches">No matches yet</string>
+    <string name="peer_match_identity_hidden">Identity hidden until both accept</string>
+
+    <!-- ── Admin Availability Approval ──────────────────────── -->
+    <string name="avail_approve_update_title">Availability Update</string>
+    <string name="avail_approve_title">Availability Approval</string>
+    <string name="avail_approve_map_label">New availability map will be approved:</string>
+    <string name="avail_approve_conflict_warn">%1$d course(s) incompatible with new availability — will be removed and can be reassigned:</string>
+    <string name="avail_approve_compatible">Existing courses are compatible — schedule preserved.</string>
+    <string name="badge_update">Update</string>
+    <string name="avail_slot_count_short">%1$d available slots</string>
+    <string name="lecturer_schedule_count">Current Schedule (%1$d courses)</string>
+    <string name="no_courses_assigned_yet">No courses assigned yet</string>
+    <string name="view_btn">View</string>
+
+    <!-- ── Add Student validation ────────────────────────────── -->
+    <string name="val_name_min_3">Name must be at least 3 characters</string>
+    <string name="val_username_min_3">Username must be at least 3 characters</string>
+    <string name="val_password_min_6">Password must be at least 6 characters</string>
+    <string name="val_select_dept">Please select a department</string>
+    <string name="val_select_year">Please select a class year</string>
+
+    <!-- ── Course assignment dialog ──────────────────────────── -->
+    <string name="assign_no_avail_warn">No approved availability — all slots shown</string>
+    <string name="assign_course_title">Assign Course</string>
+    <string name="course_label">Course</string>
+    <string name="select_day_first">Select a day first</string>
+    <string name="time_label">Time</string>
+    <string name="time_label_avail">Time (available slots)</string>
+    <string name="classroom_label">Classroom</string>
+    <string name="session_type_label">Session Type</string>
+    <string name="session_lecture_text">Lecture</string>
+    <string name="session_lab_text">Lab</string>
+    <string name="assign_btn_short">Assign</string>
+
+    <!-- ── Assignment error messages ────────────────────────── -->
+    <string name="error_lecturer_clash">Conflict: %1$s is busy at this time!</string>
+    <string name="error_classroom_clash">Classroom busy: %1$s</string>
+    <string name="clash_lecturer_detail">Conflict! %1$s is teaching %2$s\n(%3$s %4$s)</string>
+    <string name="clash_classroom_detail">Conflict! %1$s is assigned to %2$s\n(%3$s %4$s)</string>
+    <string name="error_prefix">Error: %1$s</string>
+
+    <!-- ── Password reset ────────────────────────────────────── -->
+    <string name="password_not_changed">Password unchanged</string>
+    <string name="reset_password_title">Reset Password</string>
+    <string name="reset_password_for">Set a new password for %1$s (@%2$s).</string>
+    <string name="new_password_label">New Password</string>
+    <string name="min_6_chars_hint">At least 6 characters</string>
+    <string name="reset_password_note">Lecturer will be required to change password on next login.</string>
+    <string name="reset_password_success">%1$s\'s password has been reset.</string>
+    <string name="reset_password_failed">Password reset failed.</string>
+    <string name="reset_btn">Reset</string>
+
+    <!-- ── Auto-assign screen ────────────────────────────────── -->
+    <string name="auto_assign_title">Automatic Course Assignment</string>
+    <string name="auto_assign_subtitle">Courses are automatically assigned based on availability maps</string>
+    <string name="auto_assign_computing">Computing…</string>
+    <string name="auto_assign_computing_desc">Checking availability and classrooms</string>
+    <string name="select_all_btn">Select All</string>
+    <string name="deselect_all_btn">Deselect All</string>
+    <string name="refresh_btn">Refresh</string>
+    <string name="auto_assign_empty">No courses to assign</string>
+    <string name="auto_assign_empty_hint">Lecturers must have availability maps</string>
+    <string name="auto_assign_proposals">Suggested Assignments (%1$d)</string>
+    <string name="auto_assign_unassigned">Unassigned Courses (%1$d)</string>
+    <string name="auto_assign_no_fit">No suitable lecturer/time/classroom found</string>
+    <string name="warnings_title">Warnings</string>
+    <string name="auto_assign_save">Save %1$d Assignments</string>
+    <string name="auto_assign_none">No Assignments Selected</string>
+    <string name="saving_firebase">Saving to Firebase…</string>
+    <string name="done_title">Done!</string>
+    <string name="how_it_works_title">How Does It Work?</string>
+    <string name="auto_step_1">Lecturer availability maps are analyzed</string>
+    <string name="auto_step_2">Finds suitable lecturer, time, and classroom for each course</string>
+    <string name="auto_step_3">Conflicts are automatically prevented</string>
+    <string name="auto_step_4">Separate lab session added for lab courses</string>
+    <string name="auto_step_5">Fair distribution with load balancing</string>
+    <string name="prerequisites">Prerequisites</string>
+    <string name="prereq_courses">Courses available to assign</string>
+    <string name="prereq_avail">Approved availability exists</string>
+    <string name="prereq_classrooms">Classrooms defined</string>
+    <string name="start_auto_assign">Start Auto-Assignment</string>
+    <string name="auto_assign_btn">Auto Assign</string>
+    <string name="auto_assign_result">%1$d courses assigned%2$s</string>
+
+    <!-- ── Availability admin screen ────────────────────────── -->
+    <string name="status_approved">Approved</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="status_pending">Pending</string>
+    <string name="admin_note_display">Note: \"%1$s\"</string>
+    <string name="avail_count_title">%1$d lecturer availability maps</string>
+    <string name="avail_grid_legend">Number = count of available lecturers at that time</string>
+
+    <!-- ── Schedule entry preference label ──────────────────── -->
+    <string name="preference_label">Preference:</string>
+
+    <!-- ── Classroom capacity error ──────────────────────────── -->
+    <string name="classroom_capacity_error">Capacity must be between 1 and 2000</string>
+
+    <!-- ── Login validation ───────────────────────────────────── -->
+    <string name="val_username_required">Username cannot be empty</string>
+    <string name="val_password_required">Password cannot be empty</string>
+    <string name="pwd_req_length">6+ characters</string>
+    <string name="pwd_req_upper">Uppercase</string>
+    <string name="pwd_req_lower">Lowercase</string>
+    <string name="pwd_req_digit">Digit</string>
+    <string name="no_account_prompt">Don\'t have an account? </string>
+    <string name="register_btn_text">Register</string>
+    <string name="resend_verification">Resend Verification Email</string>
+    <string name="email_unverified">Your e-mail (%1$s) is not verified. Please check your inbox.</string>
+
+    <!-- ── QR Attendance screens ─────────────────────────────── -->
+    <string name="qr_session_create_failed">Could not create session</string>
+    <string name="qr_select_course_hint">Select the course you want to take attendance for</string>
+    <string name="qr_no_courses">No assigned courses found.</string>
+    <string name="qr_course_not_scheduled">This course is not currently in the schedule. You can still start attendance.</string>
+    <string name="qr_creating_session">Creating session…</string>
+    <string name="qr_start_attendance">Start Attendance (%1$d min)</string>
+    <string name="qr_duration_label">Attendance Duration</string>
+    <string name="qr_time_left">%1$02d:%2$02d left</string>
+    <string name="qr_time_warning">Time running out!</string>
+    <string name="qr_students_attending">Attending Students (%1$d)</string>
+    <string name="qr_no_students_yet">No one has joined yet…</string>
+    <string name="qr_end_session">End Attendance</string>
+    <string name="qr_code_label">QR Code — refreshes every 30 seconds</string>
+    <string name="qr_preparing">Preparing QR…</string>
+    <string name="ble_active">Bluetooth Broadcast Active</string>
+    <string name="ble_inactive">Bluetooth Broadcast Off</string>
+    <string name="ble_hint_active">Students can verify proximity via BLE (code: %1$s)</string>
+    <string name="ble_hint_inactive">Enable for automatic student verification</string>
+    <string name="qr_extend_time">Extend Time</string>
+    <string name="qr_scan_prompt">Scan the QR code on lecturer\'s screen</string>
+    <string name="qr_active_sessions_title">Active Attendance Sessions</string>
+    <string name="qr_active_sessions_desc">Active attendance sessions in your department.</string>
+    <string name="qr_no_active_sessions">No active attendance sessions right now</string>
+    <string name="qr_no_active_hint">Will appear here when your lecturer starts attendance.</string>
+    <string name="qr_time_remaining">%1$d min left</string>
+    <string name="qr_students_count">  %1$d attended  </string>
+    <string name="qr_join_attendance">Join Attendance</string>
+    <string name="qr_ble_verifying">Verifying via Bluetooth</string>
+    <string name="qr_ble_searching">Searching for lecturer\'s device… (%1$ds)</string>
+    <string name="qr_ble_fallback">Bluetooth failed → continue with QR</string>
+    <string name="qr_scan_title">Join via QR Code</string>
+    <string name="qr_scan_subtitle">Scan the QR code on the lecturer\'s screen.\nQR code refreshes every 30 seconds.</string>
+    <string name="qr_result_success">Attendance Recorded!</string>
+    <string name="qr_result_already">Already Recorded</string>
+    <string name="qr_result_expired">Session Expired</string>
+    <string name="qr_result_invalid">Invalid QR Code</string>
+    <string name="qr_result_error">An Error Occurred</string>
+    <string name="qr_detail_success">You joined %1$s via %2$s.</string>
+    <string name="qr_detail_already">Your attendance for %1$s is already recorded.</string>
+    <string name="qr_detail_expired">This attendance session has expired.</string>
+    <string name="qr_detail_invalid">QR code is invalid or expired. Scan the latest code.</string>
+    <string name="qr_detail_error">Please try again.</string>
+    <string name="qr_attendance_title">Attendance</string>
+    <string name="ble_disabled">Bluetooth is off — please enable it</string>
+    <string name="ble_not_supported">This device does not support BLE advertising</string>
+    <string name="ble_start_failed">BLE could not be started: %1$s</string>
+    <string name="ble_advertise_perm">Bluetooth Advertise permission required</string>
+
+    <!-- ── MakeupClass screens ───────────────────────────────── -->
+    <string name="makeup_planner_title">Makeup Class Planner</string>
+    <string name="makeup_no_courses">No assigned courses found.</string>
+    <string name="makeup_enter_reason">Enter Cancellation Reason</string>
+    <string name="makeup_reason_label">Cancellation Reason</string>
+    <string name="makeup_propose_btn">Suggest Slots</string>
+    <string name="makeup_propose_desc">3 suggestions students will vote on</string>
+    <string name="makeup_no_slots_found">No suitable slots found. Broaden your search window.</string>
+    <string name="makeup_selected_slots">Selected conflict-free slots for students.</string>
+    <string name="makeup_start_voting_btn">Start Voting</string>
+    <string name="makeup_voting_title">Makeup Voting</string>
+    <string name="makeup_voting_desc">Select the makeup time that works for you.</string>
+    <string name="makeup_past_requests">Past Requests</string>
+    <string name="makeup_lecturer_cancelled">%1$s • Cancelled: %2$s %3$s</string>
+    <string name="makeup_votes_left">%1$d votes • %2$dh left</string>
+    <string name="makeup_already_voted">Voted</string>
+    <string name="makeup_cancel_btn">Cancel</string>
+    <string name="makeup_best_slot_label">Top voted slot:</string>
+    <string name="makeup_no_votes_yet">No votes yet — select a slot.</string>
+    <string name="makeup_all_slots_label">All slots:</string>
+    <string name="makeup_confirm_top">Confirm Top Slot</string>
+    <string name="makeup_status_confirmed">Confirmed</string>
+    <string name="makeup_status_cancelled">Cancelled</string>
+    <string name="makeup_no_conflict_label">No conflict</string>
+    <string name="makeup_conflict_count">%1$d conflict(s)</string>
+
+    <!-- ── Makeup extra keys ───────────────────────────────────── -->
+    <string name="makeup_active_section">Active Requests</string>
+    <string name="makeup_which_course">Which course are you cancelling?</string>
+    <string name="makeup_saving">Saving…</string>
+    <string name="makeup_no_active_hint">When your lecturer cancels a class, voting will appear here.</string>
+    <string name="makeup_active_count">%1$d active voting(s)</string>
+    <string name="makeup_join_time_hint">Select the makeup time that works for you.</string>
+    <string name="makeup_status_voting">Voting in Progress</string>
+    <string name="makeup_date_time">Makeup Date: %1$s %2$s</string>
+    <string name="makeup_vote_detail">%1$s · %2$s · %3$d votes</string>
+    <string name="makeup_slot_detail">%1$s %2$s · %3$d votes</string>
+    <string name="makeup_vote_btn">Vote</string>
+    <string name="makeup_voted_badge">Voted</string>
+    <string name="makeup_approve_btn">Confirm</string>
+    <string name="makeup_cancel_request_btn">Cancel</string>
+    <string name="makeup_which_time_dialog">Which time works?</string>
+    <string name="makeup_confirm_slot_title">Confirm Makeup Slot</string>
+    <string name="makeup_vote_count">%1$d votes</string>
+
+    <!-- ── PeerMatch screens ─────────────────────────────────── -->
+    <string name="peer_admin_title">Peer Matching</string>
+    <string name="peer_select_dept">Select Department</string>
+    <string name="peer_run_auto">Auto Match</string>
+    <string name="peer_result_found">%1$d new matches created.</string>
+    <string name="peer_result_none">No new matches found (already matched or insufficient data).</string>
+    <string name="peer_running">Matching…</string>
+    <string name="peer_run_btn">Run Matching</string>
+    <string name="peer_active_matches">Active Matches (%1$d)</string>
+    <string name="peer_no_matches">No matches yet.</string>
+    <string name="peer_past_matches">Past (%1$d)</string>
+    <string name="peer_student_title">My Peer Matches</string>
+    <string name="peer_student_subtitle">Mentor / Mentee connections</string>
+    <string name="peer_no_student_matches">No matches yet</string>
+    <string name="peer_no_student_hint">Will appear here when department admin runs matching.</string>
+    <string name="peer_active_section">Active Matches</string>
+    <string name="peer_past_section">Past</string>
+    <string name="peer_cancel_match">Cancel Match</string>
+    <string name="peer_you_are_mentor">You were selected as mentor</string>
+    <string name="peer_mentor_assigned">A mentor was assigned to you</string>
+    <string name="peer_mentee_hidden">Mentee — identity hidden (not yet active)</string>
+    <string name="peer_mentor_hidden">Mentor — identity hidden (not yet active)</string>
+    <string name="peer_you_accepted">You accepted — waiting for the other side</string>
+    <string name="peer_status_expired">Expired</string>
+
+    <!-- ── Peer match extra ─────────────────────────────────────── -->
+    <string name="peer_admin_subtitle">Mentor–Mentee automatic pairing</string>
+    <string name="peer_criteria">≥ 75%% attendance = mentor · &lt; 65%% = mentee</string>
+    <string name="peer_status_active">Active</string>
+    <string name="peer_status_declined">Declined</string>
+    <string name="peer_status_pending">Pending</string>
+
+    <!-- ── AttendanceRisk screens ────────────────────────────── -->
+    <string name="risk_screen_title">Attendance Risk</string>
+    <string name="risk_screen_subtitle">At-risk students in your courses</string>
+    <string name="risk_empty_title">No at-risk students!</string>
+    <string name="risk_empty_desc">No risk records found for the selected filter.</string>
+    <string name="risk_warning_count">Warning</string>
+    <string name="risk_filter_all">All</string>
+    <string name="risk_filter_critical">Critical</string>
+    <string name="risk_filter_warning">Warning</string>
+    <string name="risk_detail_attended">Attended</string>
+    <string name="risk_detail_consec">Consecutive Missed</string>
+    <string name="risk_detail_consec_val">%1$d sessions</string>
+    <string name="risk_detail_last_seen">Last Seen</string>
+
+    <!-- ── Risk screen extra ────────────────────────────────────── -->
+    <string name="risk_admin_title">Risk Dashboard</string>
+    <string name="risk_admin_subtitle">Department: %1$s</string>
+    <string name="risk_summary_critical">Critical</string>
+    <string name="risk_summary_warning">Warning</string>
+    <string name="risk_summary_total">Total</string>
+    <string name="risk_course_header">  %1$s (%2$s) · %3$d students  </string>
+    <string name="risk_sessions_fraction">%1$d / %2$d sessions</string>
+
+    <!-- ── Auto-assign stat chips ────────────────────────────── -->
+    <string name="auto_assign_selected_count">%1$d selected</string>
+    <string name="auto_assign_failed_count">%1$d unassigned</string>
+    <string name="auto_assign_warnings_count">%1$d warnings</string>
+    <string name="auto_assign_courses_waiting">%1$d courses waiting</string>
+    <string name="auto_assign_lecturers_avail">%1$d lecturers available</string>
+    <string name="auto_assign_classrooms_count">%1$d classrooms</string>
+    <string name="classroom_person_count">%1$s · %2$d persons · %3$s</string>
+
+    <!-- ── Admin settings screen ─────────────────────────────── -->
+    <string name="admin_system_manager">System Administrator</string>
+    <string name="admin_stat_lecturers">Lecturers</string>
+    <string name="admin_stat_students">Students</string>
+    <string name="admin_stat_courses">Courses</string>
+    <string name="admin_stat_pending">Pending</string>
+    <string name="admin_pending_regs_title">Pending Registrations</string>
+    <string name="admin_system_settings">System Settings</string>
+    <string name="admin_account_security">Account Security</string>
+    <string name="admin_password_managed">Admin password is managed by the system.</string>
+    <string name="role_label_student">  Student  </string>
+    <string name="role_label_admin">  Admin  </string>
+    <string name="role_label_lecturer">  Lecturer  </string>
+    <string name="tab_courses_data">Courses</string>
+    <string name="tab_lecturers_data">Lecturers</string>
+    <string name="tab_classrooms_data">Classrooms</string>
+
+    <!-- ── QR/BLE screen extra ──────────────────────────────────── -->
+    <string name="qr_title_lecturer">QR/BLE Attendance</string>
+    <string name="qr_title_student">Attendance Participation</string>
+    <string name="qr_session_ended_toast">Attendance session ended</string>
+    <string name="qr_active_slot_badge">  Active Class Hour  </string>
+    <string name="qr_saved_badge">Saved</string>
+    <string name="qr_mins_unit">min</string>
+    <string name="qr_extend_title">Extend Time</string>
+    <string name="qr_extend_5">+5 minutes</string>
+    <string name="qr_extend_10">+10 minutes</string>
+    <string name="qr_extend_15">+15 minutes</string>
+    <string name="qr_extend_quick_5">+5 min</string>
+    <string name="qr_extend_quick_10">+10 min</string>
+    <string name="qr_ok_btn">OK</string>
 </resources>

@@ -215,6 +215,7 @@ class UniversityApiViewModel : ViewModel() {
     private val CITY_TO_UNIVERSITIES: Map<String, List<String>> = mapOf(
         "Adana" to listOf("Çukurova Üniversitesi", "Adana Alparslan Türkeş Bilim ve Teknoloji Üniversitesi"),
         "Adıyaman" to listOf("Adıyaman Üniversitesi"),
+        "Aksaray" to listOf("Aksaray Üniversitesi"),
         "Afyonkarahisar" to listOf("Afyon Kocatepe Üniversitesi"),
         "Ağrı" to listOf("Ağrı İbrahim Çeçen Üniversitesi"),
         "Amasya" to listOf("Amasya Üniversitesi"),

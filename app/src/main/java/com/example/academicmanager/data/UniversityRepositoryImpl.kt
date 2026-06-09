@@ -315,47 +315,6 @@ class UniversityRepositoryImpl(
         firestore.collection("exam_entries").document(id).delete().await()
     }
 
-    // ── Not Yönetimi ──────────────────────────────────────────
-
-    override fun getGrades(): Flow<List<GradeRecord>> {
-        return firestore.collection("grades")
-            .snapshots()
-            .map { it.toObjects(GradeRecord::class.java) }
-    }
-
-    override fun getGradesByCourse(courseCode: String): Flow<List<GradeRecord>> {
-        return firestore.collection("grades")
-            .whereEqualTo("courseCode", courseCode)
-            .snapshots()
-            .map { it.toObjects(GradeRecord::class.java) }
-    }
-
-    override fun getGradesByStudent(studentUsername: String): Flow<List<GradeRecord>> {
-        return firestore.collection("grades")
-            .whereEqualTo("studentUsername", studentUsername)
-            .snapshots()
-            .map { it.toObjects(GradeRecord::class.java) }
-    }
-
-    override fun getGradesByLecturer(lecturerUsername: String): Flow<List<GradeRecord>> {
-        return firestore.collection("grades")
-            .whereEqualTo("lecturerUsername", lecturerUsername)
-            .snapshots()
-            .map { it.toObjects(GradeRecord::class.java) }
-    }
-
-    override suspend fun saveGrade(grade: GradeRecord) {
-        val docRef = if (grade.id.isEmpty())
-            firestore.collection("grades").document()
-        else
-            firestore.collection("grades").document(grade.id)
-        docRef.set(grade.copy(id = docRef.id)).await()
-    }
-
-    override suspend fun deleteGrade(gradeId: String) {
-        firestore.collection("grades").document(gradeId).delete().await()
-    }
-
     // ── Yoklama Takibi ────────────────────────────────────────
 
     override fun getAttendanceRecords(): Flow<List<AttendanceRecord>> {
@@ -526,5 +485,107 @@ class UniversityRepositoryImpl(
         firestore.collection("attendance_sessions").document(sessionId)
             .update("presentStudents", com.google.firebase.firestore.FieldValue.arrayUnion(studentUsername))
             .await()
+    }
+
+    override fun getActiveSessionsByDepartment(department: String): Flow<List<AttendanceSession>> {
+        return firestore.collection("attendance_sessions")
+            .whereEqualTo("department", department)
+            .whereEqualTo("isActive", true)
+            .snapshots()
+            .map { snap ->
+                snap.toObjects(AttendanceSession::class.java)
+                    .filter { it.expiresAt > System.currentTimeMillis() }
+            }
+    }
+
+    override suspend fun getSessionById(id: String): AttendanceSession? {
+        return try {
+            firestore.collection("attendance_sessions")
+                .document(id).get().await()
+                .toObject(AttendanceSession::class.java)
+        } catch (_: Exception) { null }
+    }
+
+    override suspend fun addStudentToSessionWithMethod(
+        sessionId: String, username: String, method: String
+    ) {
+        firestore.collection("attendance_sessions").document(sessionId)
+            .update(mapOf(
+                "presentStudents" to com.google.firebase.firestore.FieldValue.arrayUnion(username),
+                "verificationMethods.$username" to method
+            )).await()
+    }
+
+    // ── Telafi Dersi ─────────────────────────────────────────
+
+    override fun getMakeupRequestsByDepartment(department: String): Flow<List<MakeupRequest>> =
+        firestore.collection("makeup_requests")
+            .whereEqualTo("department", department)
+            .snapshots()
+            .map { it.toObjects(MakeupRequest::class.java) }
+
+    override fun getMakeupRequestsByLecturer(lecturerUsername: String): Flow<List<MakeupRequest>> =
+        firestore.collection("makeup_requests")
+            .whereEqualTo("lecturerUsername", lecturerUsername)
+            .snapshots()
+            .map { it.toObjects(MakeupRequest::class.java) }
+
+    override suspend fun getMakeupRequestById(id: String): MakeupRequest? = try {
+        firestore.collection("makeup_requests").document(id).get().await()
+            .toObject(MakeupRequest::class.java)
+    } catch (_: Exception) { null }
+
+    override suspend fun saveMakeupRequest(request: MakeupRequest): MakeupRequest {
+        return if (request.id.isBlank()) {
+            val ref = firestore.collection("makeup_requests").document()
+            val saved = request.copy(id = ref.id)
+            ref.set(saved).await()
+            saved
+        } else {
+            firestore.collection("makeup_requests").document(request.id).set(request).await()
+            request
+        }
+    }
+
+    override suspend fun updateMakeupRequest(request: MakeupRequest) {
+        firestore.collection("makeup_requests").document(request.id).set(request).await()
+    }
+
+    override suspend fun voteForMakeupSlot(requestId: String, studentUsername: String, slotId: String) {
+        firestore.collection("makeup_requests").document(requestId)
+            .update("votes.$studentUsername", slotId).await()
+    }
+
+    // ── Akran Eşleştirme ─────────────────────────────────────
+
+    override fun getPeerMatchesByDepartment(department: String): Flow<List<PeerMatch>> =
+        firestore.collection("peer_matches")
+            .whereEqualTo("department", department)
+            .snapshots()
+            .map { it.toObjects(PeerMatch::class.java) }
+
+    override fun getPeerMatchesByStudent(username: String): Flow<List<PeerMatch>> =
+        firestore.collection("peer_matches")
+            .whereArrayContains("participants", username)
+            .snapshots()
+            .map { it.toObjects(PeerMatch::class.java) }
+
+    override suspend fun savePeerMatch(match: PeerMatch): PeerMatch {
+        return if (match.id.isBlank()) {
+            val ref = firestore.collection("peer_matches").document()
+            val saved = match.copy(
+                id = ref.id,
+                participants = listOf(match.mentorUsername, match.menteeUsername)
+            )
+            ref.set(saved).await()
+            saved
+        } else {
+            firestore.collection("peer_matches").document(match.id).set(match).await()
+            match
+        }
+    }
+
+    override suspend fun updatePeerMatch(match: PeerMatch) {
+        firestore.collection("peer_matches").document(match.id).set(match).await()
     }
 }
